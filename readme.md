@@ -1,6 +1,6 @@
 # Talon-GPT
 
-Use LLM tools alongside Talon.
+Use LLM tools alongside Talon. Helpful to automatically generate text or fix errors in dictation.
 
 ## Setup
 
@@ -13,4 +13,7 @@ os.environ["OPENAI_API_KEY"] = "YOUR-KEY-HERE"
 
 ## TODO
 
-Create prompts that take in arguments from voice commands. Make the the help menu less verbose. Support llamafiles or other ways to run models locally.
+- Create prompts that take in arguments from voice commands.
+- Make the the help menu less verbose.
+- Support llamafiles or other ways to run models locally.
+- Support openai vision model
