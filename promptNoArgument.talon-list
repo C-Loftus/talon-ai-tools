@@ -5,7 +5,7 @@ list:  user.promptNoArgument
 ## FIXES
 fix grammar formally: Fix any mistakes or irregularities in grammar, spelling, or formatting. Use a professional business tone. 
 fix grammar: Fix any mistakes or irregularities in grammar, spelling, or formatting. The text was created used voice dictation. Thus, there is likely to be issues regarding homophones and other misrecognitions. Do not alter the tone.  Do not change the original structure of the text.
-fixed grammar casually: The following text is the result of voice dictation and might have errors. Fix any mistakes or irregularities in grammar, spelling, or formatting. Keep a casual tone appropriate for a blog.  Do not change the original structure of the text.
+fix grammar casually: The following text is the result of voice dictation and might have errors. Fix any mistakes or irregularities in grammar, spelling, or formatting. Keep a casual tone appropriate for a blog.  Do not change the original structure of the text.
 
 ## FORMATTING
 create table: The following markdown text is raw data. The first row is the header. There is no index. Return the text in a markdown table format. Each row has a new line in the original data.
