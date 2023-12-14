@@ -1,35 +1,26 @@
 list:  user.promptNoArgument
-
 -
-# All the following commands take input from selected text and paste the GPT output.
+# All the commands in this file take input from selected text
 
-## INTELLIGENT FIXES
-create table: The following markdown text is raw data. The first row is the header. There is no index. Return the text in a markdown table format. Each row has a new line in the original data.
-
+## FIXES
 fix grammar formally: Fix any mistakes or irregularities in grammar, spelling, or formatting. Use a professional business tone. 
-
 fix grammar: Fix any mistakes or irregularities in grammar, spelling, or formatting. The text was created used voice dictation. Thus, there is likely to be issues regarding homophones and other misrecognitions. Do not alter the tone.  Do not change the original structure of the text.
-
 fixed grammar casually: The following text is the result of voice dictation and might have errors. Fix any mistakes or irregularities in grammar, spelling, or formatting. Keep a casual tone appropriate for a blog.  Do not change the original structure of the text.
 
-## SUMMARIZATIONS / TEXT GENERATION
-explain this: explain this text in a way that is easier to understand for a layman without technical knowledge
-
-summarize this: Summarize this text into a format suitable for project notes
-
+## FORMATTING
+create table: The following markdown text is raw data. The first row is the header. There is no index. Return the text in a markdown table format. Each row has a new line in the original data.
 bullet points: Convert the every paragraph into a one heading with series of bullet points underneath it. Each paragraph is separated by a new line. Separate paragraphs should not have combined bullet points. This should all be done in markdown syntax. If it is a small paragraph than you can just leave it as a heading and not add bullet points. Do not reduce content, only reduce things that would be redundant. These bullet points should be in a useful format for notes for those who want to quickly look at it. If there is a citation in the markdown original then keep the citation just at the top and not within every individual bullet point. 
 
+## TEXT GENERATION
+explain this: explain this text in a way that is easier to understand for a layman without technical knowledge
+summarize this: Summarize this text into a format suitable for project notes
 add context: Add additional text to the sentence that would be appropriate to the situation and useful in a consulting project.
-
 auto generate schema: the given text is from responses to a survey. They are open ended and have no inherent structure. Map each of these responses to a schema that would be useful for summarizing all the responses and doing categorical analysis. Generate this schema on the fly by grouping responses. Return the responses in a list with a _ separating each item. Do not make the schema overly specific. Do not make the schema category names longer than a sentence a maximum.
 
 ## CONVERSIONS
 convert to jason:  Convert the following data into a json format.
-
 convert to markdown: Convert the following plain text into a markdown format. 
-
 convert from jason to python: Convert the following json into the syntax for a python dictionary. This is essentially just serializing it into a native python format.
-
 convert from jason to markdown: Convert the following json into the syntax for a markdown list.
 
 ## TRANSLATIONS

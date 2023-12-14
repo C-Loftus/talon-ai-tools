@@ -1,6 +1,6 @@
 # Talon-GPT
 
-Use LLM tools alongside Talon. Helpful to automatically generate text or fix errors in dictation.
+Use LLM tools alongside Talon. Helpful to automatically generate text, or fix errors in dictation.
 
 ## Setup
 
