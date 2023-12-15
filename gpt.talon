@@ -14,7 +14,7 @@ model ask <user.text>:
 
 # Runs a model prompt on the selected text and sets the result to the clipboard
 ^model clip {user.promptNoArgument}$:
-    result = user.gpt_clip(user.promptNoArgument)
+    result = user.gpt_answer_question(user.promptNoArgument)
     clip.set_text(result)
 
 # TODO: make this less verbose in output
