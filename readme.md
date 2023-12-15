@@ -15,7 +15,7 @@ os.environ["OPENAI_API_KEY"] = "YOUR-KEY-HERE"
 
 You can use this repository with a [llamafile](https://github.com/Mozilla-Ocho/llamafile). Set the value `user.llm_provider = "LOCAL_LLAMA"` in `gpt-settings.talon` to change the default model.
 
-These models are easy to install and run entirely offline. They can be downloaded from the [llamafile](https://github.com/Mozilla-Ocho/llamafile) repository and require no setup. Llamafiles are compatible with the OpenAI API so you can simply run the following in a terminal to run the model as a server in the background.
+These models are easy to install and run entirely offline. They can be downloaded from the [llamafile](https://github.com/Mozilla-Ocho/llamafile) repository and require no setup. All you need to do is simply run the following in a terminal to run the model as a server in the background. Then if you have the `user.llm_provider` set, it will handle all your queries locally with no other setup needed.
 
 ```sh
 .\llava-v1.5-7b-q4-server.llamafile --nobrowser
