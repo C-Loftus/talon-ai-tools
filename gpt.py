@@ -57,7 +57,16 @@ def gpt_query(prompt: str, content: str) -> str:
             }
             data = {
                 'model': 'gpt-3.5-turbo',
-                'messages': [{'role': 'user', 'content': f"{prompt}:\n{content}"}],
+                'messages': [
+                    {
+                        "role": "system",
+                        "content": "You are an assistant helping an office worker to be more productive."
+                    },
+                    {
+                        'role': 'user', 
+                        'content': f"{prompt}:\n{content}"
+                    }
+                ],
             }
         case _:
             raise ValueError(f"Unknown LLM provider {PROVIDER}")

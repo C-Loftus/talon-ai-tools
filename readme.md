@@ -27,6 +27,8 @@ Keep in mind that running a model in the background is resource intensive and it
 
 The OpenAI API that is used in this repo, through which you make queries to GPT 3.5 (the model used for ChatGPT), is not free. However it is extremely cheap and unless you are frequently processing large amounts of text, it will likely cost less than $1 per month. Most months I have spent less than $0.50
 
+
+
 ## TODO
 
 - Create prompts that take in arguments from voice commands.
