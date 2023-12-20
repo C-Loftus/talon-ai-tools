@@ -11,6 +11,8 @@ Query language models with voice commands. Helpful to automatically generate tex
 | `model clip <prompt>` | Generate text from a prompt and set it on the clipboard | "model clip summarize this"             |
 | `model help`          | Show the help menu with all the prompts                 | "model help"                            |
 
+See [the list of prompts](./promptNoArgument.talon-list) for all the prompts that can be used with the `model` command.
+
 ## OpenAI Setup
 
 In order to use this repository with GPT 3.5, you need an OpenAI API key.
