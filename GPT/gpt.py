@@ -82,7 +82,6 @@ def gpt_query(prompt: str, content: str) -> str:
         notify("GPT Failure: Check API Key or Prompt")
         print(response.content)
         return ""
-    
 
 def gpt_task(prompt: str, content: str) -> str:
     """Run a GPT task"""
@@ -104,7 +103,7 @@ class UserActions:
 
         return gpt_task(prompt, content)
 
-    def gpt_answer_question(inputText: str):
+    def gpt_answer_question(inputText: str) -> str:
         """Answer an arbitrary question"""
         prompt = """
         Generate text that satisfies the question or request given in the prompt. 
