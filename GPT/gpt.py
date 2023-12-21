@@ -22,6 +22,7 @@ def notify(message: str):
         actions.user.notify(message)
     except:
         app.notify(message)
+    print(message)
 
 def gpt_query(prompt: str, content: str) -> str:
 
