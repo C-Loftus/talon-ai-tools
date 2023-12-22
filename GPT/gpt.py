@@ -3,8 +3,6 @@ import json, os
 from talon import Module, actions, clip, app, settings
 from typing import Literal
 
-# TODO: Make it only available to run one request at a time
-
 mod = Module() 
 # Stores all our prompts that don't require arguments 
 # (ie those that just take in the clipboard text)
@@ -14,7 +12,6 @@ mod.setting(
     type=Literal["OPENAI", "LOCAL_LLAMA"],
     default="OPENAI",
 )
-
 
 # Defaults to Andreas's custom notifications if you have them installed
 def notify(message: str):
@@ -34,7 +31,7 @@ def gpt_query(prompt: str, content: str) -> str:
             try:
                 TOKEN = os.environ["OPENAI_API_KEY"]
             except:
-                notify("GPT Failure: No API Key")   
+                notify("GPT Failure: env var OPENAI_API_KEY is not set.")   
                 return ""
             
             url = 'https://api.openai.com/v1/chat/completions'
@@ -77,10 +74,9 @@ def gpt_query(prompt: str, content: str) -> str:
     if response.status_code == 200:
 
         notify("GPT Task Completed")
-
         return response.json()['choices'][0]['message']['content'].strip()
     else:
-        notify("GPT Failure: Check API Key or Prompt")
+        notify("GPT Failure: Check API Key, Model, or Prompt")
         print(response.content)
         return ""
 
