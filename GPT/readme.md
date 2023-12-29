@@ -14,7 +14,7 @@ Query language models with voice commands. Helpful to automatically generate tex
 
 ## Help
 
-- See [the list of prompts](./staticPrompts.talon-list) for all the prompts that can be used with the `model` command.
+- See [the list of prompts](./staticPrompt.talon-list) for all the prompts that can be used with the `model` command.
 
 - See the [examples file](./example.md) for gifs that show how to use the commands.
 
