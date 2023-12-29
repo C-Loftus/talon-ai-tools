@@ -31,8 +31,7 @@ model ask <user.text>:
     user.help_list("user.promptNoArgument")
 
 # Insert a response relative to a question written in your editor
-model answer {user.makeshift_destination} <user.cursorless_target>:
-    text = user.cursorless_get_text(cursorless_target)
+model answer <user.cursorless_target> <user.cursorless_destination>:
+    text = user.cursorless_get_text_list(cursorless_target)
     result = user.gpt_answer_question(text)
-    user.cursorless_command(makeshift_destination, cursorless_target)
-    user.paste(result)
+    user.cursorless_insert(cursorless_destination, result)
