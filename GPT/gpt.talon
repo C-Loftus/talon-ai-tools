@@ -10,7 +10,7 @@ model ask <user.text>:
 # Runs a model prompt on the selected text and pastes the result.
 ^model {user.staticPrompts}$:
     text = edit.selected_text()
-~    result = user.gpt_apply_prompt(user.staticPrompts, text)
+    result = user.gpt_apply_prompt(user.staticPrompts, text)
     user.paste(result)
 
 # Runs a model prompt on the selected text and sets the result to the clipboard

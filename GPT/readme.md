@@ -12,8 +12,11 @@ Query language models with voice commands. Helpful to automatically generate tex
 | `model help`               | Show the help menu with all the prompts                 | "model help"                              |
 | `model please <user.text>` | Say an arbitrary prompt and then apply it               | "model please translate this to Japanese" |
 
-See [the list of prompts](./promptNoArgument.talon-list) for all the prompts that can be used with the `model` command.
-See the [examples file](./example.md) for gifs that show how to use the commands.
+## Help
+
+- See [the list of prompts](./staticPrompts.talon-list) for all the prompts that can be used with the `model` command.
+
+- See the [examples file](./example.md) for gifs that show how to use the commands.
 
 ## OpenAI Setup
 
