@@ -30,7 +30,7 @@ model ask <user.text>:
 ^model help$:
     user.help_list("user.promptNoArgument")
 
-# Ask GPT and insert a response relative to the target
+# Insert a response relative to a question written in your editor
 model answer {user.makeshift_destination} <user.cursorless_target>:
     text = user.cursorless_get_text(cursorless_target)
     result = user.gpt_answer_question(text)
