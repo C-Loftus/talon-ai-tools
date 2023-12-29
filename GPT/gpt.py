@@ -6,7 +6,7 @@ from typing import Literal
 mod = Module() 
 # Stores all our prompts that don't require arguments 
 # (ie those that just take in the clipboard text)
-mod.list("staticPrompts", desc="GPT Prompts Without Dynamic Arguments")
+mod.list("staticPrompt", desc="GPT Prompts Without Dynamic Arguments")
 mod.setting(
     "llm_provider",
     type=Literal["OPENAI", "LOCAL_LLAMA"],

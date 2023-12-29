@@ -8,15 +8,15 @@ model ask <user.text>:
     user.paste(result)
 
 # Runs a model prompt on the selected text and pastes the result.
-^model {user.staticPrompts}$:
+^model {user.staticPrompt}$:
     text = edit.selected_text()
-    result = user.gpt_apply_prompt(user.staticPrompts, text)
+    result = user.gpt_apply_prompt(user.staticPrompt, text)
     user.paste(result)
 
 # Runs a model prompt on the selected text and sets the result to the clipboard
-^model clip {user.staticPrompts}$:
+^model clip {user.staticPrompt}$:
     text = edit.selected_text()
-    result = user.gpt_apply_prompt(user.staticPrompts, text)
+    result = user.gpt_apply_prompt(user.staticPrompt, text)
     clip.set_text(result)
 
 # Say your prompt directly and the AI will apply it to the selected text

@@ -1,4 +1,4 @@
-list:  user.staticPrompts
+list:  user.staticPrompt
 -
 
 # Use static prompts for detailed instructions without needing to say them every time
