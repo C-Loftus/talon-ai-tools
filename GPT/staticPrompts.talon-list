@@ -1,6 +1,8 @@
-list:  user.promptNoArgument
+list:  user.staticPrompts
 -
-# All the commands in this file take input from selected text
+
+# Use static prompts for detailed instructions without needing to say them every time
+# These all operate upon the currently selected text 
 
 ## FIXES
 fix grammar formally: Fix any mistakes or irregularities in grammar, spelling, or formatting. Use a professional business tone. 

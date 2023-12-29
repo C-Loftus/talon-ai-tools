@@ -6,12 +6,17 @@ from typing import Literal
 mod = Module() 
 # Stores all our prompts that don't require arguments 
 # (ie those that just take in the clipboard text)
-mod.list("promptNoArgument", desc="GPT Prompts Without Arguments")
+mod.list("staticPrompts", desc="GPT Prompts Without Dynamic Arguments")
 mod.setting(
     "llm_provider",
     type=Literal["OPENAI", "LOCAL_LLAMA"],
     default="OPENAI",
 )
+
+mod.setting("openai_model", type=Literal[
+    "gpt-3.5-turbo", "gpt-4"
+], default="gpt-3.5-turbo")
+
 
 # Defaults to Andreas's custom notifications if you have them installed
 def notify(message: str):
@@ -19,6 +24,7 @@ def notify(message: str):
         actions.user.notify(message)
     except:
         app.notify(message)
+    # Log in case notifications are disabled
     print(message)
 
 def gpt_query(prompt: str, content: str) -> str:
@@ -45,7 +51,7 @@ def gpt_query(prompt: str, content: str) -> str:
                 'temperature': 0.6,
                 'n': 1,
                 'stop': None,
-                'model': 'gpt-3.5-turbo'
+                'model': settings.get("user.openai_model"),
             }
         
         case "LOCAL_LLAMA":
@@ -72,40 +78,32 @@ def gpt_query(prompt: str, content: str) -> str:
     response = requests.post(url, headers=headers, data=json.dumps(data))
 
     if response.status_code == 200:
-
         notify("GPT Task Completed")
         return response.json()['choices'][0]['message']['content'].strip()
+    
     else:
         notify("GPT Failure: Check API Key, Model, or Prompt")
         print(response.content)
         return ""
 
-def gpt_task(prompt: str, content: str) -> str:
-    """Run a GPT task"""
-
-    resp = gpt_query(prompt, content)
-
-    if resp:
-        clip.set_text(resp)
-
-    return resp
 
 @mod.action_class
 class UserActions:
 
-    def gpt_prompt_no_argument(prompt: str) -> str:
-        """Run a GPT task"""
-
-        content = actions.edit.selected_text()
-
-        return gpt_task(prompt, content)
-
-    def gpt_answer_question(inputText: str) -> str:
+    def gpt_answer_question(text_to_process: str) -> str:
         """Answer an arbitrary question"""
         prompt = """
-        Generate text that satisfies the question or request given in the prompt. 
+        Generate text that satisfies the question or request given in the input. 
         """
+        result = gpt_query(prompt, text_to_process)
+        if result:
+            clip.set_text(result)
+        return result
 
-        return gpt_task(prompt, inputText)
-
+    def gpt_apply_prompt(prompt:str , text_to_process: str) -> str:
+        """Apply an arbitrary prompt to arbitrary text""" 
+        result = gpt_query(prompt, text_to_process)
+        if result:
+            clip.set_text(result)
+        return result
 
