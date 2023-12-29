@@ -11,6 +11,7 @@ Query language models with voice commands. Helpful to automatically generate tex
 | `model clip <prompt>`      | Generate text from a prompt and set it on the clipboard | "model clip summarize this"               |
 | `model help`               | Show the help menu with all the prompts                 | "model help"                              |
 | `model please <user.text>` | Say an arbitrary prompt and then apply it               | "model please translate this to Japanese" |
+| `model answer (before|to|after) <user.cursorless_target>` | Ask a question and insert the response inline               | "model answer after line red air" |
 
 ## Help
 

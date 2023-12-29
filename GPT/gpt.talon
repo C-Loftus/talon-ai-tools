@@ -1,12 +1,6 @@
 mode: command
 
 -
-model answer {user.makeshift_destination} <user.cursorless_target>:
-    text = user.cursorless_get_text(cursorless_target)
-    result = user.gpt_answer_question(text)
-    user.cursorless_command(makeshift_destination, cursorless_target)
-    user.paste(result)
-    
 # Ask a question in the voice command and the AI will answer it.
 model ask <user.text>:
     result = user.gpt_answer_question(text)
@@ -35,3 +29,10 @@ model ask <user.text>:
 # Shows the list of available prompts
 ^model help$:
     user.help_list("user.promptNoArgument")
+
+# Ask GPT and insert a response relative to the target
+model answer {user.makeshift_destination} <user.cursorless_target>:
+    text = user.cursorless_get_text(cursorless_target)
+    result = user.gpt_answer_question(text)
+    user.cursorless_command(makeshift_destination, cursorless_target)
+    user.paste(result)
