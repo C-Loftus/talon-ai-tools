@@ -83,8 +83,6 @@ def gpt_query(prompt: str, content: str) -> str:
     
     else:
         notify("GPT Failure: Check API Key, Model, or Prompt")
-        print(response.content)
-        return ""
 
 
 @mod.action_class
@@ -95,15 +93,9 @@ class UserActions:
         prompt = """
         Generate text that satisfies the question or request given in the input. 
         """
-        result = gpt_query(prompt, text_to_process)
-        if result:
-            clip.set_text(result)
-        return result
+        return gpt_query(prompt, text_to_process)
 
     def gpt_apply_prompt(prompt:str , text_to_process: str) -> str:
         """Apply an arbitrary prompt to arbitrary text""" 
-        result = gpt_query(prompt, text_to_process)
-        if result:
-            clip.set_text(result)
-        return result
+        return gpt_query(prompt, text_to_process)
 

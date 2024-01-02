@@ -7,7 +7,7 @@ model ask <user.text>:
     user.paste(result)
 
 # Runs a model prompt on the selected text and pastes the result.
-^model {user.staticPrompt}$:
+^model {user.staticPrompt} [this]$:
     text = edit.selected_text()
     result = user.gpt_apply_prompt(user.staticPrompt, text)
     user.paste(result)
@@ -30,9 +30,3 @@ model ask <user.text>:
 ^model help$:
     user.help_list("user.promptNoArgument")
 
-# Insert a response relative to a question written in your editor
-model answer {user.makeshift_destination} <user.cursorless_target>:
-    text = user.cursorless_get_text(cursorless_target)
-    result = user.gpt_answer_question(text)
-    user.cursorless_command(makeshift_destination, cursorless_target)
-    user.paste(result)
