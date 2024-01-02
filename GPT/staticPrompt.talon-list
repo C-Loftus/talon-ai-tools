@@ -15,10 +15,11 @@ format bullets: Convert the every paragraph into a one heading with series of bu
 format mermaid: convert the following plain text into the text syntax for a mermaid diagram. 
 
 ## TEXT GENERATION
-explain this: explain this text in a way that is easier to understand for a layman without technical knowledge
-summarize this: Summarize this text into a format suitable for project notes
+explain: explain this text in a way that is easier to understand for a layman without technical knowledge
+summarize: Summarize this text into a format suitable for project notes
 add context: Add additional text to the sentence that would be appropriate to the situation and useful in a consulting project.
 auto generate schema: the given text is from responses to a survey. They are open ended and have no inherent structure. Map each of these responses to a schema that would be useful for summarizing all the responses and doing categorical analysis. Generate this schema on the fly by grouping responses. Return the responses in a list with a _ separating each item. Do not make the schema overly specific. Do not make the schema category names longer than a sentence a maximum.
+answer: generate text that satisfies the question or request given in the input
 
 ## CONVERSIONS
 convert to jason:  Convert the following data into a json format.
