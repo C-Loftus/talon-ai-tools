@@ -83,6 +83,7 @@ def gpt_query(prompt: str, content: str) -> str:
     
     else:
         notify("GPT Failure: Check API Key, Model, or Prompt")
+        print(response.json())
 
 
 @mod.action_class

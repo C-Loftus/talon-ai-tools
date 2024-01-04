@@ -29,4 +29,3 @@ model ask <user.text>:
 # Shows the list of available prompts
 ^model help$:
     user.help_list("user.promptNoArgument")
-
