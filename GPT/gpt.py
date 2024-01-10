@@ -1,10 +1,6 @@
-import requests
-import json, os
 from talon import Module, actions, clip, app, settings
 from typing import Literal
-import webbrowser
-import os
-import tempfile
+import webbrowser, tempfile, requests, os, json
 
 mod = Module() 
 # Stores all our prompts that don't require arguments 
