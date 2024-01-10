@@ -2,6 +2,9 @@ import requests
 import json, os
 from talon import Module, actions, clip, app, settings
 from typing import Literal
+import webbrowser
+import os
+import tempfile
 
 mod = Module() 
 # Stores all our prompts that don't require arguments 
@@ -100,3 +103,50 @@ class UserActions:
         """Apply an arbitrary prompt to arbitrary text""" 
         return gpt_query(prompt, text_to_process)
 
+    def gpt_help():
+        """Open the GPT help file in the web browser"""
+        # get the text from the file and open it in the web browser
+        current_dir = os.path.dirname(__file__)
+        file_path = os.path.join(current_dir, 'staticPrompt.talon-list')
+        with open(file_path, 'r') as f:
+            lines = f.readlines()[2:]
+
+        # Create a temporary HTML file and write the content to it
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".html") as f:
+            # Write the HTML header with CSS for dark mode, larger font size, text wrapping, and margins
+            f.write(b"""
+            <html>
+            <head>
+                <style>
+                    body { 
+                        background-color: #282a36; 
+                        color: #f8f8f2; 
+                        font-family: Arial, sans-serif; 
+                        font-size: 18px; 
+                        margin: 100px; 
+                    }
+                    pre { 
+                        white-space: pre-wrap; 
+                        word-wrap: break-word; 
+                    }
+                </style>
+            </head>
+            <body>
+            <pre>
+            """)
+
+            # Write each line of the file, replacing newlines with HTML line breaks
+            for line in lines:
+                f.write((line.replace('\n', '<br>\n')).encode())
+
+            # Write the HTML footer
+            f.write(b"""
+            </pre>
+            </body>
+            </html>
+            """)
+
+            temp_filename = f.name
+
+        # Open the temporary HTML file in the web browser
+        webbrowser.open('file://' + os.path.abspath(temp_filename))
