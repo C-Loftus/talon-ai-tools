@@ -94,7 +94,16 @@ class UserActions:
         Generate text that satisfies the question or request given in the input. 
         """
         return gpt_query(prompt, text_to_process)
-
+    
+    def gpt_generate_shell(text_to_process: str) -> str:
+        """Generate a shell command from a spoken instruction"""
+        prompt = """
+        Generate a unix shell command that will perform the given task.
+        Only include the code and not any comments or explanations. 
+        Unless the user specifies otherwise, condense the code into a single line.
+        """
+        return gpt_query(prompt, text_to_process)
+    
     def gpt_apply_prompt(prompt:str , text_to_process: str) -> str:
         """Apply an arbitrary prompt to arbitrary text""" 
         return gpt_query(prompt, text_to_process)
