@@ -100,10 +100,12 @@ class UserActions:
         prompt = """
         Generate a unix shell command that will perform the given task.
         Only include the code and not any comments or explanations. 
-        Unless the user specifies otherwise, condense the code into a single line.
+        Condense the code into a single line.
         """
-        return gpt_query(prompt, text_to_process)
-    
+        result = gpt_query(prompt, text_to_process)
+        # remove any characters that would cause it to be run in the terminal when pasted
+        return result.replace("\n", "").replace("\r", "") 
+            
     def gpt_apply_prompt(prompt:str , text_to_process: str) -> str:
         """Apply an arbitrary prompt to arbitrary text""" 
         return gpt_query(prompt, text_to_process)

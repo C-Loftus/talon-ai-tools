@@ -6,6 +6,7 @@ model ask <user.text>$:
     result = user.gpt_answer_question(text)
     user.paste(result)
 
+# Generate shell commands from an instruction in the voice command and paste them 
 model shell <user.text>$:
     result = user.gpt_generate_shell(text)
     user.paste(result)
