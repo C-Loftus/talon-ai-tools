@@ -1,19 +1,20 @@
-import requests
-import json, os
 from talon import Module, actions, clip, app, settings
 from typing import Literal
-
-# TODO: Make it only available to run one request at a time
+import webbrowser, tempfile, requests, os, json
 
 mod = Module() 
 # Stores all our prompts that don't require arguments 
 # (ie those that just take in the clipboard text)
-mod.list("promptNoArgument", desc="GPT Prompts Without Arguments")
+mod.list("staticPrompt", desc="GPT Prompts Without Dynamic Arguments")
 mod.setting(
     "llm_provider",
     type=Literal["OPENAI", "LOCAL_LLAMA"],
     default="OPENAI",
 )
+
+mod.setting("openai_model", type=Literal[
+    "gpt-3.5-turbo", "gpt-4"
+], default="gpt-3.5-turbo")
 
 
 # Defaults to Andreas's custom notifications if you have them installed
@@ -22,6 +23,7 @@ def notify(message: str):
         actions.user.notify(message)
     except:
         app.notify(message)
+    # Log in case notifications are disabled
     print(message)
 
 def gpt_query(prompt: str, content: str) -> str:
@@ -34,7 +36,7 @@ def gpt_query(prompt: str, content: str) -> str:
             try:
                 TOKEN = os.environ["OPENAI_API_KEY"]
             except:
-                notify("GPT Failure: No API Key")   
+                notify("GPT Failure: env var OPENAI_API_KEY is not set.")   
                 return ""
             
             url = 'https://api.openai.com/v1/chat/completions'
@@ -48,7 +50,7 @@ def gpt_query(prompt: str, content: str) -> str:
                 'temperature': 0.6,
                 'n': 1,
                 'stop': None,
-                'model': 'gpt-3.5-turbo'
+                'model': settings.get("user.openai_model"),
             }
         
         case "LOCAL_LLAMA":
@@ -75,41 +77,83 @@ def gpt_query(prompt: str, content: str) -> str:
     response = requests.post(url, headers=headers, data=json.dumps(data))
 
     if response.status_code == 200:
-
         notify("GPT Task Completed")
-
         return response.json()['choices'][0]['message']['content'].strip()
+    
     else:
-        notify("GPT Failure: Check API Key or Prompt")
-        print(response.content)
-        return ""
+        notify("GPT Failure: Check API Key, Model, or Prompt")
+        print(response.json())
 
-def gpt_task(prompt: str, content: str) -> str:
-    """Run a GPT task"""
-
-    resp = gpt_query(prompt, content)
-
-    if resp:
-        clip.set_text(resp)
-
-    return resp
 
 @mod.action_class
 class UserActions:
 
-    def gpt_prompt_no_argument(prompt: str) -> str:
-        """Run a GPT task"""
-
-        content = actions.edit.selected_text()
-
-        return gpt_task(prompt, content)
-
-    def gpt_answer_question(inputText: str) -> str:
+    def gpt_answer_question(text_to_process: str) -> str:
         """Answer an arbitrary question"""
         prompt = """
-        Generate text that satisfies the question or request given in the prompt. 
+        Generate text that satisfies the question or request given in the input. 
         """
+        return gpt_query(prompt, text_to_process)
+    
+    def gpt_generate_shell(text_to_process: str) -> str:
+        """Generate a shell command from a spoken instruction"""
+        prompt = """
+        Generate a unix shell command that will perform the given task.
+        Only include the code and not any comments or explanations. 
+        Condense the code into a single line.
+        """
+        result = gpt_query(prompt, text_to_process)
+        # remove any characters that would cause it to be run in the terminal when pasted
+        return result.replace("\n", "").replace("\r", "") 
+            
+    def gpt_apply_prompt(prompt:str , text_to_process: str) -> str:
+        """Apply an arbitrary prompt to arbitrary text""" 
+        return gpt_query(prompt, text_to_process)
 
-        return gpt_task(prompt, inputText)
+    def gpt_help():
+        """Open the GPT help file in the web browser"""
+        # get the text from the file and open it in the web browser
+        current_dir = os.path.dirname(__file__)
+        file_path = os.path.join(current_dir, 'staticPrompt.talon-list')
+        with open(file_path, 'r') as f:
+            lines = f.readlines()[2:]
 
+        # Create a temporary HTML file and write the content to it
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".html") as f:
+            # Write the HTML header with CSS for dark mode, larger font size, text wrapping, and margins
+            f.write(b"""
+            <html>
+            <head>
+                <style>
+                    body { 
+                        background-color: #282a36; 
+                        color: #f8f8f2; 
+                        font-family: Arial, sans-serif; 
+                        font-size: 18px; 
+                        margin: 100px; 
+                    }
+                    pre { 
+                        white-space: pre-wrap; 
+                        word-wrap: break-word; 
+                    }
+                </style>
+            </head>
+            <body>
+            <pre>
+            """)
 
+            # Write each line of the file, replacing newlines with HTML line breaks
+            for line in lines:
+                f.write((line.replace('\n', '<br>\n')).encode())
+
+            # Write the HTML footer
+            f.write(b"""
+            </pre>
+            </body>
+            </html>
+            """)
+
+            temp_filename = f.name
+
+        # Open the temporary HTML file in the web browser
+        webbrowser.open('file://' + os.path.abspath(temp_filename))

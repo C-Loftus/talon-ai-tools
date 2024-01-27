@@ -4,14 +4,20 @@ Query language models with voice commands. Helpful to automatically generate tex
 
 ## Usage
 
-| Command               | Description                                             | Example                                 |
-| --------------------- | ------------------------------------------------------- | --------------------------------------- |
-| `model ask <text>`    | Ask a question to the model                             | "model ask what is the meaning of life" |
-| `model <prompt>`      | Generate text from a prompt and paste it                | "model summarize this"                  |
-| `model clip <prompt>` | Generate text from a prompt and set it on the clipboard | "model clip summarize this"             |
-| `model help`          | Show the help menu with all the prompts                 | "model help"                            |
+| Command                                                       | Description                                                          | Example                                       |
+| ------------------------------------------------------------- | -------------------------------------------------------------------- | --------------------------------------------- |
+| `model ask <text>`                                            | Ask a question to the model                                          | "model ask what is the meaning of life"       |
+| `model <prompt>`                                              | Generate text from a prompt and paste it                             | "model summarize"                             |
+| `model clip <prompt>`                                         | Generate text from a prompt and set it on the clipboard              | "model clip summarize"                        |
+| `model help`                                                  | Show the help menu with all the prompts                              | "model help"                                  |
+| `model please <text>`                                         | Say an arbitrary prompt and then apply it                            | "model please translate this to Japanese"     |
+| `model <prompt> <cursorless_target> <cursorless_destination>` | Select with cursorless, apply a prompt, and paste to the destination | "model explain line this after block red air" |
 
-See [the list of prompts](./promptNoArgument.talon-list) for all the prompts that can be used with the `model` command.
+## Help
+
+- See [the list of prompts](./staticPrompt.talon-list) for all the prompts that can be used with the `model` command.
+
+- See the [examples file](./examples.md) for gifs that show how to use the commands.
 
 ## OpenAI Setup
 
