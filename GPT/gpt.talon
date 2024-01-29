@@ -1,6 +1,7 @@
 mode: command
 
 -
+
 # Ask a question in the voice command and the AI will answer it.
 model ask <user.text>$:
     result = user.gpt_answer_question(text)
@@ -25,7 +26,14 @@ model please <user.text>$:
     result = user.gpt_apply_prompt(prompt, txt)
     user.paste(result)
 
-# TODO: make this less verbose in output
+# Applies an arbitrary prompt from the clipboard to selected text and pastes the result.
+# Useful for applying complex/custom prompts that need to be drafted in a text editor.
+model apply [from] clip$:
+    prompt = clip.text()
+    text = edit.selected_text()
+    result = user.gpt_apply_prompt(prompt, text)
+    user.paste(result)
+
 # Shows the list of available prompts
 model help$:
     user.gpt_help()
