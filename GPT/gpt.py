@@ -1,4 +1,4 @@
-from talon import Module, actions, clip, app, settings
+from talon import Module, actions, clip, app, settings, imgui
 from typing import Literal
 import webbrowser, tempfile, requests, os, json
 
@@ -16,6 +16,28 @@ mod.setting("openai_model", type=Literal[
     "gpt-3.5-turbo", "gpt-4"
 ], default="gpt-3.5-turbo")
 
+
+text_to_confirm=""
+@imgui.open()
+def confirmation_gui(gui: imgui.GUI):
+    gui.text("Confirm model output before pasting")
+    gui.line()
+    gui.spacer()
+    gui.text(text_to_confirm)
+
+    gui.spacer()
+    if gui.button("Paste model output"):
+        actions.user.paste(text_to_confirm)
+        gui.hide()
+    
+    gui.spacer()
+    if gui.button("Copy model output"):
+        clip.set_text(text_to_confirm)
+        gui.hide()
+
+    gui.spacer()
+    if gui.button("Deny model output"):
+        gui.hide()
 
 # Defaults to Andreas's custom notifications if you have them installed
 def notify(message: str):
@@ -99,13 +121,38 @@ class UserActions:
         """Generate a shell command from a spoken instruction"""
         prompt = """
         Generate a unix shell command that will perform the given task.
-        Only include the code and not any comments or explanations. 
-        Condense the code into a single line.
+        Only include the code and not any natural language comments or explanations. 
+        Condense the code into a single line such that it can be ran in the terminal.
         """
+
+        # TODO potentially sanitize this further heuristically?
         result = gpt_query(prompt, text_to_process)
-        # remove any characters that would cause it to be run in the terminal when pasted
-        return result.replace("\n", "").replace("\r", "") 
-            
+        return result
+    
+    def add_to_confirmation_gui(model_output: str):
+        """Add text to the confirmation gui"""
+        global text_to_confirm
+        text_to_confirm = model_output
+        confirmation_gui.show()
+    
+    def close_model_confirmation_gui():
+        """Close the model output without pasting it"""
+        global text_to_confirm
+        text_to_confirm = ""
+        confirmation_gui.hide()
+
+    def copy_model_confirmation_gui():
+        """Copy the model output to the clipboard"""
+        global text_to_confirm
+        clip.set_text(text_to_confirm)
+        text_to_confirm = ""
+        confirmation_gui.hide()
+
+    def paste_model_confirmation_gui():
+        """Paste the model output"""
+        actions.user.paste(text_to_confirm)
+        confirmation_gui.hide()
+       
     def gpt_apply_prompt(prompt:str , text_to_process: str) -> str:
         """Apply an arbitrary prompt to arbitrary text""" 
         return gpt_query(prompt, text_to_process)
@@ -121,7 +168,7 @@ class UserActions:
         # Create a temporary HTML file and write the content to it
         with tempfile.NamedTemporaryFile(delete=False, suffix=".html") as f:
             # Write the HTML header with CSS for dark mode, larger font size, text wrapping, and margins
-            f.write(b"""
+            f.write(b""" 
             <html>
             <head>
                 <style>
