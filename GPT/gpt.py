@@ -27,17 +27,15 @@ def confirmation_gui(gui: imgui.GUI):
 
     gui.spacer()
     if gui.button("Paste model output"):
-        actions.user.paste(text_to_confirm)
-        gui.hide()
+        actions.user.paste_model_confirmation_gui()
     
     gui.spacer()
     if gui.button("Copy model output"):
-        clip.set_text(text_to_confirm)
-        gui.hide()
+        actions.user.copy_model_confirmation_gui()
 
     gui.spacer()
     if gui.button("Deny model output"):
-        gui.hide()
+        actions.user.close_model_confirmation_gui()
 
 # Defaults to Andreas's custom notifications if you have them installed
 def notify(message: str):
