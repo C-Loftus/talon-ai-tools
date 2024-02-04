@@ -125,7 +125,7 @@ class UserActions:
 
         # TODO potentially sanitize this further heuristically?
         result = gpt_query(prompt, text_to_process)
-        return result
+        actions.user.add_to_confirmation_gui(result)
     
     def add_to_confirmation_gui(model_output: str):
         """Add text to the confirmation gui"""
