@@ -72,10 +72,6 @@ def gpt_query(prompt: str, content: str, insert_response: Callable[[str], str]) 
                         "role": "user",
                         "content": f"language:\n{actions.code.language()}",
                     },
-                    {
-                        "role": "user",
-                        "content": "instructions:\n This response will be pasted into a buffer of this language; please comment as necessary",
-                    },
                     {"role": "user", "content": f"{prompt}:\n{content}"},
                 ],
                 "tools": [
@@ -83,13 +79,47 @@ def gpt_query(prompt: str, content: str, insert_response: Callable[[str], str]) 
                         "type": "function",
                         "function": {
                             "name": "insert",
-                            "description": "insert(str: string) - this inserts the string into the document. Pay close attention to the language that the document is in to avoid syntax errors.",
+                            "description": "insert(str: string) - this inserts the string into the document. The document is in the language specified so if you aren't careful you will case syntax errors.",
                             "parameters": {
                                 "type": "object",
                                 "properties": {
                                     "str": {
                                         "type": "string",
                                         "description": "The text to insert",
+                                    }
+                                },
+                                "required": ["str"],
+                            },
+                        },
+                    },
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "notify",
+                            "description": "notify(str: string) - this notifies the user using a popup notification",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {
+                                    "str": {
+                                        "type": "string",
+                                        "description": "The text to notify",
+                                    }
+                                },
+                                "required": ["str"],
+                            },
+                        },
+                    },
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "display",
+                            "description": "display(str: string) - DEFAULT - this displays the response to the user. Use this for all informational text aside from notifications. Use this instead of returning content in the response.",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {
+                                    "str": {
+                                        "type": "string",
+                                        "description": "The text to display",
                                     }
                                 },
                                 "required": ["str"],
@@ -126,22 +156,32 @@ def gpt_query(prompt: str, content: str, insert_response: Callable[[str], str]) 
 
     if response.status_code == 200:
         notify("GPT Task Completed")
+        print(response.json())
 
         try:
             tool_calls = response.json()["choices"][0]["message"]["tool_calls"]
             while tool_calls:
                 tool = tool_calls.pop()
+                first_argument = tool['function']['arguments']
+                try:
+                    first_argument = json.loads(first_argument)['str']
+                except Exception as e:
+                    notify(f"Argument Jason was malformed: {e}")
                 if tool['function']['name'] == 'insert':
                     print(tool['function']['arguments'])
                     insert_response(tool['function']['arguments'])
-        except:
-            notify("No tool_calls found in response from LLM")
+                elif tool['function']['name'] == 'display':
+                    actions.user.display_response(first_argument)
+                elif tool['function']['name'] == 'notify':
+                    actions.user.notify_user(first_argument)
+        except Exception as e:
+            notify(f"No tool_calls found in response from LLM: {e}")
 
         try:
             content = response.json()["choices"][0]["message"]["content"].strip()
             insert_response(content)
-        except:
-            notify("No content found in response from LLM")
+        except Exception as e:
+            notify(f"No content found in response from LLM: {e}")
 
     else:
         notify("GPT Failure: Check API Key, Model, or Prompt")
@@ -243,6 +283,61 @@ class UserActions:
             # Write each line of the file, replacing newlines with HTML line breaks
             for line in lines:
                 f.write((line.replace("\n", "<br>\n")).encode())
+
+            # Write the HTML footer
+            f.write(
+                b"""
+            </pre>
+            </body>
+            </html>
+            """
+            )
+
+            temp_filename = f.name
+
+        # Open the temporary HTML file in the web browser
+        # Open the temporary HTML file in the web browser
+        webbrowser.open("file://" + os.path.abspath(temp_filename))
+
+    def notify_user(response: str):
+        """Send a notification to the desktop"""
+        print(response)
+        actions.app.notify(title="Talon AI Tools", body=response)
+
+    def display_response(response: str):
+        """Open the GPT help file in the web browser"""
+        # get the text from the file and open it in the web browser
+        current_dir = os.path.dirname(__file__)
+        file_path = os.path.join(current_dir, "staticPrompt.talon-list")
+        with open(file_path, "r") as f:
+            lines = f.readlines()[2:]
+
+        # Create a temporary HTML file and write the content to it
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".html") as f:
+            # Write the HTML header with CSS for dark mode, larger font size, text wrapping, and margins
+            f.write(
+                b""" 
+            <html>
+            <head>
+                <style>
+                    body { 
+                        background-color: #282a36; 
+                        color: #f8f8f2;
+                        font-family: Arial, sans-serif; 
+                        font-size: 18px; 
+                        margin: 100px; 
+                    }
+                    pre { 
+                        white-space: pre-wrap; 
+                        word-wrap: break-word; 
+                    }
+                </style>
+            </head>
+            <body>
+            <pre>
+            """
+            )
+            f.write(response.encode())
 
             # Write the HTML footer
             f.write(
