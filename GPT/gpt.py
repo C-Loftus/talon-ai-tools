@@ -185,7 +185,6 @@ def gpt_query(prompt: str, content: str, insert_response: Callable[[str], str]) 
                 except Exception as e:
                     notify(f"Argument Jason was malformed: {e}")
                 if tool['function']['name'] == 'insert':
-                    print(tool['function']['arguments'])
                     insert_response(first_argument)
                 elif tool['function']['name'] == 'display':
                     actions.user.display_response(first_argument)
