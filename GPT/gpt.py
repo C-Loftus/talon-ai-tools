@@ -312,7 +312,6 @@ class UserActions:
             temp_filename = f.name
 
         # Open the temporary HTML file in the web browser
-        # Open the temporary HTML file in the web browser
         webbrowser.open("file://" + os.path.abspath(temp_filename))
 
     def notify_user(response: str):
@@ -321,8 +320,8 @@ class UserActions:
 
     def search_for_command(response: str):
         """Search VSCode for command"""
-        actions.user.vscode("workbench.action.showCommands")
-        actions.insert(response)
+        actions.user.command_palette()
+        actions.user.paste(response)
 
     def display_response(response: str):
         """Open the GPT help file in the web browser"""
