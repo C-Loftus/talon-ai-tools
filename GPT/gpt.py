@@ -321,8 +321,8 @@ class UserActions:
 
     def search_for_command(response: str):
         """Search VSCode for command"""
-        actions.user.command_palette()
-        actions.user.paste(response)
+        actions.user.vscode("workbench.action.showCommands")
+        actions.insert(response)
 
     def display_response(response: str):
         """Open the GPT help file in the web browser"""
