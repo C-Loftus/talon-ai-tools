@@ -69,7 +69,7 @@ def gpt_query(prompt: str, content: str, insert_response: Callable[[str], str]) 
             data = {
                 "messages": [
                     {
-                        "role": "user",
+                        "role": "system",
                         "content": f"language:\n{actions.code.language()}",
                     },
                     {"role": "user", "content": f"{prompt}:\n{content}"},
@@ -125,6 +125,23 @@ def gpt_query(prompt: str, content: str, insert_response: Callable[[str], str]) 
                                 "required": ["str"],
                             },
                         },
+                    },
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "search_for_command",
+                            "description": "search_for_command(str: string) - this searches for a command in the VSCode command palette. If I ask you to do something, please use this command to search for an appropriate command.",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {
+                                    "str": {
+                                        "type": "string",
+                                        "description": "The command to search for",
+                                    }
+                                },
+                                "required": ["str"],
+                            },
+                        },
                     }
                 ],
                 "max_tokens": 2024,
@@ -174,6 +191,8 @@ def gpt_query(prompt: str, content: str, insert_response: Callable[[str], str]) 
                     actions.user.display_response(first_argument)
                 elif tool['function']['name'] == 'notify':
                     actions.user.notify_user(first_argument)
+                elif tool['function']['name'] == 'search_for_command':
+                    actions.user.search_for_command(first_argument)
         except Exception as e:
             notify(f"No tool_calls found in response from LLM: {e}")
 
@@ -298,8 +317,12 @@ class UserActions:
 
     def notify_user(response: str):
         """Send a notification to the desktop"""
-        print(f"this is a test {response}")
         actions.app.notify(response)
+
+    def search_for_command(response: str):
+        """Search VSCode for command"""
+        actions.user.command_palette()
+        actions.user.paste(response)
 
     def display_response(response: str):
         """Open the GPT help file in the web browser"""
