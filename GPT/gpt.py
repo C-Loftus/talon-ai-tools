@@ -78,25 +78,25 @@ def gpt_query(prompt: str, content: str, insert_response: Callable[[str], str]) 
                     },
                     {"role": "user", "content": f"{prompt}:\n{content}"},
                 ],
-                # "tools": [
-                #     {
-                #         "type": "function",
-                #         "function": {
-                #             "name": "insert",
-                #             "description": "insert(str: string) - this inserts the string into the document. Pay close attention to the language that the document is in to avoid syntax errors.",
-                #             "parameters": {
-                #                 "type": "object",
-                #                 "properties": {
-                #                     "str": {
-                #                         "type": "string",
-                #                         "description": "The text to insert",
-                #                     }
-                #                 },
-                #                 "required": ["str"],
-                #             },
-                #         },
-                #     }
-                # ],
+                "tools": [
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "insert",
+                            "description": "insert(str: string) - this inserts the string into the document. Pay close attention to the language that the document is in to avoid syntax errors.",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {
+                                    "str": {
+                                        "type": "string",
+                                        "description": "The text to insert",
+                                    }
+                                },
+                                "required": ["str"],
+                            },
+                        },
+                    }
+                ],
                 "max_tokens": 2024,
                 "temperature": 0.6,
                 "n": 1,
@@ -126,8 +126,22 @@ def gpt_query(prompt: str, content: str, insert_response: Callable[[str], str]) 
 
     if response.status_code == 200:
         notify("GPT Task Completed")
-        result = response.json()["choices"][0]["message"]["content"].strip()
-        insert_response(result)
+
+        try:
+            tool_calls = response.json()["choices"][0]["message"]["tool_calls"]
+            while tool_calls:
+                tool = tool_calls.pop()
+                if tool['function']['name'] == 'insert':
+                    print(tool['function']['arguments'])
+                    insert_response(tool['function']['arguments'])
+        except:
+            notify("No tool_calls found in response from LLM")
+
+        try:
+            content = response.json()["choices"][0]["message"]["content"].strip()
+            insert_response(content)
+        except:
+            notify("No content found in response from LLM")
 
     else:
         notify("GPT Failure: Check API Key, Model, or Prompt")
@@ -186,7 +200,7 @@ class UserActions:
         """Apply an arbitrary prompt to arbitrary text"""
         return gpt_query(prompt, text_to_process, actions.clip.set_text)
 
-    def gpt_apply_cursorless_prompt(prompt: str, text_to_process: str, cursorless_destination: List[str]):
+    def gpt_apply_cursorless_prompt(prompt: str, text_to_process: str, cursorless_destination: any):
         """Apply a cursorless prompt"""
         def insert_to_destination(result: str):
             actions.user.cursorless_insert(cursorless_destination, result)
