@@ -177,11 +177,8 @@ def gpt_query(prompt: str, content: str, insert_response: Callable[[str], str]) 
         except Exception as e:
             notify(f"No tool_calls found in response from LLM: {e}")
 
-        try:
-            content = response.json()["choices"][0]["message"]["content"].strip()
-            insert_response(content)
-        except Exception as e:
-            notify(f"No content found in response from LLM: {e}")
+        content = (response.json()["choices"][0]["message"]["content"] or "").strip()
+        insert_response(content)
 
     else:
         notify("GPT Failure: Check API Key, Model, or Prompt")
@@ -301,8 +298,8 @@ class UserActions:
 
     def notify_user(response: str):
         """Send a notification to the desktop"""
-        print(response)
-        actions.app.notify(title="Talon AI Tools", body=response)
+        print(f"this is a test {response}")
+        actions.app.notify(response)
 
     def display_response(response: str):
         """Open the GPT help file in the web browser"""
