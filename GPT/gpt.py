@@ -1,3 +1,4 @@
+import re
 from talon import Module, actions, clip, app, settings, imgui, registry
 from typing import Literal
 import requests, os, json
@@ -97,6 +98,7 @@ def gpt_query(prompt: str, content: str) -> str:
             raise ValueError(f"Unknown LLM provider {PROVIDER}")
             
     response = requests.post(url, headers=headers, data=json.dumps(data))
+    print(response.json())
 
     if response.status_code == 200:
         notify("GPT Task Completed")
@@ -183,11 +185,13 @@ class UserActions:
             items = ctx.commands.items()
             for _, command in items:
                 raw_command = remove_wrapper(str(command))
-                delimited = f"{raw_command}%"
+                delimited = f"{raw_command}\n"
                 command_list += delimited
 
         prompt = f"""
-        The following is a list of commands for a program that controls the user's desktop. Each command is a series of words separated by a '%' character which is the separator to indicate the next separate command. I am a user and I want to find {command_description}. Return nothing but the specific command phrase that most closely matches this request. Do not return any other text or groups of unrelated words besides exactly the matching command. Each command is totally separate and unrelated to any word after a %. Special characters can be ignored. If there is no command return the exact word "None". 
+        The following is a list of commands for a program that controls the user's desktop.
+        I am a user and I want to find {command_description}.
+        If there is no command return the exact word "None".
         """
 
         def split_into_chunks(text: str, chunk_size: int):
@@ -207,11 +211,6 @@ class UserActions:
 
 
 def remove_wrapper(text: str):
-    wrapper = "CommandImpl('"
-    end_wrapper = "')"
-    if text.startswith(wrapper) and text.endswith(end_wrapper):
-        return text[len(wrapper):-len(end_wrapper)]
-    return text
-
-
-
+    regex = r'[^"]+"([^"]+)"'
+    match = re.search(regex, text)
+    return match.group(1)
