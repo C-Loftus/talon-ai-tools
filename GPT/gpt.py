@@ -99,7 +99,6 @@ def gpt_query(prompt: str, content: str) -> str:
             raise ValueError(f"Unknown LLM provider {PROVIDER}")
             
     response = requests.post(url, headers=headers, data=json.dumps(data))
-    print(response.json())
 
     if response.status_code == 200:
         notify("GPT Task Completed")
