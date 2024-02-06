@@ -5,24 +5,11 @@ import tempfile
 import requests
 import os
 import json
+from .gpt import notify
 
 mod = Module()
 
-mod.setting(
-    "openai_model", type=Literal["gpt-3.5-turbo", "gpt-4"], default="gpt-3.5-turbo"
-)
-
-# Defaults to Andreas's custom notifications if you have them installed
-def notify(message: str):
-    try:
-        actions.user.notify(message)
-    except:
-        app.notify(message)
-    # Log in case notifications are disabled
-    print(message)
-
-
-def gpt_query(prompt: str, content: str, insert_response: Callable[[str], str]) -> str:
+def gpt_function_query(prompt: str, content: str, insert_response: Callable[[str], str]) -> str:
     notify("GPT Task Started")
 
     try:
@@ -49,7 +36,7 @@ def gpt_query(prompt: str, content: str, insert_response: Callable[[str], str]) 
                 "type": "function",
                 "function": {
                     "name": "insert",
-                    "description": "insert(str: string) - this inserts the string into the document. The document is in the language specified so if you aren't careful you will case syntax errors.",
+                    "description": "insert(str: string) - this inserts the string into the document. The document is in the language specified so if you aren't careful you will cause syntax errors.",
                     "parameters": {
                         "type": "object",
                         "properties": {
@@ -128,25 +115,7 @@ def gpt_query(prompt: str, content: str, insert_response: Callable[[str], str]) 
         notify("GPT Task Completed")
         print(response.json())
 
-        try:
-            tool_calls = response.json()["choices"][0]["message"]["tool_calls"]
-            while tool_calls:
-                tool = tool_calls.pop()
-                first_argument = tool['function']['arguments']
-                try:
-                    first_argument = json.loads(first_argument)['str']
-                except Exception as e:
-                    notify(f"Argument Jason was malformed: {e}")
-                if tool['function']['name'] == 'insert':
-                    insert_response(first_argument)
-                elif tool['function']['name'] == 'display':
-                    actions.user.display_response(first_argument)
-                elif tool['function']['name'] == 'notify':
-                    actions.user.notify_user(first_argument)
-                elif tool['function']['name'] == 'search_for_command':
-                    actions.user.search_for_command(first_argument)
-        except Exception as e:
-            notify(f"No tool_calls found in response from LLM: {e}")
+        process_function_calls(insert_response, response)
 
         content = (response.json()["choices"][0]["message"]["content"] or "").strip()
         if len(content) != 0:
@@ -156,19 +125,40 @@ def gpt_query(prompt: str, content: str, insert_response: Callable[[str], str]) 
         notify("GPT Failure: Check API Key, Model, or Prompt")
         print(response.json())
 
+def process_function_calls(insert_response, response):
+    try:
+        tool_calls = response.json()["choices"][0]["message"]["tool_calls"]
+        while tool_calls:
+            tool = tool_calls.pop()
+            first_argument = tool['function']['arguments']
+            try:
+                first_argument = json.loads(first_argument)['str']
+            except Exception as e:
+                notify(f"Argument Jason was malformed: {e}")
+            match tool['function']['name']:
+                case 'insert':
+                    insert_response(first_argument)
+                case 'display':
+                    actions.user.display_response(first_argument)
+                case 'notify':
+                    actions.user.notify_user(first_argument)
+                case 'search_for_command':
+                    actions.user.search_for_command(first_argument)
+    except Exception as e:
+        notify(f"No tool_calls found in response from LLM: {e}")
 
 @mod.action_class
 class UserActions:
     def gpt_go(utterance: str, selected_text: str) -> str:
         """Answer an arbitrary question"""
 
-        return gpt_query(utterance, selected_text, actions.user.paste)
+        return gpt_function_query(utterance, selected_text, actions.user.paste)
 
     def gpt_go_cursorless(utterance: str, text_to_process: str, cursorless_destination: any):
         """Apply a cursorless prompt"""
         def insert_to_destination(result: str):
             actions.user.cursorless_insert(cursorless_destination, result)
-        return gpt_query(utterance, text_to_process, insert_to_destination)
+        return gpt_function_query(utterance, text_to_process, insert_to_destination)
 
     def notify_user(response: str):
         """Send a notification to the desktop"""
