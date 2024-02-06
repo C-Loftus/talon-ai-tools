@@ -134,16 +134,18 @@ def process_function_calls(insert_response, response):
             try:
                 first_argument = json.loads(first_argument)['str']
             except Exception as e:
-                notify(f"Argument Jason was malformed: {e}")
+                notify(f"Argument JSON was malformed: {e}")
+
             match tool['function']['name']:
                 case 'insert':
                     insert_response(first_argument)
                 case 'display':
                     actions.user.display_response(first_argument)
                 case 'notify':
-                    actions.user.notify_user(first_argument)
+                    actions.app.notify(first_argument)
                 case 'search_for_command':
-                    actions.user.search_for_command(first_argument)
+                    actions.user.command_palette()
+                    actions.user.paste(first_argument)
     except Exception as e:
         notify(f"No tool_calls found in response from LLM: {e}")
 
@@ -151,7 +153,6 @@ def process_function_calls(insert_response, response):
 class UserActions:
     def gpt_go(utterance: str, selected_text: str) -> str:
         """Answer an arbitrary question"""
-
         return gpt_function_query(utterance, selected_text, actions.user.paste)
 
     def gpt_go_cursorless(utterance: str, text_to_process: str, cursorless_destination: any):
@@ -160,24 +161,9 @@ class UserActions:
             actions.user.cursorless_insert(cursorless_destination, result)
         return gpt_function_query(utterance, text_to_process, insert_to_destination)
 
-    def notify_user(response: str):
-        """Send a notification to the desktop"""
-        actions.app.notify(response)
-
-    def search_for_command(response: str):
-        """Search VSCode for command"""
-        actions.user.command_palette()
-        actions.user.paste(response)
-
     def display_response(response: str):
         """Open the GPT help file in the web browser"""
-        # get the text from the file and open it in the web browser
-        current_dir = os.path.dirname(__file__)
-        file_path = os.path.join(current_dir, "staticPrompt.talon-list")
-        with open(file_path, "r") as f:
-            lines = f.readlines()[2:]
 
-        # Create a temporary HTML file and write the content to it
         with tempfile.NamedTemporaryFile(delete=False, suffix=".html") as f:
             # Write the HTML header with CSS for dark mode, larger font size, text wrapping, and margins
             f.write(
