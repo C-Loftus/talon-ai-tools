@@ -1,6 +1,8 @@
-from talon import Module, actions, clip, app, settings, imgui
+from talon import Module, actions, clip, app, settings, imgui, registry
 from typing import Literal
-import webbrowser, tempfile, requests, os, json
+import requests, os, json
+from .lib import HTMLbuilder
+from concurrent.futures import ThreadPoolExecutor
 
 mod = Module() 
 # Stores all our prompts that don't require arguments 
@@ -163,42 +165,53 @@ class UserActions:
         with open(file_path, 'r') as f:
             lines = f.readlines()[2:]
 
-        # Create a temporary HTML file and write the content to it
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".html") as f:
-            # Write the HTML header with CSS for dark mode, larger font size, text wrapping, and margins
-            f.write(b""" 
-            <html>
-            <head>
-                <style>
-                    body { 
-                        background-color: #282a36; 
-                        color: #f8f8f2; 
-                        font-family: Arial, sans-serif; 
-                        font-size: 18px; 
-                        margin: 100px; 
-                    }
-                    pre { 
-                        white-space: pre-wrap; 
-                        word-wrap: break-word; 
-                    }
-                </style>
-            </head>
-            <body>
-            <pre>
-            """)
+        builder = HTMLbuilder.Builder()
+        builder.h1("Talon GPT Prompt List")
+        for line in lines:
+            if "##" in line:
+                builder.h2(line)
+            else:
+                builder.p(line)
 
-            # Write each line of the file, replacing newlines with HTML line breaks
-            for line in lines:
-                f.write((line.replace('\n', '<br>\n')).encode())
+        builder.render() 
+    
 
-            # Write the HTML footer
-            f.write(b"""
-            </pre>
-            </body>
-            </html>
-            """)
+    def gpt_find_talon_commands(command_description:str):
+        """Search for relevant talon commands"""
+        command_list = ""
+        for ctx in registry.active_contexts():
+            items = ctx.commands.items()
+            for _, command in items:
+                raw_command = remove_wrapper(str(command))
+                delimited = f"{raw_command}%"
+                command_list += delimited
 
-            temp_filename = f.name
+        prompt = f"""
+        The following is a list of commands for a program that controls the user's desktop. Each command is a series of words separated by a '%' character which is the separator to indicate the next separate command. I am a user and I want to find {command_description}. Return nothing but the specific command phrase that most closely matches this request. Do not return any other text or groups of unrelated words besides exactly the matching command. Each command is totally separate and unrelated to any word after a %. Special characters can be ignored. If there is no command return the exact word "None". 
+        """
 
-        # Open the temporary HTML file in the web browser
-        webbrowser.open('file://' + os.path.abspath(temp_filename))
+        def split_into_chunks(text: str, chunk_size: int):
+            return [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
+        
+        command_chunks = split_into_chunks(command_list, 1400 - len(prompt))
+
+        with ThreadPoolExecutor() as executor:
+            results = list(executor.map(gpt_query, [prompt]*len(command_chunks), command_chunks))
+
+        builder = HTMLbuilder.Builder()
+        builder.h1("Talon GPT Command Response")
+        for result in results:
+            if result != "None":
+                builder.p(result)
+        builder.render()
+
+
+def remove_wrapper(text: str):
+    wrapper = "CommandImpl('"
+    end_wrapper = "')"
+    if text.startswith(wrapper) and text.endswith(end_wrapper):
+        return text[len(wrapper):-len(end_wrapper)]
+    return text
+
+
+
