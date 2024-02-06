@@ -6,6 +6,7 @@ from .lib import HTMLbuilder
 from concurrent.futures import ThreadPoolExecutor
 
 mod = Module() 
+mod.tag("gpt_beta")
 # Stores all our prompts that don't require arguments 
 # (ie those that just take in the clipboard text)
 mod.list("staticPrompt", desc="GPT Prompts Without Dynamic Arguments")

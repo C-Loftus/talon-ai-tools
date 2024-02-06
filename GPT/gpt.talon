@@ -34,9 +34,6 @@ model apply [from] clip$:
     result = user.gpt_apply_prompt(prompt, text)
     user.paste(result)
 
-model find <user.text>:
-    user.gpt_find_talon_commands(user.text)
-
 # Shows the list of available prompts
 model help$:
     user.gpt_help()
