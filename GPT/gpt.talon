@@ -6,6 +6,12 @@ model ask <user.text>$:
     result = user.gpt_answer_question(text)
     user.paste(result)
 
+# Say your prompt directly and the AI will apply it to the selected text
+model go <user.text>$:
+    utterance = user.text
+    txt = edit.selected_text()
+    user.gpt_go(utterance, txt)
+
 # Runs a model prompt on the selected text and pastes the result.
 model {user.staticPrompt} [this]$:
     text = edit.selected_text()
