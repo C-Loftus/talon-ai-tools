@@ -151,7 +151,7 @@ def process_function_calls(insert_response, response):
 @mod.action_class
 class UserActions:
     def gpt_go(utterance: str, selected_text: str) -> str:
-        """Answer an arbitrary question"""
+        """Run a query against ChatGPT and allow it to execute targeted function calls on your machine"""
 
         return gpt_function_query(utterance, selected_text, actions.user.paste)
 
