@@ -112,13 +112,14 @@ def gpt_function_query(prompt: str, content: str, insert_response: Callable[[str
 
     response = requests.post(url, headers=headers, data=json.dumps(data))
 
+    message = response.json()["choices"][0]["message"]
     if response.status_code == 200:
         notify("GPT Task Completed")
         print(response.json())
 
-        process_function_calls(insert_response, response)
+        process_function_calls(insert_response, message)
 
-        content = (response.json()["choices"][0]["message"]["content"] or "").strip()
+        content = (message["content"] or "").strip()
         if len(content) != 0:
             actions.user.display_response(content)
 
@@ -126,9 +127,9 @@ def gpt_function_query(prompt: str, content: str, insert_response: Callable[[str
         notify("GPT Failure: Check API Key, Model, or Prompt")
         print(response.json())
 
-def process_function_calls(insert_response, response):
+def process_function_calls(insert_response, message):
     try:
-        tool_calls = response.json()["choices"][0]["message"]["tool_calls"]
+        tool_calls = message["tool_calls"]
         while tool_calls:
             tool = tool_calls.pop()
             first_argument = tool['function']['arguments']
