@@ -13,6 +13,11 @@ model go <user.text>$:
     user.gpt_go(utterance, txt)
 
 # Runs a model prompt on the selected text and pastes the result.
+model go {user.staticPrompt} [this]$:
+    text = edit.selected_text()
+    user.gpt_go(user.staticPrompt, text)
+
+# Runs a model prompt on the selected text and pastes the result.
 model {user.staticPrompt} [this]$:
     text = edit.selected_text()
     result = user.gpt_apply_prompt(user.staticPrompt, text)
