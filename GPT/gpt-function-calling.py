@@ -1,7 +1,5 @@
 from talon import Module, actions, app, settings
-from typing import Callable, Literal
-import webbrowser
-import tempfile
+from typing import Callable
 import requests
 import os
 import json
@@ -116,7 +114,6 @@ def gpt_function_query(prompt: str, content: str, insert_response: Callable[[str
     if response.status_code == 200:
         notify("GPT Task Completed")
         print(response.json())
-
         process_function_calls(insert_response, message)
 
         content = (message["content"] or "").strip()
@@ -176,5 +173,4 @@ class UserActions:
         builder = HTMLbuilder.Builder()
         builder.h1("Displaying the Model Response")
         builder.p(response)
-
         builder.render()
