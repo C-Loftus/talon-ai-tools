@@ -1,10 +1,8 @@
 from talon import Module, actions, app, settings
 from typing import Callable
-import requests
-import os
-import json
-from .gpt import notify
-from .lib import HTMLbuilder
+import json, os, requests
+from ..gpt import notify
+from .gpt_callables import *
 
 mod = Module()
 
@@ -138,11 +136,11 @@ def process_function_calls(insert_response, message):
                 case 'insert':
                     insert_response(first_argument)
                 case 'display':
-                    actions.user.display_response(first_argument)
+                    display_response(first_argument)
                 case 'notify':
-                    actions.user.notify_user(first_argument)
+                    notify_user(first_argument)
                 case 'search_for_command':
-                    actions.user.search_for_command(first_argument)
+                    search_for_command(first_argument)
     except Exception as e:
         notify(f"No tool_calls found in response from LLM: {e}")
 
@@ -158,18 +156,4 @@ class UserActions:
             actions.user.cursorless_insert(cursorless_destination, result)
         return gpt_function_query(utterance, text_to_process, insert_to_destination)
 
-    def notify_user(response: str):
-        """Send a notification to the desktop"""
-        actions.app.notify(response)
-
-    def search_for_command(response: str):
-        """Search VSCode for command"""
-        actions.user.command_palette()
-        actions.user.paste(response)
-
-    def display_response(response: str):
-        """Open the GPT help file in the web browser"""
-        builder = HTMLbuilder.Builder()
-        builder.h1("Displaying the Model Response")
-        builder.p(response)
-        builder.render()
+    
