@@ -1,5 +1,5 @@
 from talon import actions
-from ..lib.HTMLbuilder import HTMLbuilder
+from ..lib.HTMLbuilder import Builder
 from typing import Callable
 import inspect
 
@@ -39,7 +39,7 @@ def search_for_command(response: str):
 
 def display_response(response: str):
     """Open the GPT help file in the web browser"""
-    builder = HTMLbuilder.Builder()
+    builder = Builder()
     builder.h1("Displaying the Model Response")
     builder.p(response)
     builder.render()

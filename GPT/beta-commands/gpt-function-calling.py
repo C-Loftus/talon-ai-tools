@@ -1,8 +1,10 @@
-from talon import Module, actions, app, settings
+from talon import Module, actions, settings
 from typing import Callable
-import json, os, requests
+import json
+import os
+import requests
 from ..gpt import notify
-from .gpt_callables import *
+from .gpt_callables import search_for_command, notify_user, display_response
 
 mod = Module()
 
@@ -116,7 +118,7 @@ def gpt_function_query(prompt: str, content: str, insert_response: Callable[[str
 
         content = (message["content"] or "").strip()
         if len(content) != 0:
-            actions.user.display_response(content)
+            display_response(content)
 
     else:
         notify("GPT Failure: Check API Key, Model, or Prompt")
