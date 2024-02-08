@@ -148,12 +148,11 @@ def process_function_calls(insert_response, message):
 
 @mod.action_class
 class UserActions:
-    def gpt_go(utterance: str, selected_text: str) -> str:
+    def gpt_can_you(utterance: str, selected_text: str) -> str:
         """Run a query against ChatGPT and allow it to execute targeted function calls on your machine"""
-
         return gpt_function_query(utterance, selected_text, actions.user.paste)
 
-    def gpt_go_cursorless(utterance: str, text_to_process: str, cursorless_destination: any):
+    def gpt_can_you_cursorless(utterance: str, text_to_process: str, cursorless_destination: any):
         """Apply a cursorless prompt"""
         def insert_to_destination(result: str):
             actions.user.cursorless_insert(cursorless_destination, result)
