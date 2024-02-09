@@ -15,7 +15,7 @@ def gpt_function_query(prompt: str, content: str, insert_response: Callable[[str
         TOKEN = os.environ["OPENAI_API_KEY"]
     except:
         notify("GPT Failure: env var OPENAI_API_KEY is not set.")
-        return ""
+        raise Exception("GPT Failure")
 
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
@@ -121,7 +121,7 @@ def gpt_function_query(prompt: str, content: str, insert_response: Callable[[str
 
     else:
         notify("GPT Failure: Check API Key, Model, or Prompt")
-        print(response.json())
+        raise Exception(f"GPT Failure at POST request: {response.json()}")
 
 def process_function_calls(insert_response, message):
     try:
