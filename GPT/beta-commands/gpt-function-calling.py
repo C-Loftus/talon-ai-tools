@@ -1,10 +1,8 @@
 from talon import Module, actions, settings
 from typing import Callable
-import json
-import os
-import requests
+import requests, os, json
 from ..gpt import notify
-from .gpt_callables import search_for_command, notify_user, display_response
+from .gpt_callables import function_specs, search_for_command, notify_user, display_response
 
 mod = Module()
 
@@ -30,83 +28,13 @@ def gpt_function_query(prompt: str, content: str, insert_response: Callable[[str
             },
             {"role": "user", "content": f"{prompt}:\n{content}"},
         ],
-        "tools": [
-            {
-                "type": "function",
-                "function": {
-                    "name": "insert",
-                    "description": "insert(str: string) - this inserts the string into the document. The document is in the language specified so if you aren't careful you will cause syntax errors.",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "str": {
-                                "type": "string",
-                                "description": "The text to insert",
-                            }
-                        },
-                        "required": ["str"],
-                    },
-                },
-            },
-            {
-                "type": "function",
-                "function": {
-                    "name": "notify",
-                    "description": "notify(str: string) - this notifies the user using a popup notification",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "str": {
-                                "type": "string",
-                                "description": "The text to notify",
-                            }
-                        },
-                        "required": ["str"],
-                    },
-                },
-            },
-            {
-                "type": "function",
-                "function": {
-                    "name": "display",
-                    "description": "display(str: string) - DEFAULT - this displays the response to the user. Use this for all informational text aside from notifications. Use this instead of returning content in the response.",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "str": {
-                                "type": "string",
-                                "description": "The text to display",
-                            }
-                        },
-                        "required": ["str"],
-                    },
-                },
-            },
-            {
-                "type": "function",
-                "function": {
-                    "name": "search_for_command",
-                    "description": "search_for_command(str: string) - this searches for a command in the VSCode command palette. If I ask you to do something, please use this command to search for an appropriate command.",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "str": {
-                                "type": "string",
-                                "description": "The command to search for",
-                            }
-                        },
-                        "required": ["str"],
-                    },
-                },
-            }
-        ],
+        "tools": function_specs,
         "max_tokens": 2024,
         "temperature": 0.6,
         "n": 1,
         "stop": None,
         "model": settings.get("user.openai_model"),
     }
-
 
     response = requests.post(url, headers=headers, data=json.dumps(data))
 
@@ -136,19 +64,24 @@ def process_function_calls(insert_response, message):
             first_argument = tool['function']['arguments']
             first_argument = json.loads(first_argument)['str']
         except Exception as e:
+            print(tool)
             notify(f"Argument JSON was malformed: {e}")
             break
-
+        
         match tool['function']['name']:
-            case 'insert':
-                insert_response(first_argument)
             case 'display':
                 display_response(first_argument)
             case 'notify':
                 notify_user(first_argument)
             case 'search_for_command':
                 search_for_command(first_argument)
-
+            case 'insert':
+                insert_response(first_argument)
+            # Just insert everything else since sometimes if will return 
+            # the language as the function name
+            case _:
+                insert_response(first_argument)
+            
 
 @mod.action_class
 class UserActions:

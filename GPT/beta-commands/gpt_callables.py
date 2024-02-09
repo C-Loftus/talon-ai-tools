@@ -44,3 +44,75 @@ def display_response(response: str):
     builder.h1("Displaying the Model Response")
     builder.p(response)
     builder.render()
+
+
+function_specs = [
+            {
+                "type": "function",
+                "function": {
+                    "name": "insert",
+                    "description": "Insert the string into the document. The document is in the language specified so if you aren't careful you will cause syntax errors.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "str": {
+                                "type": "string",
+                                "description": "The text to insert",
+                            }
+                        },
+                        "required": ["str"],
+                    },
+                },
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "notify",
+                    "description": "Notify the user using a popup notification",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "str": {
+                                "type": "string",
+                                "description": "The text to notify",
+                            }
+                        },
+                        "required": ["str"],
+                    },
+                },
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "display",
+                    "description": "DEFAULT - Display the response to the user. Use this for all informational text aside from notifications. Use this instead of returning content in the response.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "str": {
+                                "type": "string",
+                                "description": "The text to display",
+                            }
+                        },
+                        "required": ["str"],
+                    },
+                },
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "search_for_command",
+                    "description": "Search for a command in the VSCode command palette. If I ask you to do something, please use this command to search for an appropriate command.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "str": {
+                                "type": "string",
+                                "description": "The command to search for",
+                            }
+                        },
+                        "required": ["str"],
+                    },
+                },
+            }
+]
