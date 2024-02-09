@@ -3,34 +3,84 @@ from ..lib.HTMLbuilder import Builder
 from typing import Callable
 import inspect
 
-# TODO Automatically generate tool schema from function signature 
-def _generate_tool(func: Callable):
-    sig = inspect.signature(func)
-    schema = {
-        "type": "function",
-        "function": {
-            "name": func.__name__,
-            "description": inspect.getdoc(func),
-            "parameters": {
-                "type": "object",
-                "properties": {},
-                "required": [],
-            },
-        },
-    }
+'''
+To create a new function callable by the GPT model, create a new function and add its serialization to the function_specs list. 
+'''
+# TODO make it automatically called in the match statement in gpt-function-calling.py Might require scary eval stuff
 
-    for name, param in sig.parameters.items():
-        if param.default is param.empty:
-            schema["function"]["parameters"]["required"].append(name)
-        schema["function"]["parameters"]["properties"][name] = {
-            "type": str(param.annotation).split("'")[1],
-            "description": "",
+
+def _to_openai_type(arg): 
+    match arg:
+        case "str":
+            return "string"
+        case "int":
+            return "integer"
+        case "bool":
+            return "boolean"
+        case _:
+            raise ValueError(f"Unsupported type: {arg}")
+
+# Currently only supports mandatory arguments
+class CallableFunction():
+    # The function to call
+    function: Callable
+    # The description of the function
+    description: str
+    # List of arg name, arg type, arg description
+    args: list[tuple[str, str, str]]
+
+
+    def __init__(self, function: Callable,
+                arg_descriptions: list[str] | str | None ):
+        """
+        Create a new callable function for the GPT model by providing a function and a list of argument descriptions. The argument descriptions should be in the same order as the function's arguments. The docstring and argument names are used to generate the function's description and argument names.
+        """
+        self.function = function
+        self.description = inspect.getdoc(function)
+
+        # get list of argumment names and types
+        arg_names = list(inspect.signature(function).parameters.keys())
+        arg_names = [str(arg) for arg in arg_names]
+
+        arg_types = list(inspect.signature(function).parameters.values())
+        arg_types = [str(arg).split(':')[1].strip() 
+                     for arg in arg_types]
+        arg_types = [_to_openai_type(arg) for arg in arg_types]
+        
+        # Convert arg_descriptions to a list if it is a string to make it length-wise comparable
+        if isinstance(arg_descriptions, str):
+            arg_descriptions = [arg_descriptions] 
+
+        # Make sure there are descriptions for all arguments
+        if len(arg_descriptions) != len(arg_names):
+            raise ValueError("The number of descriptions must match the number of arguments")
+        
+        self.args = list(zip(arg_names, arg_types, arg_descriptions))
+
+    def serialize(self):
+        properties = {
+            arg_name: {
+                "type": arg_type,
+                "description": arg_description
+            }
+            for (arg_name, arg_type, arg_description) in self.args
+        } 
+
+        return {
+            "type": "function",
+            "function": {
+                "name": self.function.__name__,
+                "description": self.description,
+                "parameters": {
+                    "type": "object",
+                    "properties": properties,
+                    "required": [arg_name for arg_name, _, _ in self.args]
+                },
+            },
         }
 
-    return schema
-
 def notify_user(response: str):
-    """Send a notification to the desktop"""
+    """Notify the user using a popup notification"""
     actions.app.notify(response)
 
 def search_for_command(response: str):
@@ -39,80 +89,20 @@ def search_for_command(response: str):
     actions.user.paste(response)
 
 def display_response(response: str):
-    """Open the GPT help file in the web browser"""
+    """Display the response to the user. Use this for all informational text aside from notifications. Use this instead of returning content in the response."""
     builder = Builder()
     builder.h1("Displaying the Model Response")
     builder.p(response)
     builder.render()
 
+def insert_response(response: str):
+    """Insert the response into the current document using proper syntax for the current language. This is the default action if no other function is found."""
+    actions.user.paste(response)
 
+
+# This is the list of functions that can be called by the GPT model
 function_specs = [
-            {
-                "type": "function",
-                "function": {
-                    "name": "insert",
-                    "description": "Insert the string into the document. The document is in the language specified so if you aren't careful you will cause syntax errors.",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "str": {
-                                "type": "string",
-                                "description": "The text to insert",
-                            }
-                        },
-                        "required": ["str"],
-                    },
-                },
-            },
-            {
-                "type": "function",
-                "function": {
-                    "name": "notify",
-                    "description": "Notify the user using a popup notification",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "str": {
-                                "type": "string",
-                                "description": "The text to notify",
-                            }
-                        },
-                        "required": ["str"],
-                    },
-                },
-            },
-            {
-                "type": "function",
-                "function": {
-                    "name": "display",
-                    "description": "DEFAULT - Display the response to the user. Use this for all informational text aside from notifications. Use this instead of returning content in the response.",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "str": {
-                                "type": "string",
-                                "description": "The text to display",
-                            }
-                        },
-                        "required": ["str"],
-                    },
-                },
-            },
-            {
-                "type": "function",
-                "function": {
-                    "name": "search_for_command",
-                    "description": "Search for a command in the VSCode command palette. If I ask you to do something, please use this command to search for an appropriate command.",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "str": {
-                                "type": "string",
-                                "description": "The command to search for",
-                            }
-                        },
-                        "required": ["str"],
-                    },
-                },
-            }
+    CallableFunction(display_response, "The text to display").serialize(),
+    CallableFunction(notify_user, "The text to notify").serialize(),
+    CallableFunction(search_for_command, "The command to search for").serialize(),
 ]

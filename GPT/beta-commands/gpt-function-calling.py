@@ -56,26 +56,29 @@ def process_function_calls(insert_response, message):
         tool_calls = message["tool_calls"]
     except Exception as e:
         notify(f"No tool calls were found in LLM response")
+        print(message)
         return
 
     for tool in tool_calls:
 
         try: 
             first_argument = tool['function']['arguments']
-            first_argument = json.loads(first_argument)['str']
+            first_argument = json.loads(first_argument)
+            first_argument = first_argument[list(first_argument.keys())[0]]
+            
         except Exception as e:
             print(tool)
             notify(f"Argument JSON was malformed: {e}")
             break
         
         match tool['function']['name']:
-            case 'display':
+            case 'display_response':
                 display_response(first_argument)
-            case 'notify':
+            case 'notify_user':
                 notify_user(first_argument)
             case 'search_for_command':
                 search_for_command(first_argument)
-            case 'insert':
+            case 'insert_response':
                 insert_response(first_argument)
             # Just insert everything else since sometimes if will return 
             # the language as the function name
