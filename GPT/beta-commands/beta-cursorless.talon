@@ -11,6 +11,6 @@ app: vscode
     user.cursorless_insert(cursorless_destination, result)
 
 # Apply a prompt to any text, and output it any target
-^model can you {user.staticPrompt} <user.cursorless_target> <user.cursorless_destination>$:
+^model can you {user.staticPrompt} <user.cursorless_target> [<user.cursorless_destination>]$:
     text_list = user.cursorless_get_text_list(cursorless_target)
-    user.gpt_can_you_cursorless(user.staticPrompt, text_list, cursorless_destination)
+    user.gpt_can_you_cursorless(user.staticPrompt, text_list, cursorless_destination or 0)
