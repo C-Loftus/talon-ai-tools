@@ -110,10 +110,9 @@ def gpt_function_query(prompt: str, content: str, insert_response: Callable[[str
 
     response = requests.post(url, headers=headers, data=json.dumps(data))
 
-    message = response.json()["choices"][0]["message"]
     if response.status_code == 200:
         notify("GPT Task Completed")
-        print(response.json())
+        message = response.json()["choices"][0]["message"]
         process_function_calls(insert_response, message)
 
         content = (message["content"] or "").strip()
@@ -127,33 +126,39 @@ def gpt_function_query(prompt: str, content: str, insert_response: Callable[[str
 def process_function_calls(insert_response, message):
     try:
         tool_calls = message["tool_calls"]
-        while tool_calls:
-            tool = tool_calls.pop()
-            first_argument = tool['function']['arguments']
-            try:
-                first_argument = json.loads(first_argument)['str']
-            except Exception as e:
-                notify(f"Argument json was malformed: {e}")
-            match tool['function']['name']:
-                case 'insert':
-                    insert_response(first_argument)
-                case 'display':
-                    display_response(first_argument)
-                case 'notify':
-                    notify_user(first_argument)
-                case 'search_for_command':
-                    search_for_command(first_argument)
     except Exception as e:
-        notify(f"No tool_calls found in response from LLM: {e}")
+        notify(f"No tool calls were found in LLM response")
+        return
+
+    for tool in tool_calls:
+
+        try: 
+            first_argument = tool['function']['arguments']
+            first_argument = json.loads(first_argument)['str']
+        except Exception as e:
+            notify(f"Argument JSON was malformed: {e}")
+            # Try next tool call if this one fails
+            continue
+
+        match tool['function']['name']:
+            case 'insert':
+                insert_response(first_argument)
+            case 'display':
+                display_response(first_argument)
+            case 'notify':
+                notify_user(first_argument)
+            case 'search_for_command':
+                search_for_command(first_argument)
+
 
 @mod.action_class
 class UserActions:
     def gpt_can_you(utterance: str, selected_text: str) -> str:
-        """Run a query against ChatGPT and allow it to execute targeted function calls on your machine"""
+        """Run a query with function calls and insert the result"""
         return gpt_function_query(utterance, selected_text, actions.user.paste)
 
     def gpt_can_you_cursorless(utterance: str, text_to_process: str, cursorless_destination: any):
-        """Apply a cursorless prompt"""
+        """Run a query with function calls and insert the result using cursorless"""
         def insert_to_destination(result: str):
             actions.user.cursorless_insert(cursorless_destination, result)
         return gpt_function_query(utterance, text_to_process, insert_to_destination)
