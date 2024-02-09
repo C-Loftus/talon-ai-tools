@@ -137,8 +137,7 @@ def process_function_calls(insert_response, message):
             first_argument = json.loads(first_argument)['str']
         except Exception as e:
             notify(f"Argument JSON was malformed: {e}")
-            # Try next tool call if this one fails
-            continue
+            break
 
         match tool['function']['name']:
             case 'insert':

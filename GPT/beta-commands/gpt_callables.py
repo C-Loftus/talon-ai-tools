@@ -3,6 +3,7 @@ from ..lib.HTMLbuilder import Builder
 from typing import Callable
 import inspect
 
+# TODO Automatically generate tool schema from function signature 
 def _generate_tool(func: Callable):
     sig = inspect.signature(func)
     schema = {
