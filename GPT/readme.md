@@ -19,7 +19,7 @@ Query language models with voice commands. Helpful to automatically generate tex
 
 - See the [examples file](./examples.md) for gifs that show how to use the commands.
 
-## OpenAI Setup
+## Setup
 
 In order to use this repository with GPT 3.5, you need an OpenAI API key.
 
@@ -35,6 +35,10 @@ os.environ["OPENAI_API_KEY"] = "YOUR-KEY-HERE"
 
 The OpenAI API that is used in this repo, through which you make queries to GPT 3.5 (the model used for ChatGPT), is not free. However it is extremely cheap and unless you are frequently processing large amounts of text, it will likely cost less than $1 per month. Most months I have spent less than $0.50
 
+## Configuration
+
+If you want to change any configuration settings copy the example configuration file from `GPT/gpt-talon.settings.example` to `GPT/gpt-talon.settings`, which is a .git ignored file and modify anything that you want to change.
+
 ## Local Models (llamafiles)
 
 You can use this repository with a [llamafile](https://github.com/Mozilla-Ocho/llamafile). Set the value `user.llm_provider = "LOCAL_LLAMA"` in `gpt-settings.talon` to change the default model.
@@ -46,9 +50,3 @@ These models are easy to install and run entirely offline. They can be downloade
 ```
 
 Keep in mind that running a model in the background is resource intensive and it will be slow unless you have a GPU on your computer.
-
-## TODO
-
-- Create prompts that take in arguments from voice commands.
-- Make the the help menu less verbose.
-- Support openai vision model
