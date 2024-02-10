@@ -47,6 +47,10 @@ These models are easy to install and run entirely offline. They can be downloade
 
 Keep in mind that running a model in the background is resource intensive and it will be slow unless you have a GPU on your computer.
 
+## Configuration
+
+If you want to change any configuration settings that is easy to do. Simply copy the example configuration settings file from `GPT/gpt-talon.settings.example` to `GPT/gpt-talon.settings`, which is a git ignored file and modify anything that you want to change. We've opted to avoid committing any configuration that we expect users to change so that you don't have to keep any local changes to this repository and can still configure any settings that are exposed.
+
 ## TODO
 
 - Create prompts that take in arguments from voice commands.
