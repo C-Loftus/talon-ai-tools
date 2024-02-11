@@ -1,14 +1,15 @@
-
-# Talon's imgui gui library is not accessible to screen readers. 
+# Talon's imgui gui library is not accessible to screen readers.
 # By using HTML we can create temporary web pages that are accessible to screen readers.
 
+import enum
+import os
+import platform
 import tempfile
 import webbrowser
-import enum, os, platform
 
 STYLE = """
 <style>
-    body { 
+    body {
         background-color: #2E3440;
         margin: 0;
         padding: 0;
@@ -27,6 +28,7 @@ STYLE = """
 </style>
 """
 
+
 class ARIARole(enum.Enum):
     MAIN = "main"
     BANNER = "banner"
@@ -34,12 +36,12 @@ class ARIARole(enum.Enum):
     FOOTER = "contentinfo"
     # TODO other roles?
 
-class Builder:
 
-    '''
+class Builder:
+    """
     Easily build HTML pages and add aria roles to elements
     in order to make them accessible to screen readers.
-    '''
+    """
 
     def __init__(self):
         self.elements = []
@@ -56,19 +58,23 @@ class Builder:
 
     def h1(self, text, role=None):
         self._flat_helper(text, "h1", role)
-    
+
     def h2(self, text, role=None):
         self._flat_helper(text, "h2", role)
-    
+
     def h3(self, text, role=None):
         self._flat_helper(text, "h3", role)
 
     def p(self, text, role=None):
         self._flat_helper(text, "p", role)
-    
+
     def a(self, text, href, role=None):
-        self.elements.append(f"<a href='{href}' role='{role.value}'>{text}</a>" if role else f"<a href='{href}'>{text}</a>")
-        
+        self.elements.append(
+            f"<a href='{href}' role='{role.value}'>{text}</a>"
+            if role
+            else f"<a href='{href}'>{text}</a>"
+        )
+
     def _li(self, text):
         self._flat_helper(text, "li")
 
@@ -78,7 +84,6 @@ class Builder:
         for item in text:
             self._li(item)
         self.elements.append("</ul>")
-
 
     def ol(self, *text, role=None):
         self.elements.append(f"<ol role='{role.value}'>" if role else "<ol>")
@@ -102,9 +107,8 @@ class Builder:
     def end_table(self):
         self.elements.append("</tbody></table>")
 
-
     def render(self):
-        html_content = '\n'.join(self.elements)
+        html_content = "\n".join(self.elements)
         full_html = f"""
         <!DOCTYPE html>
         <html lang="en">
@@ -122,18 +126,20 @@ class Builder:
         </html>
         """
 
-        # If you are using a browser through a snap package on Linux you cannot 
+        # If you are using a browser through a snap package on Linux you cannot
         # open many directories so we just default to the downloads folder since that is one we can use
         if platform.system() == "Linux":
             dir = os.path.join(os.path.expanduser("~"), "Downloads")
         else:
             dir = None
 
-        with tempfile.NamedTemporaryFile(mode='w+', suffix='.html', delete=False, encoding='utf-8', dir=dir) as temp_file:
+        with tempfile.NamedTemporaryFile(
+            mode="w+", suffix=".html", delete=False, encoding="utf-8", dir=dir
+        ) as temp_file:
             temp_file.write(full_html)
             temp_file_path = temp_file.name
-        webbrowser.open("file://"+os.path.abspath(temp_file_path))
-                
+        webbrowser.open("file://" + os.path.abspath(temp_file_path))
+
 
 # API Demo
 # builder = Builder()
