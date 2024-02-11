@@ -1,5 +1,5 @@
 describe image:
     user.describe_clipboard()
 
-generate image of <user.text>:
+generate [an] image of <user.text>:
     user.generate_image(text)
