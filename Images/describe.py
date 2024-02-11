@@ -17,13 +17,12 @@ class Actions:
             if not clipped_image:
                 print("No image found in clipboard")
                 return
-            
+
             data = clipped_image.encode().data()
             base64_image = base64.b64encode(data).decode("utf-8")
         except:
             print("Invalid image found in clipboard")
             return
-            
 
         # OpenAI API Key
         api_key = os.environ["OPENAI_API_KEY"]
@@ -95,6 +94,6 @@ class Actions:
         """
         {'created': $$REMOVED$$, 'data': [{'revised_prompt': 'Create a visually stunning image of a cat. The cat is domestic, with short, thick fur with brindle pattern.', 'url': '$$REMOVED$$'}]}
         """
-        webbrowser.open(response_dict['data'][0]["url"])
+        webbrowser.open(response_dict["data"][0]["url"])
 
         # TODO choose whether to save the image, save the url, or paste the image into the current window
