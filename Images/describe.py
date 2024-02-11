@@ -93,8 +93,8 @@ class Actions:
 
         # RESPONSE FORMAT (in case you don't GPT-4 access)
         """
-        {'created': $$REMOVED$$, 'data': [{'revised_prompt': 'Create a visually stunning image of a cat. The cat is domestic, with short, thick fur with brindle pattern. Its eyes are large, emerald green, shimmering with curiosity. It is playfully crouched with its tail flicking back and forth, ready to pounce. The cat is outdoors, with grass under its paws and the sun casting shadows, creating a lovely contrast of light and dark shapes on the scene.', 'url': '$$REMOVED$$'}]}
+        {'created': $$REMOVED$$, 'data': [{'revised_prompt': 'Create a visually stunning image of a cat. The cat is domestic, with short, thick fur with brindle pattern.', 'url': '$$REMOVED$$'}]}
         """
-        webbrowser.open(response_dict["output"][0]["url"])
+        webbrowser.open(response_dict['data'][0]["url"])
 
         # TODO choose whether to save the image, save the url, or paste the image into the current window
