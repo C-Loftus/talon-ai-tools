@@ -12,12 +12,18 @@ mod = Module()
 class Actions:
     def describe_clipboard():
         """Describe the image on the clipboard"""
-        clipped_image = clip.image().encode().data()
-        if clipped_image:
-            base64_image = base64.b64encode(clipped_image).decode("utf-8")
-        else:
-            print("No image found in clipboard")
+        try:
+            clipped_image = clip.image()
+            if not clipped_image:
+                print("No image found in clipboard")
+                return
+            
+            data = clipped_image.encode().data()
+            base64_image = base64.b64encode(data).decode("utf-8")
+        except:
+            print("Invalid image found in clipboard")
             return
+            
 
         # OpenAI API Key
         api_key = os.environ["OPENAI_API_KEY"]
