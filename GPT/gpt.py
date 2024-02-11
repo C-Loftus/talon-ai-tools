@@ -1,7 +1,7 @@
 import re
 from talon import Module, actions, clip, app, settings, imgui, registry
 from typing import Literal
-import requests, os, json
+import requests, os, json, platform
 from .lib import HTMLbuilder
 from concurrent.futures import ThreadPoolExecutor
 
@@ -189,11 +189,12 @@ class UserActions:
                 command_list += delimited
 
         prompt = f"""
-        The following is a list of commands for a program that controls the user's desktop.
+        The following is a list of commands separated by \n for a program that controls the user's desktop. Each command after the delimiter is a separate command unrelated to the previous command.
         I am a user and I want to find {command_description}.
-        If there is no command return the exact word "None".
+        Return the exact relevant command or the exact word "None" and nothing else. 
         """
 
+        # TODO: tokenize instead of splitting by character
         def split_into_chunks(text: str, chunk_size: int):
             return [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
         
@@ -211,6 +212,12 @@ class UserActions:
 
 
 def remove_wrapper(text: str):
-    regex = r'[^"]+"([^"]+)"'
+    # different command wrapper for Linux. 
+    if platform.system() == "Linux":
+        regex = r"^.*?'(.*?)'.*?$"
+    else:
+        # TODO condense these regexes. Hard to test between platforms
+        # since the wrapper is slightly different
+        regex = r'[^"]+"([^"]+)"'
     match = re.search(regex, text)
-    return match.group(1)
+    return match.group(1) if match else text

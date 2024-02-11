@@ -124,8 +124,12 @@ class Builder:
 
         # If you are using a browser through a snap package on Linux you cannot 
         # open many directories so we just default to the downloads folder since that is one we can use
+        if platform.system() == "Linux":
+            dir = os.path.join(os.path.expanduser("~"), "Downloads")
+        else:
+            dir = None
 
-        with tempfile.NamedTemporaryFile(mode='w+', suffix='.html', delete=False, encoding='utf-8') as temp_file:
+        with tempfile.NamedTemporaryFile(mode='w+', suffix='.html', delete=False, encoding='utf-8', dir=dir) as temp_file:
             temp_file.write(full_html)
             temp_file_path = temp_file.name
         webbrowser.open("file://"+os.path.abspath(temp_file_path))
