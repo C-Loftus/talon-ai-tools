@@ -1,5 +1,4 @@
 mode: command
-
 -
 
 # You have to explicitly confirm the output of the model before

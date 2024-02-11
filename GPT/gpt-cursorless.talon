@@ -1,6 +1,5 @@
 mode: command
 tag: user.cursorless
-
 -
 
 # Apply a prompt to any text, and output it any target
@@ -8,5 +7,3 @@ tag: user.cursorless
     text = user.cursorless_get_text_list(cursorless_target)
     result = user.gpt_apply_prompt(user.staticPrompt, text)
     user.cursorless_insert(cursorless_destination, result)
-
-

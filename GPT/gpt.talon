@@ -1,5 +1,4 @@
 mode: command
-
 -
 
 # Ask a question in the voice command and the AI will answer it.

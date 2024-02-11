@@ -2,7 +2,7 @@ list:  user.staticPrompt
 -
 
 # Use static prompts for detailed instructions without needing to say them every time
-# These all operate upon the currently selected text 
+# These all operate upon the currently selected text
 
 ## FIXES
 fix grammar formally: Fix any mistakes or irregularities in grammar, spelling, or formatting. Use a professional business tone.  The text was created used voice dictation. Thus, there is likely to be issues regarding homophones and other misrecognitions. Do not change the original structure of the text.
@@ -11,8 +11,8 @@ fix grammar casually:  Fix any mistakes or irregularities in grammar, spelling, 
 
 ## FORMATTING
 format table: The following markdown text is raw data. There is no index. Return the text in a markdown table format. Each row has a new line in the original data.
-format bullets: Convert the every paragraph into a one heading with series of bullet points underneath it. Each paragraph is separated by a new line. Separate paragraphs should not have combined bullet points. This should all be done in markdown syntax. If it is a small paragraph than you can just leave it as a heading and not add bullet points. Do not reduce content, only reduce things that would be redundant. These bullet points should be in a useful format for notes for those who want to quickly look at it. If there is a citation in the markdown original then keep the citation just at the top and not within every individual bullet point. 
-format mermaid: convert the following plain text into the text syntax for a mermaid diagram. 
+format bullets: Convert the every paragraph into a one heading with series of bullet points underneath it. Each paragraph is separated by a new line. Separate paragraphs should not have combined bullet points. This should all be done in markdown syntax. If it is a small paragraph than you can just leave it as a heading and not add bullet points. Do not reduce content, only reduce things that would be redundant. These bullet points should be in a useful format for notes for those who want to quickly look at it. If there is a citation in the markdown original then keep the citation just at the top and not within every individual bullet point.
+format mermaid: convert the following plain text into the text syntax for a mermaid diagram.
 format gant: convert the following plain text into the text syntax for a gant chart within mermaid.
 
 ## TEXT GENERATION
@@ -25,16 +25,16 @@ shell: generate a shell script that performs the following actions. Output only 
 
 ## FILE CONVERSIONS
 convert to jason:  Convert the following data into a json format.
-convert to markdown: Convert the following plain text into a markdown format. 
+convert to markdown: Convert the following plain text into a markdown format.
 convert to python: Convert the following key value pairs into the syntax for a python dictionary. This is essentially just serializing it into a native python format.
-convert to sheet: Convert the following data into a csv format. 
+convert to sheet: Convert the following data into a csv format.
 convert to yam: Convert the following data into a yaml format.
 
 ## ACCESSIBILITY
-describe code: explain what the following code does in natural language at a high level without getting into the specifics of the syntax. 
+describe code: explain what the following code does in natural language at a high level without getting into the specifics of the syntax.
 describe structure: describe the structure of the following text. Do not describe the content. Describe the structure of the text.
-describe summary: Condense the following text into a summary that is less verbose but still gives me the gist of the content. Do not describe the formatting. 
-check grammar: Check the grammar of the following text. Return a list of all potential errors. 
+describe summary: Condense the following text into a summary that is less verbose but still gives me the gist of the content. Do not describe the formatting.
+check grammar: Check the grammar of the following text. Return a list of all potential errors.
 check spelling: Check the spelling of the following text. Return a list of all potential errors.
 check structure: I want you to skim the structure and layout of the following text. Tell me if the structure and order of my writing is correct. If it is not correct or flows poorly then tell me what might be wrong with it. If it is all correct then say it looks good. Do not describe the formatting. Do not comment on the specific content only its ordering and layout.
 
