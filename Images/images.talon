@@ -1,4 +1,4 @@
-describe the clipboard:
+describe image:
     user.describe_clipboard()
 
 generate image of <user.text>:

@@ -1,5 +1,5 @@
 from talon import Module, clip
-import requests, os
+import requests, os, webbrowser, base64
 
 mod = Module()
 
@@ -7,7 +7,12 @@ mod = Module()
 class Actions:
     def describe_clipboard():
         """Describe the image on the clipboard"""
-        base64_image = clip.image().encode().data
+        clipped_image = clip.image().encode().data()
+        if clipped_image:
+            base64_image = base64.b64encode(clipped_image).decode('utf-8')
+        else:
+            print("No image found in clipboard")
+            return
 
         # OpenAI API Key
         api_key = os.environ["OPENAI_API_KEY"]
@@ -43,7 +48,15 @@ class Actions:
 
         response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
 
-        print(response.json())
+        # RESPONSE FORMAT (in case you don't GPT-4 access)
+        '''
+         {'id': '$$REMOVED$$', 'object': 'chat.completion', 'created': 1707691631, 'model': 'gpt-4-1106-vision-preview', 'usage': {'prompt_tokens': 281, 'completion_tokens': 71, 'total_tokens': 352}, 'choices': [{'message': {'role': 'assistant', 'content': "The image is a close-up photo of a person's face. The individual appears to be a man with short hair, a slight stubble on the face, and a friendly expression"}, 'finish_reason': 'stop', 'index': 0}]}
+        '''
+
+        response_dict = response.json()
+        response_text = response_dict["choices"][0]["message"]["content"]
+        print(response_text)
+        return response_text
 
     def generate_image(prompt: str):
         """Generate an image from the provided text"""
@@ -64,6 +77,12 @@ class Actions:
 
         # The response will be in JSON format, you can convert it to a Python dictionary using .json()
         response_dict = response.json() 
-        print(response_dict)
+
+        # RESPONSE FORMAT (in case you don't GPT-4 access)
+        '''
+        {'created': $$REMOVED$$, 'data': [{'revised_prompt': 'Create a visually stunning image of a cat. The cat is domestic, with short, thick fur with brindle pattern. Its eyes are large, emerald green, shimmering with curiosity. It is playfully crouched with its tail flicking back and forth, ready to pounce. The cat is outdoors, with grass under its paws and the sun casting shadows, creating a lovely contrast of light and dark shapes on the scene.', 'url': '$$REMOVED$$'}]}
+        '''
+        webbrowser.open(response_dict["output"][0]["url"])
+
         # TODO choose whether to save the image, save the url, or paste the image into the current window
     
