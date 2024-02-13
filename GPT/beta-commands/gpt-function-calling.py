@@ -94,8 +94,9 @@ class UserActions:
 
     def gpt_can_you_cursorless(utterance: str, text_to_process: str, cursorless_destination: any):
         """Run a query with function calls and insert the result using cursorless"""
+        if cursorless_destination == 0:
+            return gpt_function_query(utterance, text_to_process, actions.user.paste)
         def insert_to_destination(result: str):
             actions.user.cursorless_insert(cursorless_destination, result)
         return gpt_function_query(utterance, text_to_process, insert_to_destination)
 
-    
