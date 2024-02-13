@@ -1,6 +1,5 @@
 mode: command
 tag: user.gpt_beta
-
 -
 
 # Say your prompt directly and the AI will apply it to the selected text
