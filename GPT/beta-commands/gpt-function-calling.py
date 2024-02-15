@@ -6,8 +6,12 @@ import requests
 from talon import Module, actions, settings
 
 from ..gpt import notify
-from .gpt_callables import (display_response, function_specs, notify_user,
-                            search_for_command)
+from .gpt_callables import (
+    display_response,
+    function_specs,
+    notify_user,
+    search_for_command,
+)
 
 mod = Module()
 
