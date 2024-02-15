@@ -1,7 +1,6 @@
 # TTS comes from the sight-free-talon repo
 # This repo is a dependency for use of TTS
 tag: user.sightFreeTalonInstalled
-
 -
 
 echo {user.staticPrompt}$:
