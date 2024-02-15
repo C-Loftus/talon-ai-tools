@@ -30,10 +30,10 @@ repos:
     rev: "1.0.1"
     hooks:
       - id: flynt
-  - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
-    hooks:
-      - id: isort
+  # - repo: https://github.com/pycqa/isort
+  #   rev: 5.13.2
+  #   hooks:
+  #     - id: isort
   - repo: https://github.com/psf/black-pre-commit-mirror
     rev: 24.1.1
     hooks:
