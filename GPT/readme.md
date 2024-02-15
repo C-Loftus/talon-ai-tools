@@ -28,6 +28,7 @@ In order to use this repository with GPT 3.5, you need an OpenAI API key.
 
 ```python
 import os
+
 os.environ["OPENAI_API_KEY"] = "YOUR-KEY-HERE"
 ```
 
