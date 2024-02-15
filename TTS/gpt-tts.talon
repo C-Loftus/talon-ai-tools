@@ -3,7 +3,7 @@
 tag: user.sightFreeTalonInstalled
 -
 
-echo {user.staticPrompt}$:
+echo {user.staticPrompt} [this]$:
     text = edit.selected_text()
     result = user.gpt_apply_prompt(user.staticPrompt, text)
     user.tts(result)
