@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Any, Callable
+from typing import Any, Optional
 
 import requests
 from talon import Module, actions, settings
@@ -9,16 +9,17 @@ from ..gpt import notify
 from .gpt_callables import (
     display_response,
     function_specs,
+    insert_response,
     notify_user,
     search_for_command,
 )
-from .types import ChatCompletionResponse, Message
+from ..lib.types import ChatCompletionResponse, Message, InsertOption
 
 mod = Module()
 
 
 def gpt_function_query(
-    prompt: str, content: str, insert_response: Callable[[str], None]
+    prompt: str, content: str, insert_response: InsertOption = InsertOption.PASTE, cursorless_destination: Optional[Any] = None
 ) -> None:
     notify("GPT Task Started")
 
@@ -55,26 +56,22 @@ def gpt_function_query(
     if response.status_code == 200:
         notify("GPT Task Completed")
         payload: ChatCompletionResponse = response.json()
-        message = payload["choices"][0]["message"]
-        process_function_calls(insert_response, message)
-
-        content = (message["content"] or "").strip()
-        if len(content) != 0:
-            display_response(content)
+        result = payload["choices"][0]["message"]
+        process_function_calls(result, insert_response, cursorless_destination)
 
     else:
         notify("GPT Failure: Check API Key, Model, or Prompt")
         raise Exception(f"GPT Failure at POST request: {response.json()}")
 
 
-def process_function_calls(insert_response: Callable[[str], None], message: Message):
+def process_function_calls(message: Message, insertion_type: InsertOption, cursorless_destination: Optional[Any] = None):
     try:
         tool_calls = message["tool_calls"]
     except KeyError:
         notify("No tool calls were found in LLM response")
         print(message)
         return
-
+    
     for tool in tool_calls:
         try:
             arguments = json.loads(tool["function"]["arguments"])
@@ -93,7 +90,13 @@ def process_function_calls(insert_response: Callable[[str], None], message: Mess
             case "search_for_command":
                 search_for_command(first_argument)
             case "insert_response":
-                insert_response(first_argument)
+                match insertion_type:
+                    case InsertOption.PASTE:
+                        insert_response(first_argument)
+                    case InsertOption.CURSORLESS: 
+                        actions.user.cursorless_insert(first_argument, cursorless_destination)
+                    case InsertOption.KEY_PRESSES:
+                        actions.insert(first_argument)
             # Just insert everything else since sometimes if will return
             # the language as the function name
             case _:
@@ -102,20 +105,17 @@ def process_function_calls(insert_response: Callable[[str], None], message: Mess
 
 @mod.action_class
 class UserActions:
-    def gpt_can_you(utterance: str, selected_text: str) -> None:
-        """Run a query with function calls and insert the result"""
-        gpt_function_query(utterance, selected_text, actions.user.paste)
+    def gpt_dynamic_request(utterance: str, selected_text: str) -> None:
+        """Run a query with dynamic function calls and paste the result"""
+        gpt_function_query(utterance, selected_text)
 
-    def gpt_can_you_cursorless(
-        utterance: str, text_to_process: list[str], cursorless_destination: Any
+    def gpt_dynamic_request_cursorless(
+        utterance: str, selected_text: list[str], cursorless_destination: Any
     ) -> None:
-        """Run a query with function calls and insert the result using cursorless"""
+        """Run a query with dynamic function calls and insert the result with cursorless"""
         if cursorless_destination == 0:
-            return gpt_function_query(
-                utterance, str(text_to_process), actions.user.paste
+            gpt_function_query(
+                utterance, str(selected_text), InsertOption.PASTE, cursorless_destination=None
             )
-
-        def insert_to_destination(result: str):
-            actions.user.cursorless_insert(cursorless_destination, result)
-
-        gpt_function_query(utterance, str(text_to_process), insert_to_destination)
+        else:
+            gpt_function_query(utterance, str(selected_text), InsertOption.CURSORLESS, cursorless_destination)

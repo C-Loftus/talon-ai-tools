@@ -7,3 +7,5 @@ tag: user.cursorless
     text = user.cursorless_get_text_list(cursorless_target)
     result = user.gpt_apply_prompt(user.staticPrompt, text)
     user.cursorless_insert(cursorless_destination, result)
+
+tag(): user.gpt_beta

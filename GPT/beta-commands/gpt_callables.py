@@ -81,7 +81,7 @@ class CallableFunction:
 
 
 def notify_user(response: str):
-    """Notify the user using a popup notification"""
+    """Notify the user a message using a popup notification"""
     actions.app.notify(response)
 
 
@@ -92,7 +92,7 @@ def search_for_command(response: str):
 
 
 def display_response(response: str):
-    """Display the response to the user. Use this for all informational text aside from notifications. Use this instead of returning content in the response."""
+    """Display the response to the user in a new window."""
     builder = Builder()
     builder.h1("Displaying the Model Response")
     builder.p(response)
@@ -100,15 +100,13 @@ def display_response(response: str):
 
 
 def insert_response(response: str):
-    """Insert the response into the current document using proper syntax for the current language. This is the default action if no other function is found."""
+    """Insert or type the result of a user request into the current document, replacing or generating text and preserving proper formatting."""
     actions.user.paste(response)
-
 
 # This is the list of functions that can be called by the GPT model
 function_specs = [
     CallableFunction(display_response, "The text to display").serialize(),
     CallableFunction(notify_user, "The text to notify").serialize(),
     CallableFunction(search_for_command, "The command to search for").serialize(),
+    CallableFunction(insert_response, "The text to insert").serialize(),
 ]
-
-print(function_specs)

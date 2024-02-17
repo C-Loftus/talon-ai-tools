@@ -1,4 +1,5 @@
 from typing import Optional, TypedDict
+import enum
 
 
 class FunctionArguments(TypedDict):
@@ -21,3 +22,8 @@ class Choice(TypedDict):
 
 class ChatCompletionResponse(TypedDict):
     choices: list[Choice]
+
+class InsertOption(enum.Enum):
+    PASTE = enum.auto()
+    CURSORLESS = enum.auto()
+    KEY_PRESSES = enum.auto()
