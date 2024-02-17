@@ -102,7 +102,7 @@ def process_function_calls(
                         insert_response(first_argument)
                     case InsertOption.CURSORLESS:
                         actions.user.cursorless_insert(
-                            first_argument, cursorless_destination
+                            cursorless_destination, first_argument
                         )
                     case InsertOption.KEY_PRESSES:
                         actions.insert(first_argument)
@@ -125,14 +125,14 @@ class UserActions:
         if cursorless_destination == 0:
             gpt_function_query(
                 utterance,
-                str(selected_text),
+                " ".join(selected_text),
                 InsertOption.PASTE,
                 cursorless_destination=None,
             )
         else:
             gpt_function_query(
                 utterance,
-                str(selected_text),
+                " ".join(selected_text),
                 InsertOption.CURSORLESS,
                 cursorless_destination,
             )
