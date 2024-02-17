@@ -1,5 +1,5 @@
-from typing import Optional, TypedDict
 import enum
+from typing import Optional, TypedDict
 
 
 class FunctionArguments(TypedDict):
@@ -22,6 +22,7 @@ class Choice(TypedDict):
 
 class ChatCompletionResponse(TypedDict):
     choices: list[Choice]
+
 
 class InsertOption(enum.Enum):
     PASTE = enum.auto()

@@ -103,6 +103,7 @@ def insert_response(response: str):
     """Insert or type the result of a user request into the current document, replacing or generating text and preserving proper formatting."""
     actions.user.paste(response)
 
+
 # This is the list of functions that can be called by the GPT model
 function_specs = [
     CallableFunction(display_response, "The text to display").serialize(),

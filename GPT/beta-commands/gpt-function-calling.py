@@ -6,6 +6,7 @@ import requests
 from talon import Module, actions, settings
 
 from ..gpt import notify
+from ..lib.types import ChatCompletionResponse, InsertOption, Message
 from .gpt_callables import (
     display_response,
     function_specs,
@@ -13,13 +14,15 @@ from .gpt_callables import (
     notify_user,
     search_for_command,
 )
-from ..lib.types import ChatCompletionResponse, Message, InsertOption
 
 mod = Module()
 
 
 def gpt_function_query(
-    prompt: str, content: str, insert_response: InsertOption = InsertOption.PASTE, cursorless_destination: Optional[Any] = None
+    prompt: str,
+    content: str,
+    insert_response: InsertOption = InsertOption.PASTE,
+    cursorless_destination: Optional[Any] = None,
 ) -> None:
     notify("GPT Task Started")
 
@@ -64,14 +67,18 @@ def gpt_function_query(
         raise Exception(f"GPT Failure at POST request: {response.json()}")
 
 
-def process_function_calls(message: Message, insertion_type: InsertOption, cursorless_destination: Optional[Any] = None):
+def process_function_calls(
+    message: Message,
+    insertion_type: InsertOption,
+    cursorless_destination: Optional[Any] = None,
+):
     try:
         tool_calls = message["tool_calls"]
     except KeyError:
         notify("No tool calls were found in LLM response")
         print(message)
         return
-    
+
     for tool in tool_calls:
         try:
             arguments = json.loads(tool["function"]["arguments"])
@@ -93,8 +100,10 @@ def process_function_calls(message: Message, insertion_type: InsertOption, curso
                 match insertion_type:
                     case InsertOption.PASTE:
                         insert_response(first_argument)
-                    case InsertOption.CURSORLESS: 
-                        actions.user.cursorless_insert(first_argument, cursorless_destination)
+                    case InsertOption.CURSORLESS:
+                        actions.user.cursorless_insert(
+                            first_argument, cursorless_destination
+                        )
                     case InsertOption.KEY_PRESSES:
                         actions.insert(first_argument)
             # Just insert everything else since sometimes if will return
@@ -115,7 +124,15 @@ class UserActions:
         """Run a query with dynamic function calls and insert the result with cursorless"""
         if cursorless_destination == 0:
             gpt_function_query(
-                utterance, str(selected_text), InsertOption.PASTE, cursorless_destination=None
+                utterance,
+                str(selected_text),
+                InsertOption.PASTE,
+                cursorless_destination=None,
             )
         else:
-            gpt_function_query(utterance, str(selected_text), InsertOption.CURSORLESS, cursorless_destination)
+            gpt_function_query(
+                utterance,
+                str(selected_text),
+                InsertOption.CURSORLESS,
+                cursorless_destination,
+            )
