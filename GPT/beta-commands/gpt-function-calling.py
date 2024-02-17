@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Callable
+from typing import Any, Callable
 
 import requests
 from talon import Module, actions, settings
@@ -12,20 +12,22 @@ from .gpt_callables import (
     notify_user,
     search_for_command,
 )
+from .types import ChatCompletionResponse, Message
 
 mod = Module()
 
 
 def gpt_function_query(
-    prompt: str, content: str, insert_response: Callable[[str], str]
-) -> str:
+    prompt: str, content: str, insert_response: Callable[[str], None]
+) -> None:
     notify("GPT Task Started")
 
     try:
         TOKEN = os.environ["OPENAI_API_KEY"]
-    except:
-        notify("GPT Failure: env var OPENAI_API_KEY is not set.")
-        raise Exception("GPT Failure")
+    except KeyError:
+        message = "GPT Failure: env var OPENAI_API_KEY is not set."
+        notify(message)
+        raise Exception(message)
 
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
@@ -52,7 +54,8 @@ def gpt_function_query(
 
     if response.status_code == 200:
         notify("GPT Task Completed")
-        message = response.json()["choices"][0]["message"]
+        payload: ChatCompletionResponse = response.json()
+        message = payload["choices"][0]["message"]
         process_function_calls(insert_response, message)
 
         content = (message["content"] or "").strip()
@@ -64,20 +67,18 @@ def gpt_function_query(
         raise Exception(f"GPT Failure at POST request: {response.json()}")
 
 
-def process_function_calls(insert_response, message):
+def process_function_calls(insert_response: Callable[[str], None], message: Message):
     try:
         tool_calls = message["tool_calls"]
-    except Exception as e:
-        notify(f"No tool calls were found in LLM response")
+    except KeyError:
+        notify("No tool calls were found in LLM response")
         print(message)
         return
 
     for tool in tool_calls:
-
         try:
-            first_argument = tool["function"]["arguments"]
-            first_argument = json.loads(first_argument)
-            first_argument = first_argument[list(first_argument.keys())[0]]
+            arguments = json.loads(tool["function"]["arguments"])
+            first_argument = arguments[list(arguments.keys())[0]]
 
         except Exception as e:
             print(tool)
@@ -101,18 +102,20 @@ def process_function_calls(insert_response, message):
 
 @mod.action_class
 class UserActions:
-    def gpt_can_you(utterance: str, selected_text: str) -> str:
+    def gpt_can_you(utterance: str, selected_text: str) -> None:
         """Run a query with function calls and insert the result"""
-        return gpt_function_query(utterance, selected_text, actions.user.paste)
+        gpt_function_query(utterance, selected_text, actions.user.paste)
 
     def gpt_can_you_cursorless(
-        utterance: str, text_to_process: str, cursorless_destination: any
-    ):
+        utterance: str, text_to_process: list[str], cursorless_destination: Any
+    ) -> None:
         """Run a query with function calls and insert the result using cursorless"""
         if cursorless_destination == 0:
-            return gpt_function_query(utterance, text_to_process, actions.user.paste)
+            return gpt_function_query(
+                utterance, str(text_to_process), actions.user.paste
+            )
 
         def insert_to_destination(result: str):
             actions.user.cursorless_insert(cursorless_destination, result)
 
-        return gpt_function_query(utterance, text_to_process, insert_to_destination)
+        gpt_function_query(utterance, str(text_to_process), insert_to_destination)

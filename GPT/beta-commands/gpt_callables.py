@@ -11,7 +11,7 @@ To create a new function callable by the GPT model, create a new function and ad
 # TODO make it automatically called in the match statement in gpt-function-calling.py Might require scary eval stuff
 
 
-def _to_openai_type(arg):
+def _to_openai_type(arg: str):
     match arg:
         case "str":
             return "string"
@@ -32,24 +32,25 @@ class CallableFunction:
     # List of arg name, arg type, arg description
     args: list[tuple[str, str, str]]
 
-    def __init__(self, function: Callable, arg_descriptions: list[str] | str | None):
+    def __init__(self, function: Callable, *arg_descriptions: str):
         """
         Create a new callable function for the GPT model by providing a function and a list of argument descriptions. The argument descriptions should be in the same order as the function's arguments. The docstring and argument names are used to generate the function's description and argument names.
         """
         self.function = function
-        self.description = inspect.getdoc(function)
+        description = inspect.getdoc(function)
+
+        if description is None:
+            raise ValueError("The function must have a docstring")
+
+        self.description = description
 
         # get list of argumment names and types
         arg_names = list(inspect.signature(function).parameters.keys())
-        arg_names = [str(arg) for arg in arg_names]
 
-        arg_types = list(inspect.signature(function).parameters.values())
-        arg_types = [str(arg).split(":")[1].strip() for arg in arg_types]
-        arg_types = [_to_openai_type(arg) for arg in arg_types]
-
-        # Convert arg_descriptions to a list if it is a string to make it length-wise comparable
-        if isinstance(arg_descriptions, str):
-            arg_descriptions = [arg_descriptions]
+        arg_types = [
+            _to_openai_type(arg.annotation.__name__)
+            for arg in inspect.signature(function).parameters.values()
+        ]
 
         # Make sure there are descriptions for all arguments
         if len(arg_descriptions) != len(arg_names):
@@ -109,3 +110,5 @@ function_specs = [
     CallableFunction(notify_user, "The text to notify").serialize(),
     CallableFunction(search_for_command, "The command to search for").serialize(),
 ]
+
+print(function_specs)
