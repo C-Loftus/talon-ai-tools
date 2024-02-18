@@ -3,7 +3,6 @@ import os
 import platform
 import re
 from concurrent.futures import ThreadPoolExecutor
-from typing import Literal
 
 import requests
 from talon import Module, actions, app, clip, imgui, registry, settings
@@ -11,19 +10,6 @@ from talon import Module, actions, app, clip, imgui, registry, settings
 from .lib import HTMLbuilder
 
 mod = Module()
-mod.tag("gpt_beta")
-# Stores all our prompts that don't require arguments
-# (ie those that just take in the clipboard text)
-mod.list("staticPrompt", desc="GPT Prompts Without Dynamic Arguments")
-mod.setting(
-    "llm_provider",
-    type=Literal["OPENAI", "LOCAL_LLAMA"],
-    default="OPENAI",
-)
-
-mod.setting(
-    "openai_model", type=Literal["gpt-3.5-turbo", "gpt-4"], default="gpt-3.5-turbo"
-)
 
 
 text_to_confirm = ""
@@ -63,46 +49,33 @@ def gpt_query(prompt: str, content: str) -> str:
 
     notify("GPT Task Started")
 
-    match PROVIDER := settings.get("user.llm_provider"):
 
-        case "OPENAI":
-            try:
-                TOKEN = os.environ["OPENAI_API_KEY"]
-            except:
-                notify("GPT Failure: env var OPENAI_API_KEY is not set.")
-                return ""
+    try:
+        TOKEN = os.environ["OPENAI_API_KEY"]
+    except:
+        notify("GPT Failure: env var OPENAI_API_KEY is not set.")
+        return ""
 
-            url = "https://api.openai.com/v1/chat/completions"
-            headers = {
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {TOKEN}",
-            }
-            data = {
-                "messages": [{"role": "user", "content": f"{prompt}:\n{content}"}],
-                "max_tokens": 2024,
-                "temperature": 0.6,
-                "n": 1,
-                "stop": None,
-                "model": settings.get("user.openai_model"),
-            }
-
-        case "LOCAL_LLAMA":
-            url = "http://localhost:8080/v1/chat/completions"
-            headers = {
-                "Content-Type": "application/json",
-            }
-            data = {
-                "model": "gpt-3.5-turbo",
-                "messages": [
-                    {
-                        "role": "system",
-                        "content": "You are an assistant helping an office worker to be more productive.",
-                    },
-                    {"role": "user", "content": f"{prompt}:\n{content}"},
-                ],
-            }
-        case _:
-            raise ValueError(f"Unknown LLM provider {PROVIDER}")
+    url = settings.get("user.model_endpoint")
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {TOKEN}",
+    }
+    data = {
+        "messages": [
+            {
+                    "role": "system",
+                    "content": settings.get("user.model_system_prompt"),
+                },
+            {"role": "user", "content": f"{prompt}:\n{content}"}
+            
+            ],
+        "max_tokens": 2024,
+        "temperature": settings.get("user.model_temperature"),
+        "n": 1,
+        "stop": None,
+        "model": settings.get("user.openai_model"),
+    }
 
     response = requests.post(url, headers=headers, data=json.dumps(data))
 
