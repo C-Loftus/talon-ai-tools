@@ -48,7 +48,7 @@ def gpt_function_query(
         ],
         "tools": function_specs,
         "max_tokens": 2024,
-        "temperature": 0.6,
+        "temperature": settings.get("user.model_temperature"),
         "n": 1,
         "stop": None,
         "model": settings.get("user.openai_model"),
