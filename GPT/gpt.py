@@ -49,7 +49,6 @@ def gpt_query(prompt: str, content: str) -> str:
 
     notify("GPT Task Started")
 
-
     try:
         TOKEN = os.environ["OPENAI_API_KEY"]
     except:
@@ -64,12 +63,11 @@ def gpt_query(prompt: str, content: str) -> str:
     data = {
         "messages": [
             {
-                    "role": "system",
-                    "content": settings.get("user.model_system_prompt"),
-                },
-            {"role": "user", "content": f"{prompt}:\n{content}"}
-            
-            ],
+                "role": "system",
+                "content": settings.get("user.model_system_prompt"),
+            },
+            {"role": "user", "content": f"{prompt}:\n{content}"},
+        ],
         "max_tokens": 2024,
         "temperature": settings.get("user.model_temperature"),
         "n": 1,

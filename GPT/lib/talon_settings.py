@@ -1,5 +1,6 @@
+from typing import Literal
+
 from talon import Module
-from  typing import Literal
 
 mod = Module()
 mod.tag("gpt_beta", desc="Tag for enabling beta GPT commands")
@@ -22,12 +23,12 @@ mod.setting(
     "model_endpoint",
     type=str,
     default="https://api.openai.com/v1/chat/completions",
-    desc="The endpoint to send the model requests to"
+    desc="The endpoint to send the model requests to",
 )
 
 mod.setting(
     "model_system_prompt",
     type=str,
     default="You are an assistant helping an office worker to be more productive.",
-    desc="The default system prompt that informs the way the model should behave at a high level"
+    desc="The default system prompt that informs the way the model should behave at a high level",
 )
