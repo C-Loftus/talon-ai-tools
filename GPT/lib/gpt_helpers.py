@@ -21,8 +21,8 @@ def notify(message: str):
 def generate_payload(
     prompt: str, content: str, tools: Optional[list[Tool]] = None
 ) -> Tuple[Headers, Data]:
-    """Generate the headers and data for the OpenAI API GPT request. Does not return the URL given the fact
-    not all openai-compatible endpoints support new features like tools"""
+    """Generate the headers and data for the OpenAI API GPT request. 
+    Does not return the URL given the fact not all openai-compatible endpoints support new features like tools"""
     notify("GPT Task Started")
 
     try:
@@ -31,16 +31,20 @@ def generate_payload(
         message = "GPT Failure: env var OPENAI_API_KEY is not set."
         notify(message)
         raise Exception(message)
+    
+    language = actions.code.language() 
+    additional_context = f"\nThe user is currently in a code editor for {language}." if language != '' else ""
 
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {TOKEN}",
     }
+    
     data = {
         "messages": [
             {
                 "role": "system",
-                "content": settings.get("user.model_system_prompt"),
+                "content": settings.get("user.model_system_prompt") + additional_context,
             },
             {"role": "user", "content": f"{prompt}:\n{content}"},
         ],
