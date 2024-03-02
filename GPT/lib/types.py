@@ -28,3 +28,7 @@ class InsertOption(enum.Enum):
     PASTE = enum.auto()
     CURSORLESS = enum.auto()
     KEY_PRESSES = enum.auto()
+
+Headers = dict[str, str]
+Data = dict[str, str]
+Tool = dict[str,str]

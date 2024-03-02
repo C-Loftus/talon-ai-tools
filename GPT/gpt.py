@@ -1,13 +1,12 @@
 import json
 import os
-import platform
-import re
 from concurrent.futures import ThreadPoolExecutor
 
 import requests
 from talon import Module, actions, app, clip, imgui, registry, settings
 
 from .lib import HTMLbuilder
+from .lib.gpt_helpers import generate_payload, notify, remove_wrapper
 
 mod = Module()
 
@@ -35,56 +34,21 @@ def confirmation_gui(gui: imgui.GUI):
         actions.user.close_model_confirmation_gui()
 
 
-# Defaults to Andreas's custom notifications if you have them installed
-def notify(message: str):
-    try:
-        actions.user.notify(message)
-    except:
-        app.notify(message)
-    # Log in case notifications are disabled
-    print(message)
-
-
 def gpt_query(prompt: str, content: str) -> str:
 
-    notify("GPT Task Started")
-
-    try:
-        TOKEN = os.environ["OPENAI_API_KEY"]
-    except:
-        notify("GPT Failure: env var OPENAI_API_KEY is not set.")
-        return ""
-
     url = settings.get("user.model_endpoint")
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {TOKEN}",
-    }
-    data = {
-        "messages": [
-            {
-                "role": "system",
-                "content": settings.get("user.model_system_prompt"),
-            },
-            {"role": "user", "content": f"{prompt}:\n{content}"},
-        ],
-        "max_tokens": 2024,
-        "temperature": settings.get("user.model_temperature"),
-        "n": 1,
-        "stop": None,
-        "model": settings.get("user.openai_model"),
-    }
+    
+    headers, data = generate_payload(prompt, content)
 
     response = requests.post(url, headers=headers, data=json.dumps(data))
 
-    if response.status_code == 200:
-        notify("GPT Task Completed")
-        return response.json()["choices"][0]["message"]["content"].strip()
-
-    else:
-        notify("GPT Failure: Check API Key, Model, or Prompt")
-        print(response.json())
-
+    match response.status_code:
+        case 200:
+            notify("GPT Task Completed")
+            return response.json()["choices"][0]["message"]["content"].strip()
+        case _:
+            notify("GPT Failure: Check API Key, Model, or Prompt")
+            print(response.json())
 
 @mod.action_class
 class UserActions:
@@ -188,14 +152,3 @@ class UserActions:
                 builder.p(result)
         builder.render()
 
-
-def remove_wrapper(text: str):
-    # different command wrapper for Linux.
-    if platform.system() == "Linux":
-        regex = r"^.*?'(.*?)'.*?$"
-    else:
-        # TODO condense these regexes. Hard to test between platforms
-        # since the wrapper is slightly different
-        regex = r'[^"]+"([^"]+)"'
-    match = re.search(regex, text)
-    return match.group(1) if match else text

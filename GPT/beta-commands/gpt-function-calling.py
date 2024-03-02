@@ -5,7 +5,6 @@ from typing import Any, Optional
 import requests
 from talon import Module, actions, settings
 
-from ..gpt import notify
 from ..lib.types import ChatCompletionResponse, InsertOption, Message
 from .gpt_callables import (
     display_response,
@@ -14,6 +13,7 @@ from .gpt_callables import (
     notify_user,
     search_for_command,
 )
+from ..lib.gpt_helpers import notify, generate_payload
 
 mod = Module()
 
@@ -24,48 +24,24 @@ def gpt_function_query(
     insert_response: InsertOption = InsertOption.PASTE,
     cursorless_destination: Optional[Any] = None,
 ) -> None:
-    notify("GPT Task Started")
 
-    try:
-        TOKEN = os.environ["OPENAI_API_KEY"]
-    except KeyError:
-        message = "GPT Failure: env var OPENAI_API_KEY is not set."
-        notify(message)
-        raise Exception(message)
-
+        
+    # Function calling likely to not be supported in local models so better to use OpenAI
     url = "https://api.openai.com/v1/chat/completions"
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {TOKEN}",
-    }
-    data = {
-        "messages": [
-            {
-                "role": "system",
-                "content": f"language:\n{actions.code.language()}",
-            },
-            {"role": "user", "content": f"{prompt}:\n{content}"},
-        ],
-        "tools": function_specs,
-        "max_tokens": 2024,
-        "temperature": settings.get("user.model_temperature"),
-        "n": 1,
-        "stop": None,
-        "model": settings.get("user.openai_model"),
-    }
+     
+    headers, data = generate_payload(prompt, content, function_specs)
 
     response = requests.post(url, headers=headers, data=json.dumps(data))
 
-    if response.status_code == 200:
-        notify("GPT Task Completed")
-        payload: ChatCompletionResponse = response.json()
-        result = payload["choices"][0]["message"]
-        process_function_calls(result, insert_response, cursorless_destination)
-
-    else:
-        notify("GPT Failure: Check API Key, Model, or Prompt")
-        raise Exception(f"GPT Failure at POST request: {response.json()}")
-
+    match response.status_code:
+        case 200:
+            notify("GPT Task Completed")
+            payload: ChatCompletionResponse = response.json()
+            result = payload["choices"][0]["message"]
+            process_function_calls(result, insert_response, cursorless_destination)
+        case _:
+            notify("GPT Failure: Check API Key, Model, or Prompt")
+            raise Exception(f"GPT Failure at POST request: {response.json()}")
 
 def process_function_calls(
     message: Message,
