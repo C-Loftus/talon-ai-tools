@@ -40,14 +40,9 @@ The OpenAI API that is used in this repo, through which you make queries to GPT 
 
 If you want to change any configuration settings copy the example configuration file from `GPT/gpt-talon.settings.example` to `GPT/gpt-talon.settings`, which is a .git ignored file and modify anything that you want to change.
 
-## Local Models (llamafiles)
-
-You can use this repository with a [llamafile](https://github.com/Mozilla-Ocho/llamafile). Set the value `user.llm_provider = "LOCAL_LLAMA"` in `gpt-settings.talon` to change the default model.
-
-These models are easy to install and run entirely offline. They can be downloaded from the [llamafile](https://github.com/Mozilla-Ocho/llamafile) repository and require no setup. All you need to do is simply run the following in a terminal to run the model as a server in the background. Then if you have the `user.llm_provider` set, it will handle all your queries locally with no other setup needed.
-
-```sh
-.\llava-v1.5-7b-q4-server.llamafile --nobrowser
-```
-
-Keep in mind that running a model in the background is resource intensive and it will be slow unless you have a GPU on your computer.
+| Setting                  | Default                                                                | Notes                                                                              |
+| ------------------------ | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| user.openai_model        | "gpt-3.5-turbo"                                                        | The model to use for the queries. NOTE: To access gpt-4 you may need prior API use |
+| user.model_temperature   | 0.6                                                                    | Higher temperatures will make the model more creative and less accurate            |
+| user.model_endpoint      | https://api.openai.com/v1/chat/completions                             | Any OpenAI compatible endpoint address can be used (Azure, local llamafiles, etc)  |
+| user.model_system_prompt | "You are an assistant helping an office worker to be more productive." | The meta-prompt for how to respond to prompts                                      |

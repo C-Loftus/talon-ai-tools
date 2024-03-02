@@ -100,7 +100,7 @@ def display_response(response: str):
 
 
 def insert_response(response: str):
-    """Insert or type the result of a user request into the current document, replacing or generating text and preserving proper formatting."""
+    """Insert or type the result of a user request into the current document, replacing or generating text."""
     actions.user.paste(response)
 
 
