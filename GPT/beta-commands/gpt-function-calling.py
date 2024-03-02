@@ -5,6 +5,7 @@ from typing import Any, Optional
 import requests
 from talon import Module, actions, settings
 
+from ..lib.gpt_helpers import generate_payload, notify
 from ..lib.types import ChatCompletionResponse, InsertOption, Message
 from .gpt_callables import (
     display_response,
@@ -13,7 +14,6 @@ from .gpt_callables import (
     notify_user,
     search_for_command,
 )
-from ..lib.gpt_helpers import notify, generate_payload
 
 mod = Module()
 
@@ -25,10 +25,9 @@ def gpt_function_query(
     cursorless_destination: Optional[Any] = None,
 ) -> None:
 
-        
     # Function calling likely to not be supported in local models so better to use OpenAI
     url = "https://api.openai.com/v1/chat/completions"
-     
+
     headers, data = generate_payload(prompt, content, function_specs)
 
     response = requests.post(url, headers=headers, data=json.dumps(data))
@@ -42,6 +41,7 @@ def gpt_function_query(
         case _:
             notify("GPT Failure: Check API Key, Model, or Prompt")
             raise Exception(f"GPT Failure at POST request: {response.json()}")
+
 
 def process_function_calls(
     message: Message,

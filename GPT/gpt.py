@@ -37,7 +37,7 @@ def confirmation_gui(gui: imgui.GUI):
 def gpt_query(prompt: str, content: str) -> str:
 
     url = settings.get("user.model_endpoint")
-    
+
     headers, data = generate_payload(prompt, content)
 
     response = requests.post(url, headers=headers, data=json.dumps(data))
@@ -49,6 +49,7 @@ def gpt_query(prompt: str, content: str) -> str:
         case _:
             notify("GPT Failure: Check API Key, Model, or Prompt")
             print(response.json())
+
 
 @mod.action_class
 class UserActions:
@@ -151,4 +152,3 @@ class UserActions:
             if result != "None":
                 builder.p(result)
         builder.render()
-

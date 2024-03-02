@@ -1,7 +1,12 @@
+import os
+import platform
+import re
+from typing import Optional, Tuple
+
 from talon import actions, app, settings
-import os, platform, re
-from typing import Tuple, Optional
-from .types import Headers, Data, Tool
+
+from .types import Data, Headers, Tool
+
 
 def notify(message: str):
     """Send a notification to the user. Defaults the Andreas' notification system if you have it installed"""
@@ -13,7 +18,9 @@ def notify(message: str):
     print(message)
 
 
-def generate_payload(prompt: str, content: str, tools: Optional[list[Tool]] = None) -> Tuple[Headers, Data]:
+def generate_payload(
+    prompt: str, content: str, tools: Optional[list[Tool]] = None
+) -> Tuple[Headers, Data]:
     """Generate the headers and data for the OpenAI API GPT request. Does not return the URL given the fact
     not all openai-compatible endpoints support new features like tools"""
     notify("GPT Task Started")
@@ -46,7 +53,7 @@ def generate_payload(prompt: str, content: str, tools: Optional[list[Tool]] = No
 
     if tools is not None:
         data["tools"] = tools
-        
+
     return headers, data
 
 
