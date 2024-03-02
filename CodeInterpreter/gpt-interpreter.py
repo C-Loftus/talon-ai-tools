@@ -1,9 +1,12 @@
-from talon import Module, actions
-import requests
 import json
-from ..GPT.lib.gpt_helpers import get_token, notify 
+
+import requests
+from talon import Module, actions
+
+from ..GPT.lib.gpt_helpers import get_token, notify
 
 mod = Module()
+
 
 @mod.action_class
 class InterpreterActions:
@@ -14,17 +17,15 @@ class InterpreterActions:
 
         url = "https://api.openai.com/v1/assistants"
         headers = {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             "Authorization": f"Bearer {TOKEN}",
-            'OpenAI-Beta': 'assistants=v1'
+            "OpenAI-Beta": "assistants=v1",
         }
         data = {
-                "instructions": instruction,
-                "tools": [
-                    { "type": "code_interpreter" }
-                ],
-                "model": "gpt-4-turbo-preview"
-            }
+            "instructions": instruction,
+            "tools": [{"type": "code_interpreter"}],
+            "model": "gpt-4-turbo-preview",
+        }
 
         response = requests.post(url, headers=headers, data=json.dumps(data))
 
