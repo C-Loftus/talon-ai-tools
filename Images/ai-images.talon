@@ -1,3 +1,5 @@
-describe image: user.describe_clipboard()
+image describe [{user.descriptionPrompt}]$: user.image_describe_clipboard(descriptionPrompt or "")
 
-generate [an] image of <user.text>: user.generate_image(text)
+image generate <user.text>$: user.image_generate(text)
+
+image apply {user.generationPrompt}$: user.image_apply(generationPrompt)

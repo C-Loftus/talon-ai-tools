@@ -11,3 +11,7 @@ echo {user.staticPrompt} [this]$:
 echo ask <user.text>$:
     result = user.gpt_answer_question(text)
     user.tts(result)
+
+echo describe [image]:
+    result = user.image_describe_clipboard("")
+    user.tts(result)

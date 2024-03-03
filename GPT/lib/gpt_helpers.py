@@ -18,6 +18,16 @@ def notify(message: str):
     print(message)
 
 
+def get_token() -> str:
+    """Get the OpenAI API key from the environment"""
+    try:
+        return os.environ["OPENAI_API_KEY"]
+    except KeyError:
+        message = "GPT Failure: env var OPENAI_API_KEY is not set."
+        notify(message)
+        raise Exception(message)
+
+
 def generate_payload(
     prompt: str, content: str, tools: Optional[list[Tool]] = None
 ) -> Tuple[Headers, Data]:
@@ -26,12 +36,7 @@ def generate_payload(
     """
     notify("GPT Task Started")
 
-    try:
-        TOKEN = os.environ["OPENAI_API_KEY"]
-    except KeyError:
-        message = "GPT Failure: env var OPENAI_API_KEY is not set."
-        notify(message)
-        raise Exception(message)
+    TOKEN = get_token()
 
     language = actions.code.language()
     additional_context = (

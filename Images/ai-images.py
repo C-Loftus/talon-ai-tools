@@ -4,33 +4,51 @@ import webbrowser
 
 import requests
 from talon import Module, clip
+from ..GPT.lib.gpt_helpers import get_token, notify 
 
 mod = Module()
+
+mod.list("descriptionPrompt", desc="Prompts for describing images")
+mod.list("generationPrompt", desc="Prompts for generating images")
+
+
+def get_clipboard_image():
+    try:
+        clipped_image = clip.image()
+        if not clipped_image:
+            raise Exception("No image found in clipboard")
+
+        data = clipped_image.encode().data()
+        base64_image = base64.b64encode(data).decode("utf-8")
+        return base64_image
+    except Exception as e:
+        print(e)
+        raise Exception("Invalid image in clipboard")
+    
+def upload_file():
+    TOKEN = get_token()
+    url = 'https://api.openai.com/v1/files'
+    headers = {'Authorization': f'Bearer {TOKEN}'}
+    files = {'purpose': 'fine-tune', 'file': open('mydata.jsonl', 'rb')}
+
+    response = requests.post(url, headers=headers, files=files)
 
 
 @mod.action_class
 class Actions:
-    def describe_clipboard():
-        """Describe the image on the clipboard"""
-        try:
-            clipped_image = clip.image()
-            if not clipped_image:
-                print("No image found in clipboard")
-                return
+    def image_describe_clipboard(prompt: str):
+        """Describe an image on the clipboard"""
 
-            data = clipped_image.encode().data()
-            base64_image = base64.b64encode(data).decode("utf-8")
-        except:
-            print("Invalid image found in clipboard")
-            return
+        prompt = "I am a user with a visual impairment. Please describe to me what is in this image." if prompt == "" else prompt
 
-        # OpenAI API Key
-        api_key = os.environ["OPENAI_API_KEY"]
+        base64_image = get_clipboard_image()
+
+        TOKEN = get_token()
 
         # Getting the base64 string
         headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {api_key}",
+            "Authorization": f"Bearer {TOKEN}",
         }
 
         payload = {
@@ -41,7 +59,7 @@ class Actions:
                     "content": [
                         {
                             "type": "text",
-                            "text": "I am a user with a visual impairment. Please describe to me what is in this image.",
+                            "text": prompt,
                         },
                         {
                             "type": "image_url",
@@ -52,8 +70,8 @@ class Actions:
                     ],
                 }
             ],
-            # TODO not sure if this is the right number
-            "max_tokens": 300,
+            # TODO not sure if this is the right number. Will depend a lot if we are trying to output HTML or just get a general description
+            "max_tokens": 600,
         }
 
         response = requests.post(
@@ -70,7 +88,7 @@ class Actions:
         print(response_text)
         return response_text
 
-    def generate_image(prompt: str):
+    def image_generate(prompt: str):
         """Generate an image from the provided text"""
 
         url = "https://api.openai.com/v1/images/generations"
@@ -95,5 +113,32 @@ class Actions:
         {'created': $$REMOVED$$, 'data': [{'revised_prompt': 'Create a visually stunning image of a cat. The cat is domestic, with short, thick fur with brindle pattern.', 'url': '$$REMOVED$$'}]}
         """
         webbrowser.open(response_dict["data"][0]["url"])
-
         # TODO choose whether to save the image, save the url, or paste the image into the current window
+
+    def image_apply(prompt: str):
+        """Applies the prompt as a filter to the current image"""
+        base64_image = get_clipboard_image()
+
+        TOKEN = get_token()
+        url = "https://api.openai.com/v1/images/generations"
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}",
+        }
+        data = {
+            "model": "dall-e-3",
+            "prompt": prompt,
+            "n": 1,
+            "size": "1024x1024",
+        }
+
+        response = requests.post(url, headers=headers, json=data)
+
+        response_dict = response.json()
+
+        webbrowser.open(response_dict["data"][0]["url"])
+
+
+
+
+
