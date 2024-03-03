@@ -4,7 +4,8 @@ import webbrowser
 
 import requests
 from talon import Module, clip
-from ..GPT.lib.gpt_helpers import get_token, notify 
+
+from ..GPT.lib.gpt_helpers import get_token, notify
 
 mod = Module()
 
@@ -24,12 +25,13 @@ def get_clipboard_image():
     except Exception as e:
         print(e)
         raise Exception("Invalid image in clipboard")
-    
+
+
 def upload_file():
     TOKEN = get_token()
-    url = 'https://api.openai.com/v1/files'
-    headers = {'Authorization': f'Bearer {TOKEN}'}
-    files = {'purpose': 'fine-tune', 'file': open('mydata.jsonl', 'rb')}
+    url = "https://api.openai.com/v1/files"
+    headers = {"Authorization": f"Bearer {TOKEN}"}
+    files = {"purpose": "fine-tune", "file": open("mydata.jsonl", "rb")}
 
     response = requests.post(url, headers=headers, files=files)
 
@@ -39,7 +41,11 @@ class Actions:
     def image_describe_clipboard(prompt: str):
         """Describe an image on the clipboard"""
 
-        prompt = "I am a user with a visual impairment. Please describe to me what is in this image." if prompt == "" else prompt
+        prompt = (
+            "I am a user with a visual impairment. Please describe to me what is in this image."
+            if prompt == ""
+            else prompt
+        )
 
         base64_image = get_clipboard_image()
 
@@ -137,8 +143,3 @@ class Actions:
         response_dict = response.json()
 
         webbrowser.open(response_dict["data"][0]["url"])
-
-
-
-
-
