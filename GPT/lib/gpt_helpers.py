@@ -17,6 +17,7 @@ def notify(message: str):
     # Log in case notifications are disabled
     print(message)
 
+
 def get_token() -> str:
     """Get the OpenAI API key from the environment"""
     try:
