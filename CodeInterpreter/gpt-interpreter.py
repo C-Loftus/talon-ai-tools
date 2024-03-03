@@ -39,6 +39,4 @@ class InterpreterActions:
                 notify("GPT Failure: Check API Key, Model, or Prompt")
                 print(response.json())
 
-
-
             # {'id': 'asst_l6bZo7Uy7ozJoT6p8dOAWnju', 'object': 'assistant', 'created_at': 1709401396, 'name': None, 'description': None, 'model': 'gpt-4-turbo-preview', 'instructions': 'generate plot of apple stock returns', 'tools': [{'type': 'code_interpreter'}], 'metadata': {}, 'file_ids': []}
