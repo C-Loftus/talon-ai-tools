@@ -21,6 +21,7 @@ extensions = [
     "talondoc.sphinx",
 ]
 
+
 # -- Options for MyST --------------------------------------------------------
 
 myst_enable_extensions = [
