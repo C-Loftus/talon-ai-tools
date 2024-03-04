@@ -7,8 +7,8 @@ docs/index.md
 
 .. include:: ../README.md
 
-README
-======
+# README
+
 '''{include} ../README.md
 :relative-images:
 '''
