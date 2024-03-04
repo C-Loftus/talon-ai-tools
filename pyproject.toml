@@ -1,3 +1,40 @@
+
+[project]
+name = "talon-ai-tools"
+version = "1.0.0"
+description = "Use Talon with AI tools to speed up your development."
+license = { file = 'LICENSE' }
+authors = [
+    { name = "Colton Loftus", email = "c-loftus@users.noreply.github.com" },
+]
+readme = "README.md"
+keywords = ["talon", "GPT", "OpenAI"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Software Development :: Compilers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+requires-python = ">=3.9,<3.12"
+dependencies = [
+    "awesome_progress_bar >=1.7,<2",
+    "docstring_parser >=0.14,<0.16",
+    "editdistance >=0.6,<0.7",
+    "Jinja2 >=3,<4",
+    "Sphinx >=5,<8",
+    "talonfmt >=1.7.4,<2",
+    "tree_sitter_talon >=3!1.0,<3!2",
+    "colorlog >=6.7,<7",
+    "packaging >=23.1,<24",
+    'pywin32; platform_system=="Windows"',
+    "singledispatchmethod >=1.0,<2; python_version <'3.8'",
+    "myst_parser >=1,<2",
+    "sphinx_rtd_theme >=1.2,<2",
+    "sphinx_tabs >=3.4,<5",
+]
+
 [tool.black]
 target-version = ['py310']
 
@@ -5,10 +42,7 @@ target-version = ['py310']
 profile = 'black'
 
 [tool.pytest.ini_options]
-pythonpath = [
-    ".",
-    "test/stubs",
-]
+pythonpath = [".", "test/stubs"]
 
 [tool.pyright]
 reportSelfClsParameterName = false

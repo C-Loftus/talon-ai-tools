@@ -1,0 +1,116 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - docs
+    tags:
+      - "*"
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+  merge_group:
+
+defaults:
+  run:
+    shell: sh
+
+env:
+  # NOTE: The default Python version is installed with actions/setup-python.
+  DEFAULT_PYTHON_VERSION: "3.11"
+  CI_REQUIREMENTS_PATH: "./github/requirements-ci.txt"
+
+jobs:
+  ################################################################################
+  # Build source distribution
+  ################################################################################
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get source
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - # Required to run job via act: https://github.com/nektos/act
+        name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          cache: "pip"
+          cache-dependency-path: ${{ env.CI_REQUIREMENTS_PATH }}
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+
+      - # Required to run job via act: https://github.com/nektos/act
+        name: Setup dependencies
+        run: pip install -r ${{ env.CI_REQUIREMENTS_PATH }}
+
+      - name: Build sdist
+        run: pipx run --spec build pyproject-build --outdir dist
+
+      - name: Upload sdist
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: |
+            ./dist/*.tar.gz
+            ./dist/*.whl
+
+  ################################################################################
+  # Publish docs to GitHub Pages
+  ################################################################################
+
+  publish-docs-to-github-pages:
+    name: Publish docs to GitHub Pages
+    runs-on: ubuntu-latest
+
+    # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+    # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+    concurrency:
+      group: "pages"
+      cancel-in-progress: false
+
+    steps:
+      - name: Get source
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - # Required to run job via act: https://github.com/nektos/act
+        name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          cache: "pip"
+          cache-dependency-path: "./pyproject.toml"
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+
+      # - name: Setup dependencies
+      #   run: pip install .[docs]
+
+      - name: Build docs
+        run: |
+          python -X utf8 -m talondoc autogen .docs -o knausj_talon --generate-index
+          python -X utf8 -m talondoc build .docs .docs/_build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: .docs/_build
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2

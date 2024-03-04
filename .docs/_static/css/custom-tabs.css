@@ -1,0 +1,60 @@
+.sphinx-tabs {
+  padding: 0;
+  margin-bottom: 1rem;
+}
+
+.sphinx-tabs > [role="tablist"] {
+  border-bottom: 1px solid #dddddd;
+}
+
+.sphinx-tabs > [role="tablist"] > .sphinx-tabs-tab {
+  position: relative;
+  margin-bottom: -1px;
+  padding: 10px 15px;
+  margin-right: 2px;
+  border: 1px solid transparent;
+  border-radius: 4px 4px 0 0;
+  line-height: 24px;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.sphinx-tabs > [role="tablist"] > .sphinx-tabs-tab:hover,
+.sphinx-tabs > [role="tablist"] > .sphinx-tabs-tab:focus {
+  cursor: pointer;
+  text-decoration: none;
+  background-color: #dddddd;
+}
+
+.sphinx-tabs > [role="tablist"] > .sphinx-tabs-tab:focus {
+  z-index: 1;
+  outline-offset: 1px;
+}
+
+.sphinx-tabs > [role="tablist"] > .sphinx-tabs-tab:hover {
+  border-color: #dddddd #dddddd #eeeeee;
+}
+
+.sphinx-tabs > [role="tablist"] > .sphinx-tabs-tab[aria-selected="true"],
+.sphinx-tabs > [role="tablist"] > .sphinx-tabs-tab[aria-selected="true"]:hover,
+.sphinx-tabs > [role="tablist"] > .sphinx-tabs-tab[aria-selected="true"]:focus {
+  color: #555555;
+  cursor: default;
+  background-color: #ffffff;
+  border: 1px solid #dddddd;
+  border-bottom-color: #ffffff;
+  margin-bottom: -1px;
+}
+
+.sphinx-tabs > .sphinx-tabs-panel {
+  position: relative;
+  background-color: #ffffff;
+  border: 1px solid #dddddd;
+  border-radius: 0 0 4px 4px;
+  border-top: 0;
+  padding: 1rem;
+}
+
+.sphinx-tabs > .sphinx-tabs-panel > div:last-child:has(.highlight) {
+  margin-bottom: 0;
+}
