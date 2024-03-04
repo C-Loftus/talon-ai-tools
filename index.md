@@ -5,5 +5,4 @@
 docs/index.md
 :::
 
-'''{include} ../README.md
-'''
+.. include:: ../README.md
