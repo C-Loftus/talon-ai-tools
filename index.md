@@ -6,13 +6,13 @@ docs/index.md
 :::
 
 .. include:: ../README.md
-   :parser: myst_parser.sphinx_
+:parser: myst*parser.sphinx*
 
 .. include:: ./README.md
-   :parser: myst_parser.sphinx_
+:parser: myst*parser.sphinx*
 
 .. include:: README.md
-   :parser: myst_parser.sphinx_   
+:parser: myst*parser.sphinx*
 
 # README
 
@@ -20,4 +20,15 @@ docs/index.md
 :relative-images:
 '''
 
+:::{include} README.md
+:end-before: "# Collaborators"
+:::
 
+:::{include} ../README.md
+:::
+
+:::{include} ./README.md
+:::
+
+:::{include} /README.md
+:::
