@@ -6,9 +6,4 @@ docs/index.md
 :::
 
 .. include:: ../README.md
-
-README
-======
-'''{include} ../README.md
-:relative-images:
-'''
+   :parser: myst_parser.sphinx_
