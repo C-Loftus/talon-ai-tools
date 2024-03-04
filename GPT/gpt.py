@@ -35,7 +35,6 @@ def confirmation_gui(gui: imgui.GUI):
 
 
 def gpt_query(prompt: str, content: str) -> str:
-
     url = settings.get("user.model_endpoint")
 
     headers, data = generate_payload(prompt, content)
@@ -53,7 +52,6 @@ def gpt_query(prompt: str, content: str) -> str:
 
 @mod.action_class
 class UserActions:
-
     def gpt_answer_question(text_to_process: str) -> str:
         """Answer an arbitrary question"""
         prompt = """
@@ -152,3 +150,13 @@ class UserActions:
             if result != "None":
                 builder.p(result)
         builder.render()
+
+    def gpt_reformat_last(how_to_reformat: str):
+        """Reformat the last model output"""
+        PROMPT = f"""The last phrase was written using voice dictation. It has an error with spelling, grammar, or just general misrecognition due to a lack of context. Please reformat the following text to correct the error with the context that it was {how_to_reformat}."""
+        last_output = actions.user.get_last_phrase()
+        if last_output:
+            actions.user.clear_last_phrase()
+            return gpt_query(PROMPT, last_output)
+        else:
+            notify("No text to reformat")
