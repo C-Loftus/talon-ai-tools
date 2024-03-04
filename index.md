@@ -6,3 +6,9 @@ docs/index.md
 :::
 
 .. include:: ../README.md
+
+README
+======
+'''{include} ../README.md
+:relative-images:
+'''
