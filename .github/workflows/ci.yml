@@ -50,16 +50,6 @@ jobs:
         name: Setup dependencies
         run: pip install -r ${{ env.CI_REQUIREMENTS_PATH }}
 
-      - name: Build sdist
-        run: pipx run --spec build pyproject-build --outdir dist
-
-      - name: Upload sdist
-        uses: actions/upload-artifact@v3
-        with:
-          name: dist
-          path: |
-            ./dist/*.tar.gz
-            ./dist/*.whl
 
   ################################################################################
   # Publish docs to GitHub Pages
