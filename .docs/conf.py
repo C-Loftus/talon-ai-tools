@@ -84,6 +84,7 @@ talon_package = {
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
 
+
 def setup(app: Sphinx) -> None:
     # Add custom styles for Sphinx Tabs
     app.add_css_file("css/custom-tabs.css")
