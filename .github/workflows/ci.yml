@@ -50,7 +50,6 @@ jobs:
         name: Setup dependencies
         run: pip install -r ${{ env.CI_REQUIREMENTS_PATH }}
 
-
   ################################################################################
   # Publish docs to GitHub Pages
   ################################################################################
