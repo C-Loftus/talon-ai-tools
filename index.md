@@ -1,9 +1,12 @@
 # Talon-AI-Tools Documentation
 
+Click the sidebar to read:
 :::{toctree}
 :maxdepth: 1
 docs/index.md
 :::
+
+## About
 
 Use large language models and AI tools alongside Talon. Currently supports:
 
