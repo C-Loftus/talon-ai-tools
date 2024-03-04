@@ -160,3 +160,4 @@ class UserActions:
             return gpt_query(PROMPT, last_output)
         else:
             notify("No text to reformat")
+            raise Exception("No text to reformat")
