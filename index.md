@@ -1,34 +1,19 @@
-# Talon-AI-Tools Documentation
-
 :::{toctree}
 :maxdepth: 1
 docs/index.md
 :::
 
-.. include:: ../README.md
-:parser: myst*parser.sphinx*
+# Talon-AI-Tools
 
-.. include:: ./README.md
-:parser: myst*parser.sphinx*
+Use large language models and AI tools alongside Talon. Currently supports:
 
-.. include:: README.md
-:parser: myst*parser.sphinx*
+- Github Copilot
+- OpenAI API (GPT-3.5/GPT-4) for text generation and processing
+  - Any OpenAI compatible model endpoint can be used (Azure, local llamafiles, etc)
+- OpenAI API for image generation and vision
 
-# README
+These tools are helpful to automatically generate text, fix errors in dictation, and generally speed up your Talon workflow.
 
-'''{include} ../README.md
-:relative-images:
-'''
+## Help and Setup:
 
-:::{include} README.md
-:end-before: "# Collaborators"
-:::
-
-:::{include} ../README.md
-:::
-
-:::{include} ./README.md
-:::
-
-:::{include} README.md
-:::
+See the readme in each folder for more information on how to set up and use each tool.
