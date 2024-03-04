@@ -42,16 +42,13 @@ jobs:
           python -X utf8 -m talondoc build ./ docs/_build
 
       - name: Setup Pages
-        if: github.event_name == 'push'
         uses: actions/configure-pages@v3
 
       - name: Upload Pages artifact
-        if: github.event_name == 'push'
         uses: actions/upload-pages-artifact@v1
         with:
           path: docs/_build
 
       - name: Deploy to GitHub Pages
-        if: github.event_name == 'push'
         id: deployment
         uses: actions/deploy-pages@v2
