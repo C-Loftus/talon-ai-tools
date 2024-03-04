@@ -1,6 +1,5 @@
 # Talon-AI-Tools Documentation
 
-Click the sidebar to read:
 :::{toctree}
 :maxdepth: 1
 docs/index.md
