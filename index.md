@@ -6,18 +6,16 @@ docs/index.md
 :::
 
 .. include:: ../README.md
-   :parser: myst_parser.sphinx_
+:parser: myst*parser.sphinx*
 
 .. include:: ./README.md
-   :parser: myst_parser.sphinx_
+:parser: myst*parser.sphinx*
 
 .. include:: README.md
-   :parser: myst_parser.sphinx_   
+:parser: myst*parser.sphinx*
 
 # README
 
 '''{include} ../README.md
 :relative-images:
 '''
-
-
