@@ -31,6 +31,7 @@ myst_enable_extensions = [
     # Enables definition lists
     # https://myst-parser.readthedocs.io/en/latest/syntax/optional.html#definition-lists
     "deflist",
+    "substitution",
 ]
 
 # -- Options for TalonDoc ----------------------------------------------------
