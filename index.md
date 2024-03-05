@@ -1,3 +1,5 @@
+<!-- This document is used for generating the docs, with this index.md being the docs root -->
+
 # Talon-AI-Tools Documentation
 
 :::{toctree}
@@ -15,3 +17,7 @@ Use large language models and AI tools alongside Talon. Currently supports:
 - OpenAI API for image generation and vision
 
 These tools are helpful to automatically generate text, fix errors in dictation, and generally speed up your Talon workflow.
+
+## Authors
+
+This repository contains code from {{author}}

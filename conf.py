@@ -8,7 +8,7 @@
 
 project = "Talon-AI-Tools"
 copyright = "2024 Colton Loftus"
-author = "Colton Loftus, Joshua Aretsy, Pokey Rule, and Others"
+author = "Colton Loftus, Joshua Aretsy, Pokey Rule, and others from the Talon Community"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -31,6 +31,7 @@ myst_enable_extensions = [
     # Enables definition lists
     # https://myst-parser.readthedocs.io/en/latest/syntax/optional.html#definition-lists
     "deflist",
+    "substitution",
 ]
 
 # -- Options for TalonDoc ----------------------------------------------------
@@ -46,3 +47,6 @@ talon_package = {
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "sphinx_rtd_theme"
+
+
+myst_substitutions = {"author": author}
