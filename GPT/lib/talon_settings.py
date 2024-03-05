@@ -29,6 +29,6 @@ mod.setting(
 mod.setting(
     "model_system_prompt",
     type=str,
-    default="You are an assistant helping an office worker to be more productive.",
+    default="You are an assistant helping an office worker to be more productive. Output just the response to the request and no additional content.",
     desc="The default system prompt that informs the way the model should behave at a high level",
 )

@@ -1,16 +1,19 @@
 import base64
-import os
 import webbrowser
 
 import requests
-from talon import Module, clip
+import time
+from talon import Module, clip, settings
+from ..GPT.lib.HTMLbuilder import Builder
 
 from ..GPT.lib.gpt_helpers import get_token, notify
 
 mod = Module()
 
+mod.setting("openDescriptionInBrowser", type=bool, default=True)
+mod.setting("maxDescriptionTokens", type=int, default=300)
+
 mod.list("descriptionPrompt", desc="Prompts for describing images")
-mod.list("generationPrompt", desc="Prompts for generating images")
 
 
 def get_clipboard_image():
@@ -25,15 +28,6 @@ def get_clipboard_image():
     except Exception as e:
         print(e)
         raise Exception("Invalid image in clipboard")
-
-
-def upload_file():
-    TOKEN = get_token()
-    url = "https://api.openai.com/v1/files"
-    headers = {"Authorization": f"Bearer {TOKEN}"}
-    files = {"purpose": "fine-tune", "file": open("mydata.jsonl", "rb")}
-
-    response = requests.post(url, headers=headers, files=files)
 
 
 @mod.action_class
@@ -77,59 +71,42 @@ class Actions:
                 }
             ],
             # TODO not sure if this is the right number. Will depend a lot if we are trying to output HTML or just get a general description
-            "max_tokens": 600,
+            "max_tokens": settings.get("user.maxDescriptionTokens"),
         }
-
+        notify("GPT Image Description Start...")
         response = requests.post(
             "https://api.openai.com/v1/chat/completions", headers=headers, json=payload
         )
 
-        # RESPONSE FORMAT (in case you don't GPT-4 access)
-        """
-         {'id': '$$REMOVED$$', 'object': 'chat.completion', 'created': 1707691631, 'model': 'gpt-4-1106-vision-preview', 'usage': {'prompt_tokens': 281, 'completion_tokens': 71, 'total_tokens': 352}, 'choices': [{'message': {'role': 'assistant', 'content': "The image is a close-up photo of a person's face. The individual appears to be a man with short hair, a slight stubble on the face, and a friendly expression"}, 'finish_reason': 'stop', 'index': 0}]}
-        """
-
-        response_dict = response.json()
-        response_text = response_dict["choices"][0]["message"]["content"]
-        print(response_text)
-        return response_text
+        match response.status_code:
+            case 200:
+                response_dict = response.json()
+                response_text = response_dict["choices"][0]["message"]["content"]
+                print(response_text)
+                notify("Done")
+                if settings.get("user.openDescriptionInBrowser"):
+                    builder = Builder()
+                    builder.title("Image Description")
+                    builder.h1(f"AI Description for Image given at {time.ctime()}")
+                    builder.p(response_text)
+                    builder.base64_img(
+                        base64_image, alt="Your image that was described"
+                    )
+                    builder.render()
+                return response_text
+            case _:
+                print(response.json())
+                notify("Error describing image")
+                raise Exception("Error in describing image")
 
     def image_generate(prompt: str):
         """Generate an image from the provided text"""
 
         url = "https://api.openai.com/v1/images/generations"
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}",
-        }
-        data = {
-            "model": "dall-e-3",
-            "prompt": prompt,
-            "n": 1,
-            "size": "1024x1024",
-        }
-
-        response = requests.post(url, headers=headers, json=data)
-
-        # The response will be in JSON format, you can convert it to a Python dictionary using .json()
-        response_dict = response.json()
-
-        # RESPONSE FORMAT (in case you don't GPT-4 access)
-        """
-        {'created': $$REMOVED$$, 'data': [{'revised_prompt': 'Create a visually stunning image of a cat. The cat is domestic, with short, thick fur with brindle pattern.', 'url': '$$REMOVED$$'}]}
-        """
-        webbrowser.open(response_dict["data"][0]["url"])
-        # TODO choose whether to save the image, save the url, or paste the image into the current window
-
-    def image_apply(prompt: str):
-        """Applies the prompt as a filter to the current image"""
-        base64_image = get_clipboard_image()
-
         TOKEN = get_token()
-        url = "https://api.openai.com/v1/images/generations"
         headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}",
+            "Authorization": f"Bearer {TOKEN}",
         }
         data = {
             "model": "dall-e-3",
@@ -140,6 +117,13 @@ class Actions:
 
         response = requests.post(url, headers=headers, json=data)
 
-        response_dict = response.json()
-
-        webbrowser.open(response_dict["data"][0]["url"])
+        match response.status_code:
+            case 200:
+                response_dict = response.json()
+                image_url = response_dict["data"][0]["url"]
+                # TODO choose whether to save the image, save the url, or paste the image into the current window
+                webbrowser.open(image_url)
+            case _:
+                print(response.json())
+                notify("Error generating image")
+                raise Exception("Error generating image")
