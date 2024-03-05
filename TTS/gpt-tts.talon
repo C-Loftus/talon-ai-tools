@@ -11,5 +11,3 @@ echo {user.staticPrompt} [this]$:
 echo ask <user.text>$:
     result = user.gpt_answer_question(text)
     user.tts(result)
-
-

@@ -1,12 +1,12 @@
 import base64
+import time
 import webbrowser
 
 import requests
-import time
 from talon import Module, clip, settings
-from ..GPT.lib.HTMLbuilder import Builder
 
 from ..GPT.lib.gpt_helpers import get_token, notify
+from ..GPT.lib.HTMLbuilder import Builder
 
 mod = Module()
 

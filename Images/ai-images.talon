@@ -13,4 +13,3 @@ image describe screen [{user.descriptionPrompt}]$:
     user.paste(result)
 
 image generate <user.text>$: user.image_generate(text)
-
