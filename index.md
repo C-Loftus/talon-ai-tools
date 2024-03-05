@@ -1,3 +1,5 @@
+<!-- This document is used for generating the docs, with this index.md being the docs root -->
+
 # Talon-AI-Tools Documentation
 
 :::{toctree}
