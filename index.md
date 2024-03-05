@@ -20,4 +20,4 @@ These tools are helpful to automatically generate text, fix errors in dictation,
 
 ## Authors
 
-Created by |author|
+This repository contains code from {{author}}
