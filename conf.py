@@ -8,7 +8,7 @@
 
 project = "Talon-AI-Tools"
 copyright = "2024 Colton Loftus"
-author = "Colton Loftus, Joshua Aretsy, Pokey Rule, and Others"
+author = "Colton Loftus, Joshua Aretsy, Pokey Rule, and others from the Talon Community"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

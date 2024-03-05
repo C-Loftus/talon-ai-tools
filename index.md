@@ -17,3 +17,7 @@ Use large language models and AI tools alongside Talon. Currently supports:
 - OpenAI API for image generation and vision
 
 These tools are helpful to automatically generate text, fix errors in dictation, and generally speed up your Talon workflow.
+
+## Authors
+
+Created by |author|
