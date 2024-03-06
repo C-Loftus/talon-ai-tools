@@ -21,3 +21,9 @@ a {
     color: #eceff4;
     margin: 20px 0;
 }
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 20px auto;
+}
