@@ -1,36 +1,54 @@
 import base64
-import os
+import time
 import webbrowser
 
 import requests
-from talon import Module, clip
+from talon import Module, clip, settings
+
+from ..GPT.lib.gpt_helpers import get_token, notify
+from ..GPT.lib.HTMLbuilder import Builder
 
 mod = Module()
+
+mod.setting("openDescriptionInBrowser", type=bool, default=True)
+mod.setting("maxDescriptionTokens", type=int, default=300)
+
+mod.list("descriptionPrompt", desc="Prompts for describing images")
+
+
+def get_clipboard_image():
+    try:
+        clipped_image = clip.image()
+        if not clipped_image:
+            raise Exception("No image found in clipboard")
+
+        data = clipped_image.encode().data()
+        base64_image = base64.b64encode(data).decode("utf-8")
+        return base64_image
+    except Exception as e:
+        print(e)
+        raise Exception("Invalid image in clipboard")
 
 
 @mod.action_class
 class Actions:
-    def describe_clipboard():
-        """Describe the image on the clipboard"""
-        try:
-            clipped_image = clip.image()
-            if not clipped_image:
-                print("No image found in clipboard")
-                return
+    def image_describe_clipboard(prompt: str):
+        """Describe an image on the clipboard"""
 
-            data = clipped_image.encode().data()
-            base64_image = base64.b64encode(data).decode("utf-8")
-        except:
-            print("Invalid image found in clipboard")
-            return
+        prompt = (
+            "I am a user with a visual impairment. Please describe to me what is in this image."
+            if prompt == ""
+            else prompt
+        )
 
-        # OpenAI API Key
-        api_key = os.environ["OPENAI_API_KEY"]
+        base64_image = get_clipboard_image()
+
+        TOKEN = get_token()
 
         # Getting the base64 string
         headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {api_key}",
+            "Authorization": f"Bearer {TOKEN}",
         }
 
         payload = {
@@ -41,7 +59,7 @@ class Actions:
                     "content": [
                         {
                             "type": "text",
-                            "text": "I am a user with a visual impairment. Please describe to me what is in this image.",
+                            "text": prompt,
                         },
                         {
                             "type": "image_url",
@@ -52,31 +70,43 @@ class Actions:
                     ],
                 }
             ],
-            # TODO not sure if this is the right number
-            "max_tokens": 300,
+            # TODO not sure if this is the right number. Will depend a lot if we are trying to output HTML or just get a general description
+            "max_tokens": settings.get("user.maxDescriptionTokens"),
         }
-
+        notify("GPT Image Description Start...")
         response = requests.post(
             "https://api.openai.com/v1/chat/completions", headers=headers, json=payload
         )
 
-        # RESPONSE FORMAT (in case you don't GPT-4 access)
-        """
-         {'id': '$$REMOVED$$', 'object': 'chat.completion', 'created': 1707691631, 'model': 'gpt-4-1106-vision-preview', 'usage': {'prompt_tokens': 281, 'completion_tokens': 71, 'total_tokens': 352}, 'choices': [{'message': {'role': 'assistant', 'content': "The image is a close-up photo of a person's face. The individual appears to be a man with short hair, a slight stubble on the face, and a friendly expression"}, 'finish_reason': 'stop', 'index': 0}]}
-        """
+        match response.status_code:
+            case 200:
+                response_dict = response.json()
+                response_text = response_dict["choices"][0]["message"]["content"]
+                print(response_text)
+                notify("Done")
+                if settings.get("user.openDescriptionInBrowser"):
+                    builder = Builder()
+                    builder.title("Image Description")
+                    builder.h1(f"AI Description for Image given at {time.ctime()}")
+                    builder.p(response_text)
+                    builder.base64_img(
+                        base64_image, alt="Your image that was described"
+                    )
+                    builder.render()
+                return response_text
+            case _:
+                print(response.json())
+                notify("Error describing image")
+                raise Exception("Error in describing image")
 
-        response_dict = response.json()
-        response_text = response_dict["choices"][0]["message"]["content"]
-        print(response_text)
-        return response_text
-
-    def generate_image(prompt: str):
+    def image_generate(prompt: str):
         """Generate an image from the provided text"""
 
         url = "https://api.openai.com/v1/images/generations"
+        TOKEN = get_token()
         headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}",
+            "Authorization": f"Bearer {TOKEN}",
         }
         data = {
             "model": "dall-e-3",
@@ -87,13 +117,13 @@ class Actions:
 
         response = requests.post(url, headers=headers, json=data)
 
-        # The response will be in JSON format, you can convert it to a Python dictionary using .json()
-        response_dict = response.json()
-
-        # RESPONSE FORMAT (in case you don't GPT-4 access)
-        """
-        {'created': $$REMOVED$$, 'data': [{'revised_prompt': 'Create a visually stunning image of a cat. The cat is domestic, with short, thick fur with brindle pattern.', 'url': '$$REMOVED$$'}]}
-        """
-        webbrowser.open(response_dict["data"][0]["url"])
-
-        # TODO choose whether to save the image, save the url, or paste the image into the current window
+        match response.status_code:
+            case 200:
+                response_dict = response.json()
+                image_url = response_dict["data"][0]["url"]
+                # TODO choose whether to save the image, save the url, or paste the image into the current window
+                webbrowser.open(image_url)
+            case _:
+                print(response.json())
+                notify("Error generating image")
+                raise Exception("Error generating image")

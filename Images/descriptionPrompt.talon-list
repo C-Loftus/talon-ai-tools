@@ -1,0 +1,10 @@
+list:  user.descriptionPrompt
+
+-
+
+structure: Output nothing but your best approximation for the raw semantic HTML without any styling that could be used to create the user interface in the following image. Do not include any boilerplate HTML.
+# The model can't output hex or colorcodes, so its the best we can do
+color scheme: I want to know the colorscheme used in my image and recreate it. Output extremely specific colornames and nothing more. Do not output other natural language.
+color blind: I am a user who is colorblind. Describe the overall colorscheme in the image so that I can understand it or explain it to others.
+components: I am a developer creating a user interface based on this image. Return a list of component names and their relation to each other such that I could use them when drafting the interface.
+language: I am a user that does not speak the language in the image. I want to know at a high level what this image is about.

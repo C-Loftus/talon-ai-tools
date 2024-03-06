@@ -7,26 +7,18 @@ import platform
 import tempfile
 import webbrowser
 
-STYLE = """
-<style>
-    body {
-        background-color: #2E3440;
-        margin: 0;
-        padding: 0;
-        font-family: 'Ubuntu Mono', monospace;
-    }
-    .container {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 20px;
-        box-sizing: border-box;
-    }
-    h1, p, h2, h3, ul, ol, table, a {
-        color: #ECEFF4  ;
-        margin: 20px 0;
-    }
-</style>
-"""
+
+def get_style():
+    # read in all the styles from a file ./styles.css
+    style_path = os.path.join(os.path.dirname(__file__), "styles.css")
+    with open(style_path, "r") as f:
+        all_styles = f.read()
+
+    return f"""
+    <style>
+    {all_styles}
+    </style>
+    """
 
 
 class ARIARole(enum.Enum):
@@ -91,6 +83,13 @@ class Builder:
             self._li(item)
         self.elements.append("</ol>")
 
+    def base64_img(self, img, alt="", role=None):
+        self.elements.append(
+            f"<img src='data:image/jpeg;base64,{img}' alt='{alt}' role='{role.value}'>"
+            if role
+            else f"<img src='data:image/jpeg;base64,{img}' alt='{alt}'>"
+        )
+
     def start_table(self, headers, role=None):
         self.elements.append(f"<table role='{role.value}'>" if role else "<table>")
         self.elements.append("<thead><tr>")
@@ -116,7 +115,7 @@ class Builder:
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>{self.doc_title}</title>
-            {STYLE}
+            {get_style()}
         </head>
         <body>
             <div class="container">
