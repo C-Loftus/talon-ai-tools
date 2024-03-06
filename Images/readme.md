@@ -4,9 +4,7 @@ The code in this folder is particularly useful for individuals with visual impai
 
 ## Talon Settings for Customization
 
-```
-| setting                     | default |
-|-----------------------------|---------|
+| setting                       | default |
+| ----------------------------- | ------- |
 | user.openDescriptionInBrowser | true    |
 | user.maxDescriptionTokens     | 300     |
-```
