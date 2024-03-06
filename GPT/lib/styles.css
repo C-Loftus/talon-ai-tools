@@ -1,0 +1,29 @@
+body {
+    background-color: #2e3440;
+    margin: 0;
+    padding: 0;
+    font-family: "Ubuntu Mono", monospace;
+}
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+h1,
+p,
+h2,
+h3,
+ul,
+ol,
+table,
+a {
+    color: #eceff4;
+    margin: 20px 0;
+}
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 20px auto;
+}
