@@ -1,6 +1,3 @@
-mode: command
--
-
 # Ask a question in the voice command and the AI will answer it.
 model ask <user.text>$:
     result = user.gpt_answer_question(text)
@@ -35,3 +32,8 @@ model apply [from] clip$:
 
 # Shows the list of available prompts
 model help$: user.gpt_help()
+
+# Reformat the last dictation with additional context or formatting instructions
+model [nope] that was <user.text>$:
+    result = user.gpt_reformat_last(text)
+    user.paste(result)
