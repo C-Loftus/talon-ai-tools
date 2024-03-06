@@ -7,16 +7,18 @@ import platform
 import tempfile
 import webbrowser
 
-# read in all the styles from a file ./styles.css
-style_path = os.path.join(os.path.dirname(__file__), "styles.css")
-with open(style_path, "r") as f:
-    all_styles = f.read()
 
-STYLE = f"""
-<style>
-{all_styles}
-</style>
-"""
+def get_style():
+    # read in all the styles from a file ./styles.css
+    style_path = os.path.join(os.path.dirname(__file__), "styles.css")
+    with open(style_path, "r") as f:
+        all_styles = f.read()
+
+    return f"""
+    <style>
+    {all_styles}
+    </style>
+    """
 
 
 class ARIARole(enum.Enum):
@@ -113,7 +115,7 @@ class Builder:
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>{self.doc_title}</title>
-            {STYLE}
+            {get_style()}
         </head>
         <body>
             <div class="container">
