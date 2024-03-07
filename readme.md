@@ -12,3 +12,7 @@ These tools are helpful to automatically generate text, fix errors in dictation,
 ## Help and Setup:
 
 See the readme in each folder for more information on how to set up and use each tool.
+
+### Quickstart Video
+
+[![Talon-AI-Tools Quickstart](https://res.cloudinary.com/marcomontalbano/image/upload/v1709846688/video_to_markdown/images/youtube--FctiTs6D2tM-c05b58ac6eb4c4700831b2b3070cd403.jpg)](https://www.youtube.com/watch?v=FctiTs6D2tM "Talon-AI-Tools Quickstart")
