@@ -39,7 +39,7 @@ myst_enable_extensions = [
 talon_package = {
     "path": ".",
     "name": "user",
-    "exclude": ["conf.py"],
+    "exclude": ["conf.py", "thumb.jpg"],
     "trigger": "ready",
 }
 
