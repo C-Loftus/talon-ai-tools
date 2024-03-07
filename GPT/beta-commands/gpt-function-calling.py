@@ -24,7 +24,6 @@ def gpt_function_query(
     insert_response: InsertOption = InsertOption.PASTE,
     cursorless_destination: Optional[Any] = None,
 ) -> None:
-
     # Function calling likely to not be supported in local models so better to use OpenAI
     url = "https://api.openai.com/v1/chat/completions"
 
