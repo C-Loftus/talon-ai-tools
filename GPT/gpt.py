@@ -95,8 +95,13 @@ class UserActions:
         actions.user.paste(text_to_confirm)
         confirmation_gui.hide()
 
-    def gpt_apply_prompt(prompt: str, text_to_process: str) -> str:
+    def gpt_apply_prompt(prompt: str, text_to_process: str | list[str]) -> str:
         """Apply an arbitrary prompt to arbitrary text"""
+        text_to_process = (
+            " ".join(text_to_process)
+            if isinstance(text_to_process, list)
+            else text_to_process
+        )
         return gpt_query(prompt, text_to_process)
 
     def gpt_help():
