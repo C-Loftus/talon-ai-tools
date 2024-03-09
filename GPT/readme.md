@@ -21,7 +21,7 @@ Query language models with voice commands. Helpful to automatically generate tex
 
 ## Setup
 
-In order to use this repository with GPT 3.5, you need [an OpenAI API key](https://platform.openai.com/signup).
+In order to use this repository with GPT 3.5, you need to [create an OpenAI API key](https://platform.openai.com/signup).
 
 - Once you get the key, set the environment variable within a Python file anywhere in your Talon user directory.
 - **Make sure you do not push the key to a public repo!**
