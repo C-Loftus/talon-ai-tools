@@ -4,6 +4,7 @@ import time
 
 import requests
 from talon import Module, actions
+from ..GPT.lib.gpt_helpers import get_token
 
 
 #  Currently not publicly exposed given the latency and impractical cost
@@ -11,11 +12,7 @@ from talon import Module, actions
 def _openai_tts(text: str):
     """text to speech with openai"""
     url = "https://api.openai.com/v1/audio/speech"
-    try:
-        TOKEN = os.environ["OPENAI_API_KEY"]
-    except:
-        actions.user.tts("GPT Failure: No API Key")
-        return
+    TOKEN = get_token()
 
     headers = {
         "Authorization": f"Bearer {TOKEN}",
