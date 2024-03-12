@@ -46,8 +46,8 @@ def gpt_query(prompt: str, content: str) -> str:
             notify("GPT Task Completed")
             return response.json()["choices"][0]["message"]["content"].strip()
         case _:
-            notify("GPT Failure: Check API Key, Model, or Prompt")
-            print(response.json())
+            notify("GPT Failure: Check the Talon Log")
+            raise Exception(response.json())
 
 
 @mod.action_class
