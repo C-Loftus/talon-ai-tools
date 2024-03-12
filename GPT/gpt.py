@@ -1,8 +1,8 @@
 import json
 import os
 from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Literal
 
-from typing import Literal, Any
 import requests
 from talon import Module, actions, clip, imgui, registry, settings
 
