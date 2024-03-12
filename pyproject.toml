@@ -11,9 +11,6 @@ readme = "README.md"
 keywords = ["talon", "GPT", "OpenAI"]
 classifiers = [
     "License :: OSI Approved :: MIT License",
-    "Topic :: Software Development :: Compilers",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
 ]

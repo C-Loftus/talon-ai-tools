@@ -1,9 +1,8 @@
 import json
-import os
 from typing import Any, Optional
 
 import requests
-from talon import Module, actions, settings
+from talon import Module, actions
 
 from ..lib.gpt_helpers import generate_payload, notify
 from ..lib.types import ChatCompletionResponse, InsertOption, Message

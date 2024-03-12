@@ -1,9 +1,10 @@
 import json
 import os
 from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Literal
 
 import requests
-from talon import Module, actions, app, clip, imgui, registry, settings
+from talon import Module, actions, clip, imgui, registry, settings
 
 from .lib import HTMLbuilder
 from .lib.gpt_helpers import generate_payload, notify, remove_wrapper
@@ -166,3 +167,12 @@ class UserActions:
         else:
             notify("No text to reformat")
             raise Exception("No text to reformat")
+
+    def cursorless_or_paste_helper(
+        cursorless_destination: Any | Literal[0], text: str
+    ) -> None:
+        """If a destination is specified, use cursorless to insert text. Otherwise, paste the text."""
+        if cursorless_destination == 0:
+            actions.user.paste(text)
+        else:
+            actions.user.cursorless_insert(cursorless_destination, text)
