@@ -4,6 +4,7 @@ import time
 
 import requests
 from talon import Module, actions
+
 from ..GPT.lib.gpt_helpers import get_token
 
 
