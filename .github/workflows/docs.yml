@@ -38,7 +38,7 @@ jobs:
 
       - name: Move conf.py to root
         # Move sphinx configuration to root since we normally don't want it there
-        run: mv docs/conf.py conf.py; mv docs/docs_root index.md
+        run: mv docs/conf.py conf.py; mv docs/docs_root.md index.md
 
       - name: Build docs
         run: |
