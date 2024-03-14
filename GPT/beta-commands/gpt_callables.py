@@ -3,7 +3,7 @@ from typing import Callable
 
 from talon import actions
 
-from ..lib.HTMLbuilder import Builder
+from ...lib.HTMLBuilder import Builder
 
 """
 To create a new function callable by the GPT model, create a new function and add its serialization to the function_specs list.

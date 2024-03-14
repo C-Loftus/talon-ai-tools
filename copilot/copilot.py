@@ -66,7 +66,7 @@ class Actions:
         for _ in range(count):
             actions.user.vscode(action)
 
-    def copilot_bring_code_block(index: int):
+    def copilot_bring_code_block(index: int) -> None:
         """Bring a copilot chat suggestion to the cursor"""
         actions.user.copilot_focus_code_block(index)
         actions.user.vscode("workbench.action.chat.insertCodeBlock")

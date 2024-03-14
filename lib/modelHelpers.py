@@ -1,11 +1,12 @@
+import base64
 import os
 import platform
 import re
 from typing import Optional, Tuple
 
-from talon import actions, app, settings
+from talon import actions, app, clip, settings
 
-from .types import Data, Headers, Tool
+from .modelTypes import Data, Headers, Tool
 
 
 def notify(message: str):
@@ -83,3 +84,17 @@ def remove_wrapper(text: str):
         regex = r'[^"]+"([^"]+)"'
     match = re.search(regex, text)
     return match.group(1) if match else text
+
+
+def get_clipboard_image():
+    try:
+        clipped_image = clip.image()
+        if not clipped_image:
+            raise Exception("No image found in clipboard")
+
+        data = clipped_image.encode().data()
+        base64_image = base64.b64encode(data).decode("utf-8")
+        return base64_image
+    except Exception as e:
+        print(e)
+        raise Exception("Invalid image in clipboard")

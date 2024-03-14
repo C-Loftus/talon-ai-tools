@@ -32,3 +32,9 @@ mod.setting(
     default="You are an assistant helping an office worker to be more productive. Output just the response to the request and no additional content. Do not generate any markdown formatting unless it is requested.",
     desc="The default system prompt that informs the way the model should behave at a high level",
 )
+
+
+mod.setting("openDescriptionInBrowser", type=bool, default=True)
+mod.setting("maxDescriptionTokens", type=int, default=300)
+
+mod.list("descriptionPrompt", desc="Prompts for describing images")

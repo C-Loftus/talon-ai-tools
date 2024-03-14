@@ -1,33 +1,13 @@
-import base64
 import time
 import webbrowser
 
 import requests
-from talon import Module, clip, settings
+from talon import Module, settings
 
-from ..GPT.lib.gpt_helpers import get_token, notify
-from ..GPT.lib.HTMLbuilder import Builder
+from ..lib.HTMLBuilder import Builder
+from ..lib.modelHelpers import get_clipboard_image, get_token, notify
 
 mod = Module()
-
-mod.setting("openDescriptionInBrowser", type=bool, default=True)
-mod.setting("maxDescriptionTokens", type=int, default=300)
-
-mod.list("descriptionPrompt", desc="Prompts for describing images")
-
-
-def get_clipboard_image():
-    try:
-        clipped_image = clip.image()
-        if not clipped_image:
-            raise Exception("No image found in clipboard")
-
-        data = clipped_image.encode().data()
-        base64_image = base64.b64encode(data).decode("utf-8")
-        return base64_image
-    except Exception as e:
-        print(e)
-        raise Exception("Invalid image in clipboard")
 
 
 @mod.action_class
