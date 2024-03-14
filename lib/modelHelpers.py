@@ -1,10 +1,10 @@
-import os
 import base64
+import os
 import platform
 import re
 from typing import Optional, Tuple
 
-from talon import actions, app, settings, clip
+from talon import actions, app, clip, settings
 
 from .modelTypes import Data, Headers, Tool
 

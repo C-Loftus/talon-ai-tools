@@ -4,8 +4,8 @@ import webbrowser
 import requests
 from talon import Module, settings
 
-from ..lib.modelHelpers import get_token, notify, get_clipboard_image
 from ..lib.HTMLBuilder import Builder
+from ..lib.modelHelpers import get_clipboard_image, get_token, notify
 
 mod = Module()
 
