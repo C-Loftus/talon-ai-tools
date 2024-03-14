@@ -6,11 +6,10 @@ from typing import Literal, Any
 import requests
 from talon import Module, actions, clip, imgui, registry, settings
 
-from .lib import HTMLbuilder
-from .lib.gpt_helpers import generate_payload, notify, remove_wrapper
+from ..lib.HTMLBuilder import Builder
+from ..lib.modelHelpers import generate_payload, notify, remove_wrapper
 
 mod = Module()
-
 
 text_to_confirm = ""
 
@@ -113,7 +112,7 @@ class UserActions:
         with open(file_path, "r") as f:
             lines = f.readlines()[2:]
 
-        builder = HTMLbuilder.Builder()
+        builder = Builder()
         builder.h1("Talon GPT Prompt List")
         for line in lines:
             if "##" in line:
@@ -150,7 +149,7 @@ class UserActions:
                 executor.map(gpt_query, [prompt] * len(command_chunks), command_chunks)
             )
 
-        builder = HTMLbuilder.Builder()
+        builder = Builder()
         builder.h1("Talon GPT Command Response")
         for result in results:
             if result != "None":

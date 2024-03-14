@@ -1,11 +1,8 @@
 import json
-import os
 import time
-
 import requests
-from talon import Module, actions
 
-from ..GPT.lib.gpt_helpers import get_token
+from ..lib.modelHelpers import get_token
 
 
 #  Currently not publicly exposed given the latency and impractical cost

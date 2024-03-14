@@ -1,4 +1,4 @@
-name: CI
+name: Docs
 
 on:
   push:
@@ -35,6 +35,10 @@ jobs:
 
       - name: Install dependencies
         run: pip install -r .github/requirements-docs.txt
+
+      - name: Move conf.py to root
+        # Move sphinx configuration to root since we normally don't want it there
+        run: mv docs/conf.py conf.py; mv docs/docs_root index.md
 
       - name: Build docs
         run: |
