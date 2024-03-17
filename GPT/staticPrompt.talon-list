@@ -14,7 +14,9 @@ format table: The following markdown text is raw data. There is no index. Return
 format bullets: Convert the every paragraph into a one heading with series of bullet points underneath it. Each paragraph is separated by a new line. Separate paragraphs should not have combined bullet points. This should all be done in markdown syntax. If it is a small paragraph than you can just leave it as a heading and not add bullet points. Do not reduce content, only reduce things that would be redundant. These bullet points should be in a useful format for notes for those who want to quickly look at it. If there is a citation in the markdown original then keep the citation just at the top and not within every individual bullet point.
 format mermaid: convert the following plain text into the text syntax for a mermaid diagram.
 format gant: convert the following plain text into the text syntax for a gant chart within mermaid.
-format loop: the following plaintext describes an iterative process in code in the language that is specified by the system prompt. Please output the code necessary to do this transformation.
+format loop: the following plaintext describes an iterative process in code in the language that is specified by the system prompt. Please output the code necessary to do this.
+format conditional: the following plaintext describes a conditional branching process in code in the language that is specified by the system prompt. Please output the code necessary to do this.
+format code: the following plaintext describes a process in code in the language that is specified by the system prompt. Please output the code necessary to do this.
 
 ## TEXT GENERATION
 explain: explain this text in a way that is easier to understand for a layman without technical knowledge
