@@ -9,8 +9,7 @@ This functionality is especially helpful for users who:
 - have health issues affecting their hands and want to reduce keyboard use
 - want to speed up their workflow and use AI commands across the entire desktop
 
-## Supported AI Tools
-
+**Prompts and extends the following tools:**
 - Github Copilot
 - OpenAI API (GPT-3.5/GPT-4) for text generation and processing
   - Any OpenAI compatible model endpoint can be used (Azure, local llamafiles, etc)
