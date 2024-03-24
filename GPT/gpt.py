@@ -48,8 +48,10 @@ def gpt_query(prompt: str, content: str) -> str:
         case _:
             notify("GPT Failure: Check the Talon Log")
             raise Exception(response.json())
+
+
 @mod.action_class
-class UserActions():
+class UserActions:
     def gpt_answer_question(text_to_process: str) -> str:
         """Answer an arbitrary question"""
         prompt = """
