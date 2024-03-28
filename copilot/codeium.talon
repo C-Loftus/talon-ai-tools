@@ -1,25 +1,29 @@
 app: vscode
 -
 
-codeium chat: user.vscode("codeium.openChatView")
+## Commands for https://codeium.com/ extension
 
-codeium toggle: user.vscode("codeium.toggleEnabledForCurrentLanguage")
+codeium chat:               user.vscode("codeium.openChatView")
 
-codeium submit: key(ctrl-shift-enter)
+codeium toggle:             user.vscode("codeium.toggleEnabledForCurrentLanguage")
 
-codeium command: user.vscode("codeium.openCodeiumCommand")
+codeium submit:             key(ctrl-shift-enter)
 
-codeium search: user.vscode("codeium.openSearchView")
+codeium command:            user.vscode("codeium.openCodeiumCommand")
 
-codeium explain: user.vscode("codeium.explainCodeBlock")
+codeium search:             user.vscode("codeium.openSearchView")
 
-codeium debug: user.vscode("codeium.explainProblem")
+codeium explain:            user.vscode("codeium.explainCodeBlock")
 
-codeium editor: user.vscode("codeium.openChatInPane")
+codeium debug:              user.vscode("codeium.explainProblem")
 
-codeium jest: user.vscode("editor.action.inlineSuggest.trigger")
-codeium next: user.vscode("editor.action.inlineSuggest.showNext")
-codeium (previous | last): user.vscode("editor.action.inlineSuggest.showPrevious")
-codeium yes: user.vscode("editor.action.inlineSuggest.commit")
+codeium editor:             user.vscode("codeium.openChatInPane")
 
-codeium refactor: user.vscode("codeium.refactorCodeBlock")
+codeium jest:               user.vscode("editor.action.inlineSuggest.trigger")
+codeium next:               user.vscode("editor.action.inlineSuggest.showNext")
+codeium (previous | last):  user.vscode("editor.action.inlineSuggest.showPrevious")
+codeium yes:                user.vscode("editor.action.inlineSuggest.commit")
+codium nope:                user.vscode("editor.action.inlineSuggest.undo")
+codeium cancel:             user.vscode("editor.action.inlineSuggest.hide")
+
+codeium refactor:           user.vscode("codeium.refactorCodeBlock")
