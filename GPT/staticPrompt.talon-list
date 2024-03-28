@@ -22,6 +22,7 @@ add context: Add additional text to the sentence that would be appropriate to th
 fit schema: the given text has a series of responses that need to be categorized. Each response has a key that needs to be mapped to a value. Infer the schema from the text unless it is given at the top of the text with prior examples. Return the key value pairs in a json format unless you infer a different format.
 answer: generate text that satisfies the question or request given in the input
 shell: generate a shell script that performs the following actions. Output only the command. Do not output any comments or explanations. Default to the bash shell unless otherwise specified.
+add emoji: return the same exact text verbatim with the same formatting, but add emoji when appropriate in order to make the text fun and easier to understand
 
 ## FILE CONVERSIONS
 convert to jason:  Convert the following data into a json format.
