@@ -1,29 +1,36 @@
 app: vscode
+# You must manually enable this. By default we use Github Copilot for pilot commands
+tag: user.codeium
+
 -
 
 ## Commands for https://codeium.com/ extension
 
-codeium chat: user.vscode("codeium.openChatView")
+pilot (previous | last):    user.vscode("editor.action.inlineSuggest.showPrevious")
+pilot next:                 user.vscode("editor.action.inlineSuggest.showNext")
 
-codeium toggle: user.vscode("codeium.toggleEnabledForCurrentLanguage")
+pilot yes:                  user.vscode("editor.action.inlineSuggest.commit")
+pilot nope:                 user.vscode("editor.action.inlineSuggest.undo")
 
-codeium submit: key(ctrl-shift-enter)
+pilot chat [<user.prose>]:
+    user.vscode("codeium.openChatView")
+    sleep(2)
+    user.paste(user.prose or "")
 
-codeium command: user.vscode("codeium.openCodeiumCommand")
+pilot toggle:               user.vscode("codeium.toggleEnabledForCurrentLanguage")
 
-codeium search: user.vscode("codeium.openSearchView")
+# Submit the request from within a codeium request window
+pilot submit:               key(ctrl-shift-enter)
 
-codeium explain: user.vscode("codeium.explainCodeBlock")
+pilot make [<user.prose>]:
+    user.vscode("codeium.openCodeiumCommand")
+    sleep(0.7)
+    user.paste(user.prose or "")
 
-codeium debug: user.vscode("codeium.explainProblem")
+pilot search:               user.vscode("codeium.openSearchView")
+pilot explain:              user.vscode("codeium.explainCodeBlock")
+pilot debug:                user.vscode("codeium.explainProblem")
+pilot editor:               user.vscode("codeium.openChatInPane")
 
-codeium editor: user.vscode("codeium.openChatInPane")
-
-codeium jest: user.vscode("editor.action.inlineSuggest.trigger")
-codeium next: user.vscode("editor.action.inlineSuggest.showNext")
-codeium (previous | last): user.vscode("editor.action.inlineSuggest.showPrevious")
-codeium yes: user.vscode("editor.action.inlineSuggest.commit")
-codium nope: user.vscode("editor.action.inlineSuggest.undo")
-codeium cancel: user.vscode("editor.action.inlineSuggest.hide")
-
-codeium refactor: user.vscode("codeium.refactorCodeBlock")
+pilot cancel:               user.vscode("editor.action.inlineSuggest.hide")
+pilot refactor:             user.vscode("codeium.refactorCodeBlock")
