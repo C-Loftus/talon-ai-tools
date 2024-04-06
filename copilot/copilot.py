@@ -25,6 +25,8 @@ ctx.lists["user.makeshift_destination"] = {
     "before": "editNewLineBefore",
 }
 
+mod.tag("codeium", desc="Enable codeium for copilot integration")
+
 
 @mod.action_class
 class Actions:

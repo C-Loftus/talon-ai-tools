@@ -1,4 +1,5 @@
 app: vscode
+not tag: user.codeium
 -
 pilot jest: user.vscode("editor.action.inlineSuggest.trigger")
 pilot next: user.vscode("editor.action.inlineSuggest.showNext")

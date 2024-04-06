@@ -1,8 +1,12 @@
-# VSCode Copilot
+# Copilot Interaction in VSCode
 
-This directory contains some very experimental commands for interacting with Copilot.
+This directory contains commands for interacting with [GitHub Copilot](https://github.com/features/copilot) and/or [Codeium](https://codeium.com/). The former is paid, the latter is a free alternative.
 
-## Inline chat / refactoring / code generation
+The only setup step is to install the corresponding extension in VSCode.
+
+## GitHub Copilot
+
+### Inline chat / refactoring / code generation
 
 There are some commands to interact with the inline chat, leveraging Cursorless targets:
 
@@ -16,7 +20,7 @@ There are some commands to interact with the inline chat, leveraging Cursorless 
 | `"pilot fix <target> to <phrase>"`    | Tells copilot to fix the target using the instructions in `<phrase>`.                                        | `"pilot fix funk air to remove warnings"`                     |
 | `"pilot make <phrase>"`               | Tells copilot to generate code using the instructions in `<phrase>`, at the current cursor position.         | `"pilot make a function that returns the sum of two numbers"` |
 
-## Chat sidebar
+### Chat sidebar
 
 There are some commands to interact with the chat sidebar:
 
