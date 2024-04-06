@@ -1,7 +1,7 @@
 import json
 import os
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Literal, ClassVar
+from typing import Any, ClassVar, Literal
 
 import requests
 from talon import Module, actions, clip, imgui, registry, settings
@@ -11,7 +11,8 @@ from ..lib.modelHelpers import generate_payload, notify, remove_wrapper
 
 mod = Module()
 
-class GuiState():
+
+class GuiState:
     text_to_confirm: ClassVar[str] = ""
 
 
