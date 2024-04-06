@@ -32,3 +32,7 @@ There are some commands to interact with the chat sidebar:
 | `"pilot copy <ordinal>"`                | copies nth code block in most recent chat response                                             | `"pilot copy first"`                                                     |
 | `"pilot bring <ordinal> <destination>"` | inserts nth code block in most recent chat response into your editor at Cursorless destination | `"pilot bring first after state air"`, `"pilot bring first to line air"` |
 | `"pilot bring first to funk"`           | replaces function containing your cursor with first code block in most recent chat response    |                                                                          |
+
+## Codeium
+
+Codeium commands are currently in active development and are likely to change. Please directly see [codeium.talon](./codeium.talon) for the latest commands.
