@@ -26,7 +26,8 @@ ctx.lists["user.makeshift_destination"] = {
 }
 
 mod.tag("codeium", desc="Enable codeium for copilot integration")
- 
+
+
 @mod.action_class
 class Actions:
     def copilot_inline_chat(copilot_slash_command: str = "", prose: str = ""):
