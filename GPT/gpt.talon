@@ -4,15 +4,15 @@ model ask <user.text>$:
     user.paste(result)
 
 # Runs a model prompt on the selected text and pastes the result.
-model {user.staticPrompt} [this]$:
+model <user.modelPrompt> [this]$:
     text = edit.selected_text()
-    result = user.gpt_apply_prompt(user.staticPrompt, text)
+    result = user.gpt_apply_prompt(modelPrompt, text)
     user.paste(result)
 
 # Runs a model prompt on the selected text and sets the result to the clipboard
-model clip {user.staticPrompt} [this]$:
+model clip <user.modelPrompt> [this]$:
     text = edit.selected_text()
-    result = user.gpt_apply_prompt(user.staticPrompt, text)
+    result = user.gpt_apply_prompt(modelPrompt, text)
     clip.set_text(result)
 
 # Say your prompt directly and the AI will apply it to the selected text
@@ -31,7 +31,7 @@ model apply [from] clip$:
     user.paste(result)
 
 # Shows the list of available prompts
-model help$: user.gpt_help()
+model help$:                user.gpt_help()
 
 # Reformat the last dictation with additional context or formatting instructions
 model [nope] that was <user.text>$:

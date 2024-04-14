@@ -1,12 +1,20 @@
 from typing import Literal
-
-from talon import Module
+from talon import Module, Context
 
 mod = Module()
+ctx = Context()
 mod.tag("gpt_beta", desc="Tag for enabling beta GPT commands")
 # Stores all our prompts that don't require arguments
 # (ie those that just take in the clipboard text)
-mod.list("staticPrompt", desc="GPT Prompts Without Dynamic Arguments")
+mod.list("staticPrompt", desc="GPT Prompts Without Dynamic Arguments") 
+mod.list("customPrompt", desc="Custom user-defined GPT prompts")
+mod.list("modelPrompt", desc="GPT Prompts")
+
+# model prompts can be either static in this repo or custom outside of it
+@mod.capture(rule="{user.staticPrompt} | {user.customPrompt}")
+def modelPrompt(matched_prompt) -> str:
+    return str(matched_prompt)
+
 
 mod.setting(
     "openai_model", type=Literal["gpt-3.5-turbo", "gpt-4"], default="gpt-3.5-turbo"

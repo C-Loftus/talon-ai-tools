@@ -5,9 +5,9 @@ app: vscode
 -
 
 # Apply a prompt to any text, and output it any target
-^model please {user.staticPrompt} <user.cursorless_target> [<user.cursorless_destination>]$:
+^model please <user.modelPrompt> <user.cursorless_target> [<user.cursorless_destination>]$:
     text_list = user.cursorless_get_text_list(cursorless_target)
-    user.gpt_dynamic_request_cursorless(user.staticPrompt, text_list, cursorless_destination or 0)
+    user.gpt_dynamic_request_cursorless(user.modelPrompt, text_list, cursorless_destination or 0)
 
 ^model please <user.text> <user.cursorless_target> [<user.cursorless_destination>]$:
     text_list = user.cursorless_get_text_list(cursorless_target)
