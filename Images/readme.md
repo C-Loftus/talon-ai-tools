@@ -6,5 +6,5 @@ The code in this folder is particularly useful for individuals with visual impai
 
 | setting                       | default |
 | ----------------------------- | ------- |
-| user.openDescriptionInBrowser | `true`    |
-| user.maxDescriptionTokens     | `300`     |
+| user.openDescriptionInBrowser | `true`  |
+| user.maxDescriptionTokens     | `300`   |

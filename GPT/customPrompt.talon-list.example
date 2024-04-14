@@ -8,4 +8,3 @@ list:  user.customPrompt
 
 ## Allows you to say "model translate korean" to trigger the translation prompt
 translate korean: translate the following text into korean
-
