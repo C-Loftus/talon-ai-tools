@@ -69,7 +69,7 @@ class UserActions:
 
         prompt = f"""
         Generate a {shell_name} shell command that will perform the given task.
-        Only include the code. Do not include any comments, backticks, or natural language explanations. Do not output the shell name, only the code that is valid {shell_name}. 
+        Only include the code. Do not include any comments, backticks, or natural language explanations. Do not output the shell name, only the code that is valid {shell_name}.
         Condense the code into a single line such that it can be ran in the terminal.
         """
 

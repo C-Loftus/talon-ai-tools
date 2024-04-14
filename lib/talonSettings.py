@@ -33,11 +33,12 @@ mod.setting(
     desc="The default system prompt that informs the way the model should behave at a high level",
 )
 
-mod.setting("model_shell_default", 
-            type=str,
-            default="bash",
-            desc="The default shell for outputting model shell commands"
-            )
+mod.setting(
+    "model_shell_default",
+    type=str,
+    default="bash",
+    desc="The default shell for outputting model shell commands",
+)
 
 # Image description settings
 mod.setting("openDescriptionInBrowser", type=bool, default=True)
