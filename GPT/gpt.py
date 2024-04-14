@@ -63,13 +63,16 @@ class UserActions:
 
     def gpt_generate_shell(text_to_process: str) -> str:
         """Generate a shell command from a spoken instruction"""
-        prompt = """
-        Generate a unix shell command that will perform the given task.
-        Only include the code and not any natural language comments or explanations.
+        shell_name = settings.get("user.model_shell_default")
+        if shell_name == None:
+            raise Exception("GPT Error: Shell name is not set. Set it in the settings.")
+
+        prompt = f"""
+        Generate a {shell_name} shell command that will perform the given task.
+        Only include the code. Do not include any comments, backticks, or natural language explanations. Do not output the shell name, only the code that is valid {shell_name}. 
         Condense the code into a single line such that it can be ran in the terminal.
         """
 
-        # TODO potentially sanitize this further heuristically?
         result = gpt_query(prompt, text_to_process)
         return result
 
