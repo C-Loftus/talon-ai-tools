@@ -38,7 +38,9 @@ The OpenAI API that is used in this repo, through which you make queries to GPT 
 
 ## Configuration
 
-If you want to change any configuration settings copy the example configuration file from `GPT/gpt-talon.settings.example` to `GPT/gpt-talon.settings`, which is a .git ignored file and modify anything that you want to change.
+To add additional prompts, copy the [Talon list for custom prompts](./customPrompt.talon-list.example) to anywhere in your user directory and add your desired prompts. These prompts will automatically be added into the `<user.modelPrompt>` capture.
+
+If you wish to change any configuration settings, copy the [example configuration file](../talon-ai-settings.talon.example) into your user directory and modify settings that you want to change.
 
 | Setting                  | Default                                                                                                                                                                                                                                                            | Notes                                                                              |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
