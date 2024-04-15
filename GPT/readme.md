@@ -17,7 +17,7 @@ Query language models with voice commands. Helpful to automatically generate tex
 
 - See [the list of prompts](./staticPrompt.talon-list) for all the prompts that can be used with the `model` command.
 
-- See the [examples file](./examples/examples.md) for gifs that show how to use the commands.
+- See the [examples file](usage-examples/examples.md) for gifs that show how to use the commands.
 
 ## Setup
 
@@ -38,11 +38,14 @@ The OpenAI API that is used in this repo, through which you make queries to GPT 
 
 ## Configuration
 
-If you want to change any configuration settings copy the example configuration file from `GPT/gpt-talon.settings.example` to `GPT/gpt-talon.settings`, which is a .git ignored file and modify anything that you want to change.
+To add additional prompts, copy the [Talon list for custom prompts](./customPrompt.talon-list.example) to anywhere in your user directory and add your desired prompts. These prompts will automatically be added into the `<user.modelPrompt>` capture.
 
-| Setting                  | Default                                                                                                                                   | Notes                                                                              |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| user.openai_model        | "gpt-3.5-turbo"                                                                                                                           | The model to use for the queries. NOTE: To access gpt-4 you may need prior API use |
-| user.model_temperature   | 0.6                                                                                                                                       | Higher temperatures will make the model more creative and less accurate            |
-| user.model_endpoint      | https://api.openai.com/v1/chat/completions                                                                                                | Any OpenAI compatible endpoint address can be used (Azure, local llamafiles, etc)  |
-| user.model_system_prompt | "You are an assistant helping an office worker to be more productive. Output just the response to the request and no additional content." | The meta-prompt for how to respond to prompts                                      |
+If you wish to change any configuration settings, copy the [example configuration file](../talon-ai-settings.talon.example) into your user directory and modify settings that you want to change.
+
+| Setting                  | Default                                                                                                                                                                                                                                                            | Notes                                                                              |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| user.openai_model        | `"gpt-3.5-turbo"`                                                                                                                                                                                                                                                  | The model to use for the queries. NOTE: To access gpt-4 you may need prior API use |
+| user.model_temperature   | `0.6`                                                                                                                                                                                                                                                              | Higher temperatures will make the model more creative and less accurate            |
+| user.model_endpoint      | `"https://api.openai.com/v1/chat/completions"`                                                                                                                                                                                                                     | Any OpenAI compatible endpoint address can be used (Azure, local llamafiles, etc)  |
+| user.model_shell_default | `"bash"`                                                                                                                                                                                                                                                           | The default shell for `model shell` commands                                       |
+| user.model_system_prompt | `"You are an assistant helping an office worker to be more productive. Output just the response to the request and no additional content. Do not generate any markdown formatting such as backticks for programming languages unless it is explicitly requested."` | The meta-prompt for how to respond to all prompts                                  |

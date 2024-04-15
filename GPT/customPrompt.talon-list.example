@@ -1,0 +1,10 @@
+# Copy this file into your user directory and add your own custom prompts
+# Any prompts in this list are automatically added into the <user.modelPrompt> capture
+
+list:  user.customPrompt
+-
+
+# Example
+
+## Allows you to say "model translate korean" to trigger the translation prompt
+translate korean: translate the following text into korean
