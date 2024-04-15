@@ -3,9 +3,9 @@
 tag: user.sightFreeTalonInstalled
 -
 
-echo {user.staticPrompt} [this]$:
+echo <user.modelPrompt> [this]$:
     text = edit.selected_text()
-    result = user.gpt_apply_prompt(user.staticPrompt, text)
+    result = user.gpt_apply_prompt(user.modelPrompt, text)
     user.tts(result)
 
 echo ask <user.text>$:
