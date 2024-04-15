@@ -1,12 +1,22 @@
 from typing import Literal
 
-from talon import Module
+from talon import Context, Module
 
 mod = Module()
+ctx = Context()
 mod.tag("gpt_beta", desc="Tag for enabling beta GPT commands")
 # Stores all our prompts that don't require arguments
 # (ie those that just take in the clipboard text)
 mod.list("staticPrompt", desc="GPT Prompts Without Dynamic Arguments")
+mod.list("customPrompt", desc="Custom user-defined GPT prompts")
+mod.list("modelPrompt", desc="GPT Prompts")
+
+
+# model prompts can be either static in this repo or custom outside of it
+@mod.capture(rule="{user.staticPrompt} | {user.customPrompt}")
+def modelPrompt(matched_prompt) -> str:
+    return str(matched_prompt)
+
 
 mod.setting(
     "openai_model", type=Literal["gpt-3.5-turbo", "gpt-4"], default="gpt-3.5-turbo"
@@ -29,12 +39,18 @@ mod.setting(
 mod.setting(
     "model_system_prompt",
     type=str,
-    default="You are an assistant helping an office worker to be more productive. Output just the response to the request and no additional content. Do not generate any markdown formatting unless it is requested.",
+    default="You are an assistant helping an office worker to be more productive. Output just the response to the request and no additional content. Do not generate any markdown formatting such as backticks for programming languages unless it is explicitly requested.",
     desc="The default system prompt that informs the way the model should behave at a high level",
 )
 
+mod.setting(
+    "model_shell_default",
+    type=str,
+    default="bash",
+    desc="The default shell for outputting model shell commands",
+)
 
+# Image description settings
 mod.setting("openDescriptionInBrowser", type=bool, default=True)
 mod.setting("maxDescriptionTokens", type=int, default=300)
-
 mod.list("descriptionPrompt", desc="Prompts for describing images")

@@ -9,6 +9,6 @@ model please <user.text>$:
     user.gpt_dynamic_request(utterance, txt)
 
 # Runs a model prompt on the selected text and pastes the result.
-model please {user.staticPrompt} [this]$:
+model please <user.modelPrompt> [this]$:
     text = edit.selected_text()
-    user.gpt_dynamic_request(user.staticPrompt, text)
+    user.gpt_dynamic_request(user.modelPrompt, text)
