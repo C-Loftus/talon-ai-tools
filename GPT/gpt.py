@@ -80,7 +80,7 @@ class UserActions:
         """Generate a SQL query from a spoken instruction"""
 
         prompt = """
-       Generate SQL to complete a given request. 
+       Generate SQL to complete a given request.
        Output only the SQL in one line without newlines.
        Do not output comments, backticks, or natural language explanations.
        Prioritize SQL queries that are database agnostic.
