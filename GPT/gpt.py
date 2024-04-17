@@ -76,6 +76,17 @@ class UserActions:
         result = gpt_query(prompt, text_to_process)
         return result
 
+    def gpt_generate_sql(text_to_process: str) -> str:
+        """Generate a SQL query from a spoken instruction"""
+
+        prompt = """
+       Generate SQL to complete a given request.
+       Output only the SQL in one line without newlines.
+       Do not output comments, backticks, or natural language explanations.
+       Prioritize SQL queries that are database agnostic.
+        """
+        return gpt_query(prompt, text_to_process)
+
     def add_to_confirmation_gui(model_output: str):
         """Add text to the confirmation gui"""
         GuiState.text_to_confirm = model_output
