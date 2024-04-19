@@ -15,6 +15,12 @@ model clip <user.modelPrompt> [this]$:
     result = user.gpt_apply_prompt(modelPrompt, text)
     clip.set_text(result)
 
+# Runs a model prompt on the selected text and sets the selection to the pasted response
+model selected <user.modelPrompt> [this]$:
+    text = edit.selected_text()
+    result = user.gpt_apply_prompt(modelPrompt, text)
+    user.paste_selected(result)
+
 # Say your prompt directly and the AI will apply it to the selected text
 model please <user.text>$:
     prompt = user.text
