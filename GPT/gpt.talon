@@ -37,7 +37,7 @@ model apply [from] clip$:
     user.paste(result)
 
 # Shows the list of available prompts
-model help$:                user.gpt_help()
+model help$: user.gpt_help()
 
 # Reformat the last dictation with additional context or formatting instructions
 model [nope] that was <user.text>$:
