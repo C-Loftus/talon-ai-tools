@@ -110,7 +110,7 @@ class UserActions:
         GuiState.text_to_confirm = ""
         confirmation_gui.hide()
 
-    def paste_selected(result: str):
+    def paste_and_select(result: str):
         """Paste and select the pasted text"""
 
         actions.user.paste(result)

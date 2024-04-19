@@ -16,10 +16,10 @@ model clip <user.modelPrompt> [this]$:
     clip.set_text(result)
 
 # Runs a model prompt on the selected text and sets the selection to the pasted response
-model selected <user.modelPrompt> [this]$:
+model <user.modelPrompt> [this] (then | and) select [it]$:
     text = edit.selected_text()
     result = user.gpt_apply_prompt(modelPrompt, text)
-    user.paste_selected(result)
+    user.paste_and_select(result)
 
 # Say your prompt directly and the AI will apply it to the selected text
 model please <user.text>$:
@@ -37,7 +37,7 @@ model apply [from] clip$:
     user.paste(result)
 
 # Shows the list of available prompts
-model help$: user.gpt_help()
+model help$:                user.gpt_help()
 
 # Reformat the last dictation with additional context or formatting instructions
 model [nope] that was <user.text>$:
