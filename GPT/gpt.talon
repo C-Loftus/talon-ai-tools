@@ -10,7 +10,7 @@ model <user.modelPrompt> [this]$:
     user.paste(result)
 
 # Runs a model prompt on the selected text and sets the result to the clipboard
-model clip <user.modelPrompt> [this]$:
+model <user.modelPrompt> [this] (then | and) (clip | copy) [it]$:
     text = edit.selected_text()
     result = user.gpt_apply_prompt(modelPrompt, text)
     clip.set_text(result)
@@ -37,7 +37,7 @@ model apply [from] clip$:
     user.paste(result)
 
 # Shows the list of available prompts
-model help$: user.gpt_help()
+model help$:                user.gpt_help()
 
 # Reformat the last dictation with additional context or formatting instructions
 model [nope] that was <user.text>$:
