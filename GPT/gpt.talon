@@ -10,10 +10,16 @@ model <user.modelPrompt> [this]$:
     user.paste(result)
 
 # Runs a model prompt on the selected text and sets the result to the clipboard
-model clip <user.modelPrompt> [this]$:
+model <user.modelPrompt> [this] (then | and) (clip | copy) [it]$:
     text = edit.selected_text()
     result = user.gpt_apply_prompt(modelPrompt, text)
     clip.set_text(result)
+
+# Runs a model prompt on the selected text and sets the selection to the pasted response
+model <user.modelPrompt> [this] (then | and) select [it]$:
+    text = edit.selected_text()
+    result = user.gpt_apply_prompt(modelPrompt, text)
+    user.paste_and_select(result)
 
 # Say your prompt directly and the AI will apply it to the selected text
 model please <user.text>$:

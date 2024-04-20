@@ -110,6 +110,14 @@ class UserActions:
         GuiState.text_to_confirm = ""
         confirmation_gui.hide()
 
+    def paste_and_select(result: str):
+        """Paste and select the pasted text"""
+
+        actions.user.paste(result)
+
+        for _ in result:
+            actions.edit.extend_left()
+
     def gpt_apply_prompt(prompt: str, text_to_process: str | list[str]) -> str:
         """Apply an arbitrary prompt to arbitrary text"""
         text_to_process = (
