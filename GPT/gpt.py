@@ -118,12 +118,6 @@ class UserActions:
         for _ in result:
             actions.edit.extend_left()
 
-    def paste_and_append(result: str):
-        """Paste to the next line"""
-
-        actions.edit.line_insert_down()
-        actions.user.paste(result)
-
     def gpt_apply_prompt(prompt: str, text_to_process: str | list[str]) -> str:
         """Apply an arbitrary prompt to arbitrary text"""
         text_to_process = (

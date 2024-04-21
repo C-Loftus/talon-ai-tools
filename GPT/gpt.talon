@@ -25,7 +25,8 @@ model <user.modelPrompt> [this] (then | and) select [it]$:
 model <user.modelPrompt> [this] (then | and) append [it]$:
     text = edit.selected_text()
     result = user.gpt_apply_prompt(modelPrompt, text)
-    user.paste_and_append(result)
+    edit.line_insert_down()
+    user.paste(result)
 
 # Say your prompt directly and the AI will apply it to the selected text
 model please <user.text>$:
