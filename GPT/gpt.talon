@@ -22,7 +22,7 @@ model <user.modelPrompt> [this] (then | and) select [it]$:
     user.paste_and_select(result)
 
 # Runs a model prompt on the selected text and appends the result to the next line
-model <user.modelPrompt> [this] (then | and) append [it]$:
+model <user.modelPrompt> after$:
     text = edit.selected_text()
     result = user.gpt_apply_prompt(modelPrompt, text)
     edit.line_insert_down()
