@@ -1,15 +1,15 @@
-# Ask a question in the voice command and the AI will answer it.
+# Ask a question in the voice command and the model will answer it.
 model ask <user.text>$:
     result = user.gpt_answer_question(text)
     user.paste(result)
 
-# Runs a model prompt on the selected text and appends the result to the next line
+# Runs a model prompt on the selected text; pastes or inserts via the specified method
 model <user.modelPrompt> [this] [{user.modelInsertionMethod}]$:
     text = edit.selected_text()
     result = user.gpt_apply_prompt(modelPrompt, text)
     user.gpt_insert_response(result, modelInsertionMethod or "")
 
-# Say your prompt directly and the AI will apply it to the selected text
+# Runs a command on the selected text; pastes or inserts via the specified method
 model please <user.text> [{user.modelInsertionMethod}]$:
     prompt = user.text
     txt = edit.selected_text()
