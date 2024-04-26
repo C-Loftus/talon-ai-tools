@@ -3,37 +3,18 @@ model ask <user.text>$:
     result = user.gpt_answer_question(text)
     user.paste(result)
 
-# Runs a model prompt on the selected text and pastes the result.
-model <user.modelPrompt> [this]$:
-    text = edit.selected_text()
-    result = user.gpt_apply_prompt(modelPrompt, text)
-    user.paste(result)
-
-# Runs a model prompt on the selected text and sets the result to the clipboard
-model <user.modelPrompt> [this] (then | and) (clip | copy) [it]$:
-    text = edit.selected_text()
-    result = user.gpt_apply_prompt(modelPrompt, text)
-    clip.set_text(result)
-
-# Runs a model prompt on the selected text and sets the selection to the pasted response
-model <user.modelPrompt> [this] (then | and) select [it]$:
-    text = edit.selected_text()
-    result = user.gpt_apply_prompt(modelPrompt, text)
-    user.paste_and_select(result)
-
 # Runs a model prompt on the selected text and appends the result to the next line
-model <user.modelPrompt> after$:
+model <user.modelPrompt> [this] [{user.modelInsertionMethod}]$:
     text = edit.selected_text()
     result = user.gpt_apply_prompt(modelPrompt, text)
-    edit.line_insert_down()
-    user.paste(result)
+    user.gpt_insert_response(result, modelInsertionMethod or "")
 
 # Say your prompt directly and the AI will apply it to the selected text
-model please <user.text>$:
+model please <user.text> [{user.modelInsertionMethod}]$:
     prompt = user.text
     txt = edit.selected_text()
     result = user.gpt_apply_prompt(prompt, txt)
-    user.paste(result)
+    user.gpt_insert_response(result, modelInsertionMethod or "")
 
 # Applies an arbitrary prompt from the clipboard to selected text and pastes the result.
 # Useful for applying complex/custom prompts that need to be drafted in a text editor.
@@ -44,7 +25,7 @@ model apply [from] clip$:
     user.paste(result)
 
 # Shows the list of available prompts
-model help$: user.gpt_help()
+model help$:                user.gpt_help()
 
 # Reformat the last dictation with additional context or formatting instructions
 model [nope] that was <user.text>$:
