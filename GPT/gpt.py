@@ -190,6 +190,25 @@ class UserActions:
             notify("No text to reformat")
             raise Exception("No text to reformat")
 
+    def gpt_insert_response(result: str, method: str = ""):
+        """Insert a GPT result in a specified way"""
+
+        match method:
+            case "above":
+                actions.key("left")
+                actions.edit.line_insert_up()
+                actions.user.paste(result)
+            case "below":
+                actions.key("right")
+                actions.edit.line_insert_down()
+                actions.user.paste(result)
+            case "clipped":
+                clip.set_text(result)
+            case "selected":
+                actions.user.paste_and_select(result)
+            case _:
+                actions.user.paste(result)
+
     def cursorless_or_paste_helper(
         cursorless_destination: Any | Literal[0], text: str
     ) -> None:
