@@ -36,10 +36,9 @@ os.environ["OPENAI_API_KEY"] = "YOUR-KEY-HERE"
 
 5. See the [GPT](./GPT/readme.md) or [Copilot](./copilot/README.md) folders for usage examples.
 
-
-> [!NOTE]  
-> You can use this repo without an OpenAI key by [customizing the endpoint url](./GPT/readme.md#configuration) to be your preferred model. 
-> 
+> [!NOTE]
+> You can use this repo without an OpenAI key by [customizing the endpoint url](./GPT/readme.md#configuration) to be your preferred model.
+>
 > You can also exclusively use this repo with just [Copilot](./copilot/README.md) if you do not need LLM integration
 
 ### Quickstart Video
