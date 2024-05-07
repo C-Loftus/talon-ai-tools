@@ -11,8 +11,8 @@ Query language models with voice commands. Helpful to automatically generate tex
 | `model please <text>`                                         | Say an arbitrary prompt and then apply it                            | "model please translate this to Japanese"     |
 | `model ask <text>`                                            | Ask a question to the model                                          | "model ask what is the meaning of life"       |
 | `model <prompt> <cursorless_target> <cursorless_destination>` | Select with cursorless, apply a prompt, and paste to the destination | "model explain line this after block red air" |
-| `model <prompt> then select it`                               | Apply a prompt and then select the result                            | "model format bullets then select it"         |
-| `model <prompt> then clip it`                                 | Apply a prompt and return the result in the clipboard                | "model explain this then clip it"             |
+| `model <prompt> below`                                        | Apply a prompt and then paste the result below the cursor            | "model format bullets below"                  |
+| `model <prompt> clipped`                                      | Apply a prompt and return the result in the clipboard                | "model explain this clipped"                  |
 
 ## Help
 
