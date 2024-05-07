@@ -34,7 +34,7 @@ import os
 os.environ["OPENAI_API_KEY"] = "YOUR-KEY-HERE"
 ```
 
-> [!NOTE]  
+> [!NOTE]
 > You can also use this repo without an OpenAI API key by using an offline model and [customizing the endpoint url](./GPT/readme.md#configuration) to be another model, or a local LLM.
 
 ### Quickstart Video
