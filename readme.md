@@ -18,8 +18,28 @@ This functionality is especially helpful for users who:
 
 ## Help and Setup:
 
-- Clone this repo into your Talon user directory.
-- Read the readme in each folder for more information on how to set up and use each tool.
+1. Download or `git clone` this repo into your Talon user directory.
+1. [Obtain an OpenAI API key](https://platform.openai.com/signup).
+
+1. Create a Python file anywhere in your Talon user directory.
+1. Set the key environment variable within the Python file
+
+> [!CAUTION]
+> Make sure you do not push the key to a public repo!
+
+```python
+# Example of setting the environment variable
+import os
+
+os.environ["OPENAI_API_KEY"] = "YOUR-KEY-HERE"
+```
+
+5. See the [GPT](./GPT/readme.md) or [Copilot](./copilot/README.md) folders for usage examples.
+
+> [!NOTE]
+> You can use this repo without an OpenAI key by [customizing the endpoint url](./GPT/readme.md#configuration) to be your preferred model.
+>
+> You can also exclusively use this repo with just [Copilot](./copilot/README.md) if you do not need LLM integration
 
 ### Quickstart Video
 
