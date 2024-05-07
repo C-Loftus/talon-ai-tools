@@ -10,6 +10,7 @@ mod.tag("gpt_beta", desc="Tag for enabling beta GPT commands")
 mod.list("staticPrompt", desc="GPT Prompts Without Dynamic Arguments")
 mod.list("customPrompt", desc="Custom user-defined GPT prompts")
 mod.list("modelPrompt", desc="GPT Prompts")
+mod.list("modelInsertionMethod", desc="What to do after returning the model response")
 
 
 # model prompts can be either static in this repo or custom outside of it
