@@ -11,8 +11,10 @@ from ..lib.modelHelpers import generate_payload, notify, remove_wrapper
 
 mod = Module()
 
+
 class GuiState:
     text_to_confirm: ClassVar[str] = ""
+
 
 @imgui.open()
 def confirmation_gui(gui: imgui.GUI):
