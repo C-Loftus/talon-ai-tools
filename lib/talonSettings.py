@@ -12,6 +12,7 @@ mod.list("customPrompt", desc="Custom user-defined GPT prompts")
 mod.list("modelPrompt", desc="GPT Prompts")
 mod.list("modelInsertionMethod", desc="What to do after returning the model response")
 
+
 # model prompts can be either static in this repo or custom outside of it
 @mod.capture(rule="{user.staticPrompt} | {user.customPrompt}")
 def modelPrompt(matched_prompt) -> str:
