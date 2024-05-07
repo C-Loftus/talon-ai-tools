@@ -18,8 +18,24 @@ This functionality is especially helpful for users who:
 
 ## Help and Setup:
 
-- Clone this repo into your Talon user directory.
-- Read the readme in each folder for more information on how to set up and use each tool.
+1. Download or `git clone` this repo into your Talon user directory.
+1. [Obtain an OpenAI API key](https://platform.openai.com/signup).
+
+1. Create a Python file anywhere in your Talon user directory.
+1. Set the key environment variable within the Python file
+
+> [!CAUTION]
+> Make sure you do not push the key to a public repo!
+
+```python
+# Example of setting the environment variable
+import os
+
+os.environ["OPENAI_API_KEY"] = "YOUR-KEY-HERE"
+```
+
+> [!NOTE]  
+> You can also use this repo without an OpenAI API key by using an offline model and [customizing the endpoint url](./GPT/readme.md#configuration) to be another model, or a local LLM.
 
 ### Quickstart Video
 
