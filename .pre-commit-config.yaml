@@ -50,4 +50,3 @@ repos:
     hooks:
       - id: talonfmt
         args: ["--in-place"]
-        language_version: python3.11
