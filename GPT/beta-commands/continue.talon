@@ -25,9 +25,6 @@ tin you dock <user.cursorless_target>:
 tin you comment <user.cursorless_target>:
     user.cursorless_ide_command("continue.writeCommentsForCode", cursorless_target)
 
-tin you comment <user.cursorless_target>:
-    user.cursorless_ide_command("continue.writeCommentsForCode", cursorless_target)
-
 tin you optimize <user.cursorless_target>:
     user.cursorless_ide_command("continue.optimizeCode", cursorless_target)
 
