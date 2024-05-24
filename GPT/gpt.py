@@ -64,7 +64,7 @@ class UserActions:
     def gpt_generate_shell(text_to_process: str) -> str:
         """Generate a shell command from a spoken instruction"""
         shell_name = settings.get("user.model_shell_default")
-        if shell_name == None:
+        if shell_name is None:
             raise Exception("GPT Error: Shell name is not set. Set it in the settings.")
 
         prompt = f"""
