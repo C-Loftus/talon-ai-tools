@@ -3,13 +3,17 @@ model ask <user.text>$:
     result = user.gpt_answer_question(text)
     user.paste(result)
 
-# Runs a model prompt on the selected text; pastes or inserts via the specified method
+# Runs a model prompt on the selected text; inserts with paste by default
+#   Example: `model fix grammar below`
+#   Example: `model explain this`
 model <user.modelPrompt> [this] [{user.modelInsertionMethod}]$:
     text = edit.selected_text()
     result = user.gpt_apply_prompt(modelPrompt, text)
     user.gpt_insert_response(result, modelInsertionMethod or "")
 
-# Runs a command on the selected text; pastes or inserts via the specified method
+# Runs an arbitrary prompt on the selected text; inserts with paste by default
+#   Example: `model please translate this into English`
+#   Example: `model please reformat this code in a more imperative style clipped`
 model please <user.text> [{user.modelInsertionMethod}]$:
     prompt = user.text
     txt = edit.selected_text()
