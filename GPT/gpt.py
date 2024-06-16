@@ -61,6 +61,20 @@ class UserActions:
         """
         return gpt_query(prompt, text_to_process)
 
+    def gpt_smart_clipboard(clipboard_text: str, destination_text: str):
+        """Intelligently integrate the source text with the destination"""
+        prompt = """
+        Act as a smart clipboard. I'm going to give you some text and I want you to integrate it with the text of the destination. Please adjust the inputs in anyway necessary to make them fit the new context. For example, if you're pasting into a type definition please make it a type.
+
+        Here is the destination text:
+        ```
+        {destination_text}
+        ```
+
+        Please return only the integrated text.
+        """
+        return gpt_query(prompt, clipboard_text)
+
     def gpt_generate_shell(text_to_process: str) -> str:
         """Generate a shell command from a spoken instruction"""
         shell_name = settings.get("user.model_shell_default")
