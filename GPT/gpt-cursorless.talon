@@ -7,4 +7,5 @@ tag: user.cursorless
 model <user.modelPrompt> <user.cursorless_target> [<user.cursorless_destination>]$:
     text = user.cursorless_get_text_list(cursorless_target)
     result = user.gpt_apply_prompt(user.modelPrompt, text)
-    user.cursorless_or_paste_helper(cursorless_destination or 0, result)
+    default_destination = user.cursorless_create_destination(cursorless_target)
+    user.cursorless_insert(cursorless_destination or default_destination, result)
