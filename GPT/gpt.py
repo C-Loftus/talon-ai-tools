@@ -40,7 +40,6 @@ def gpt_query(prompt: str, content: str) -> str:
     url = settings.get("user.model_endpoint")
 
     headers, data = generate_payload(prompt, content)
-    print(data)
     response = requests.post(url, headers=headers, data=json.dumps(data))
 
     match response.status_code:
