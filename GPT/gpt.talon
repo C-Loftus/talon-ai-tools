@@ -11,10 +11,10 @@ model <user.modelPrompt> [this] [{user.modelInsertionMethod}]$:
     result = user.gpt_apply_prompt(modelPrompt, text)
     user.gpt_insert_response(result, modelInsertionMethod or "")
 
-model paste:
+model blend:
     clipboard_text = clip.text()
     destination_text = edit.selected_text()
-    result = user.gpt_smart_clipboard(clipboard_text, destination_text)
+    result = user.model_blend(clipboard_text, destination_text)
     user.gpt_insert_response(result, "")
 
 # Runs an arbitrary prompt on the selected text; inserts with paste by default

@@ -40,7 +40,7 @@ def gpt_query(prompt: str, content: str) -> str:
     url = settings.get("user.model_endpoint")
 
     headers, data = generate_payload(prompt, content)
-
+    print(data)
     response = requests.post(url, headers=headers, data=json.dumps(data))
 
     match response.status_code:
@@ -61,19 +61,19 @@ class UserActions:
         """
         return gpt_query(prompt, text_to_process)
 
-    def gpt_smart_clipboard(clipboard_text: str, destination_text: str):
-        """Intelligently integrate the source text with the destination"""
-        prompt = """
-        Act as a smart clipboard. I'm going to give you some text and I want you to integrate it with the text of the destination. Please adjust the inputs in anyway necessary to make them fit the new context. For example, if you're pasting into a type definition please make it a type.
+    def model_blend(source_text: str, destination_text: str):
+        """Blend all the source text and send it to the destination"""
+        prompt = f"""
+        Act as a text transformer. I'm going to give you some source text and destination text and I want you to modify the destination text based on the contents of the source text in a way that combines both of them together. Please return only the final text with no decoration for insertion into a document in the specified language.
 
         Here is the destination text:
         ```
         {destination_text}
         ```
 
-        Please return only the integrated text.
+        Please return only the final text. What follows is all of the source texts.
         """
-        return gpt_query(prompt, clipboard_text)
+        return gpt_query(prompt, source_text)
 
     def gpt_generate_shell(text_to_process: str) -> str:
         """Generate a shell command from a spoken instruction"""
