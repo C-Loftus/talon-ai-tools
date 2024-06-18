@@ -15,7 +15,14 @@ app: vscode
     default_destination = user.cursorless_create_destination(cursorless_target)
     user.gpt_dynamic_request_cursorless(user.text, text_list, cursorless_destination or default_destination)
 
-model blend <user.cursorless_target> [<user.cursorless_destination>]$:
+model blend <user.cursorless_target> to <user.cursorless_target>$:
+    target_text = user.cursorless_get_text_list(cursorless_target_1)
+    destination_text = user.cursorless_get_text(cursorless_target_2)
+    default_destination = user.cursorless_create_destination(cursorless_target_2)
+    result = user.model_blend(target_text, destination_text)
+    user.cursorless_insert(default_destination, result)
+
+model blend <user.cursorless_target>$:
     target_text = user.cursorless_get_text_list(cursorless_target)
     result = user.model_blend(target_text, edit.selected_text())
     user.cursorless_or_paste_helper(cursorless_destination or 0, result)
