@@ -63,7 +63,7 @@ class UserActions:
     def model_blend(source_text: str, destination_text: str):
         """Blend all the source text and send it to the destination"""
         prompt = f"""
-        Act as a text transformer. I'm going to give you some source text and destination text and I want you to modify the destination text based on the contents of the source text in a way that combines both of them together. Please return only the final text with no decoration for insertion into a document in the specified language.
+        Act as a text transformer. I'm going to give you some source text and destination text, and I want you to modify the destination text based on the contents of the source text in a way that combines both of them together. Use the structure of the destination text, reordering and renaming as necessary to ensure a natural and coherent flow. Please return only the final text with no decoration for insertion into a document in the specified language.
 
         Here is the destination text:
         ```
