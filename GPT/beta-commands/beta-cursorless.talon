@@ -32,4 +32,4 @@ model blend to <user.cursorless_target>$:
 model blend <user.cursorless_target>$:
     target_text = user.cursorless_get_text_list(cursorless_target)
     result = user.model_blend(target_text, edit.selected_text())
-    user.cursorless_or_paste_helper(cursorless_destination or 0, result)
+    user.cursorless_or_paste_helper(0, result)
