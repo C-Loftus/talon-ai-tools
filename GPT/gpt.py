@@ -7,7 +7,8 @@ import requests
 from talon import Module, actions, clip, imgui, registry, settings
 
 from ..lib.HTMLBuilder import Builder
-from ..lib.modelHelpers import generate_payload, notify, remove_wrapper
+from ..lib.modelHelpers import generate_payload, notify
+from ..lib.pureHelpers import remove_wrapper, strip_markdown
 
 mod = Module()
 
@@ -46,7 +47,10 @@ def gpt_query(prompt: str, content: str) -> str:
     match response.status_code:
         case 200:
             notify("GPT Task Completed")
-            return response.json()["choices"][0]["message"]["content"].strip()
+            resp = response.json()["choices"][0]["message"]["content"].strip()
+            formatted_resp = strip_markdown(resp)
+            return formatted_resp
+
         case _:
             notify("GPT Failure: Check the Talon Log")
             raise Exception(response.json())
