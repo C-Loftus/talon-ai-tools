@@ -55,6 +55,20 @@ def gpt_query(prompt: str, content: str) -> str:
             raise Exception(response.json())
 
 
+def model_blend(source_text: str, destination_text: str):
+    prompt = f"""
+    Act as a text transformer. I'm going to give you some source text and destination text, and I want you to modify the destination text based on the contents of the source text in a way that combines both of them together. Use the structure of the destination text, reordering and renaming as necessary to ensure a natural and coherent flow. Please return only the final text with no decoration for insertion into a document in the specified language.
+
+    Here is the destination text:
+    ```
+    {destination_text}
+    ```
+
+    Please return only the final text. What follows is all of the source texts separated by '---'.
+    """
+    return gpt_query(prompt, source_text)
+
+
 @mod.action_class
 class UserActions:
     def gpt_answer_question(text_to_process: str) -> str:
@@ -66,17 +80,13 @@ class UserActions:
 
     def model_blend(source_text: str, destination_text: str):
         """Blend all the source text and send it to the destination"""
-        prompt = f"""
-        Act as a text transformer. I'm going to give you some source text and destination text, and I want you to modify the destination text based on the contents of the source text in a way that combines both of them together. Use the structure of the destination text, reordering and renaming as necessary to ensure a natural and coherent flow. Please return only the final text with no decoration for insertion into a document in the specified language.
 
-        Here is the destination text:
-        ```
-        {destination_text}
-        ```
+        return model_blend(source_text, destination_text)
 
-        Please return only the final text. What follows is all of the source texts.
-        """
-        return gpt_query(prompt, source_text)
+    def model_blend_list(source_text: list[str], destination_text: str):
+        """Blend all the source text as a list and send it to the destination"""
+
+        return model_blend("\n---\n".join(source_text), destination_text)
 
     def gpt_generate_shell(text_to_process: str) -> str:
         """Generate a shell command from a spoken instruction"""

@@ -19,7 +19,7 @@ model blend <user.cursorless_target> to <user.cursorless_target>$:
     target_text = user.cursorless_get_text_list(cursorless_target_1)
     destination_text = user.cursorless_get_text(cursorless_target_2)
     default_destination = user.cursorless_create_destination(cursorless_target_2)
-    result = user.model_blend(target_text, destination_text)
+    result = user.model_blend_list(target_text, destination_text)
     user.cursorless_insert(default_destination, result)
 
 model blend to <user.cursorless_target>$:
@@ -31,5 +31,5 @@ model blend to <user.cursorless_target>$:
 
 model blend <user.cursorless_target>$:
     target_text = user.cursorless_get_text_list(cursorless_target)
-    result = user.model_blend(target_text, edit.selected_text())
+    result = user.model_blend_list(target_text, edit.selected_text())
     user.cursorless_or_paste_helper(0, result)
