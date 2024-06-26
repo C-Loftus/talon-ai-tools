@@ -11,7 +11,7 @@ model <user.modelPrompt> [this] [{user.modelInsertionMethod}]$:
     result = user.gpt_apply_prompt(modelPrompt, text)
     user.gpt_insert_response(result, modelInsertionMethod or "")
 
-model blend:
+model blend clip:
     clipboard_text = clip.text()
     destination_text = edit.selected_text()
     result = user.model_blend(clipboard_text, destination_text)
