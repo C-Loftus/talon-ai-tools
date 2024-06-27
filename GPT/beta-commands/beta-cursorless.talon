@@ -26,7 +26,8 @@ model blend to <user.cursorless_target>:
     target_text = edit.selected_text()
     destination_text = user.cursorless_get_text(cursorless_target)
     default_destination = user.cursorless_create_destination(cursorless_target)
-    result = user.model_blend(target_text, destination_text) * user.cursorless_insert(default_destination, result)
+    result = user.model_blend(target_text, destination_text)
+    user.cursorless_insert(default_destination, result)
 
 model blend <user.cursorless_target>:
     target_text = user.cursorless_get_text_list(cursorless_target)
