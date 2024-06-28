@@ -13,7 +13,6 @@ fix grammar casually:  Fix any mistakes or irregularities in grammar, spelling, 
 format table: The following markdown text is raw data. There is no index. Return the text in a markdown table format. Each row has a new line in the original data.
 format bullets: Convert the every paragraph into a one heading with series of bullet points underneath it. Each paragraph is separated by a new line. Separate paragraphs should not have combined bullet points. This should all be done in markdown syntax. If it is a small paragraph than you can just leave it as a heading and not add bullet points. Do not reduce content, only reduce things that would be redundant. These bullet points should be in a useful format for notes for those who want to quickly look at it. If there is a citation in the markdown original then keep the citation just at the top and not within every individual bullet point.
 format mermaid: convert the following plain text into the text syntax for a mermaid diagram.
-format gant: convert the following plain text into the text syntax for a gant chart within mermaid.
 format comment: format the following text as a comment for the current programming language. Use the proper comment syntax for the current language. Split the comment into multiple lines if the lines are too long
 
 ## TEXT GENERATION
@@ -34,11 +33,9 @@ convert to yam: Convert the following data into a yaml format.
 
 ## ACCESSIBILITY
 describe code: explain what the following code does in natural language at a high level without getting into the specifics of the syntax.
-describe structure: describe the structure of the following text. Do not describe the content. Describe the structure of the text.
-describe summary: Condense the following text into a summary that is less verbose but still gives me the gist of the content. Do not describe the formatting.
-check grammar: Check the grammar of the following text. Return a list of all potential errors.
+check grammar: Check the grammar and formatting of the following text. Return a list of all potential errors.
 check spelling: Check the spelling of the following text. Return a list of all potential errors.
-check structure: I want you to skim the structure and layout of the following text. Tell me if the structure and order of my writing is correct. If it is not correct or flows poorly then tell me what might be wrong with it. If it is all correct then say it looks good. Do not describe the formatting. Do not comment on the specific content only its ordering and layout.
+check structure: Skim the structure and layout of the following text. Tell me if the structure and order of my writing is correct. If it is not correct or flows poorly then tell me what might be wrong with it. If it is all correct then say it looks good.
 
 ## TRANSLATIONS
 translate to english: Translate the following text into English.

@@ -18,7 +18,7 @@ Query language models with voice commands. Helpful to automatically generate tex
 
 - See [the list of prompts](./staticPrompt.talon-list) for all the prompts that can be used with the `model` command.
 
-- See the [examples file](usage-examples/examples.md) for gifs that show how to use the commands.
+- See the [examples file](../docs/usage-examples/examples.md) for gifs that show how to use the commands.
 
 ## OpenAI API Pricing
 
