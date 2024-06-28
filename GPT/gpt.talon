@@ -1,7 +1,5 @@
-# Ask a question in the voice command and the model will answer it.
-model ask <user.text>$:
-    result = user.gpt_answer_question(text)
-    user.paste(result)
+# Shows the list of available prompts
+model help$: user.gpt_help()
 
 # Runs a model prompt on the selected text; inserts with paste by default
 #   Example: `model fix grammar below`
@@ -9,6 +7,13 @@ model ask <user.text>$:
 model <user.modelPrompt> [this] [{user.modelInsertionMethod}]$:
     text = edit.selected_text()
     result = user.gpt_apply_prompt(modelPrompt, text)
+    user.gpt_insert_response(result, modelInsertionMethod or "")
+
+# Ask a question in the voice command and the model will answer it.
+#   Example: `model ask what is the meaning of life`
+#   Example: `model ask generate a plan to learn Javascript in browser`
+model ask <user.text> [{user.modelInsertionMethod}]$:
+    result = user.gpt_answer_question(text)
     user.gpt_insert_response(result, modelInsertionMethod or "")
 
 # Runs an arbitrary prompt on the selected text; inserts with paste by default
@@ -27,9 +32,6 @@ model apply [from] clip$:
     text = edit.selected_text()
     result = user.gpt_apply_prompt(prompt, text)
     user.paste(result)
-
-# Shows the list of available prompts
-model help$: user.gpt_help()
 
 # Reformat the last dictation with additional context or formatting instructions
 model [nope] that was <user.text>$:

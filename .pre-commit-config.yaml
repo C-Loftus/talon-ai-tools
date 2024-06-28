@@ -50,3 +50,9 @@ repos:
     hooks:
       - id: talonfmt
         args: ["--in-place"]
+
+  - repo: https://github.com/tcort/markdown-link-check
+    rev: v3.12.2
+    hooks:
+      - id: markdown-link-check
+        args: [-q]

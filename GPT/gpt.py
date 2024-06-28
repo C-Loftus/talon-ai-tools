@@ -1,14 +1,13 @@
 import json
 import os
-from concurrent.futures import ThreadPoolExecutor
 from typing import Any, ClassVar, Literal
 
 import requests
-from talon import Module, actions, clip, imgui, registry, settings
+from talon import Module, actions, clip, imgui, settings
 
 from ..lib.HTMLBuilder import Builder
 from ..lib.modelHelpers import generate_payload, notify
-from ..lib.pureHelpers import remove_wrapper, strip_markdown
+from ..lib.pureHelpers import strip_markdown
 
 mod = Module()
 
@@ -167,40 +166,6 @@ class UserActions:
 
         builder.render()
 
-    def gpt_find_talon_commands(command_description: str):
-        """Search for relevant talon commands"""
-        command_list = ""
-        for ctx in registry.active_contexts():
-            items = ctx.commands.items()
-            for _, command in items:
-                raw_command = remove_wrapper(str(command))
-                delimited = f"{raw_command}\n"
-                command_list += delimited
-
-        prompt = f"""
-        The following is a list of commands separated by \n for a program that controls the user's desktop. Each command after the delimiter is a separate command unrelated to the previous command.
-        I am a user and I want to find {command_description}.
-        Return the exact relevant command or the exact word "None" and nothing else.
-        """
-
-        # TODO: tokenize instead of splitting by character
-        def split_into_chunks(text: str, chunk_size: int):
-            return [text[i : i + chunk_size] for i in range(0, len(text), chunk_size)]
-
-        command_chunks = split_into_chunks(command_list, 1400 - len(prompt))
-
-        with ThreadPoolExecutor() as executor:
-            results = list(
-                executor.map(gpt_query, [prompt] * len(command_chunks), command_chunks)
-            )
-
-        builder = Builder()
-        builder.h1("Talon GPT Command Response")
-        for result in results:
-            if result != "None":
-                builder.p(result)
-        builder.render()
-
     def gpt_reformat_last(how_to_reformat: str):
         """Reformat the last model output"""
         PROMPT = f"""The last phrase was written using voice dictation. It has an error with spelling, grammar, or just general misrecognition due to a lack of context. Please reformat the following text to correct the error with the context that it was {how_to_reformat}."""
@@ -228,6 +193,11 @@ class UserActions:
                 clip.set_text(result)
             case "selected":
                 actions.user.paste_and_select(result)
+            case "browser":
+                builder = Builder()
+                builder.h1("Talon GPT Result")
+                builder.p(result)
+                builder.render()
             case _:
                 actions.user.paste(result)
 
