@@ -35,7 +35,7 @@ convert to yam: Convert the following data into a yaml format.
 describe code: explain what the following code does in natural language at a high level without getting into the specifics of the syntax.
 check grammar: Check the grammar and formatting of the following text. Return a list of all potential errors.
 check spelling: Check the spelling of the following text. Return a list of all potential errors.
-check structure: Skim the structure and layout of the following text. Tell me if the structure and order of my writing is correct. If it is not correct or flows poorly then tell me what might be wrong with it. If it is all correct then say it looks good. Do not describe the formatting.
+check structure: Skim the structure and layout of the following text. Tell me if the structure and order of my writing is correct. If it is not correct or flows poorly then tell me what might be wrong with it. If it is all correct then say it looks good.
 
 ## TRANSLATIONS
 translate to english: Translate the following text into English.
