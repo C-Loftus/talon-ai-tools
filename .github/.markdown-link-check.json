@@ -1,0 +1,8 @@
+{
+    "timeout": "10s",
+    "retryOn429": true,
+    "retryCount": 5,
+    "fallbackRetryDelay": "30s",
+    // We have to treat 403 as success, because some sites have ddos protection. So we just need to manually check those
+    "aliveStatusCodes": [0, 200, 206, 403]
+}
