@@ -9,7 +9,7 @@ model find <user.text>: user.gpt_find_talon_commands(user.text)
 model blend [from] clip:
     clipboard_text = clip.text()
     destination_text = edit.selected_text()
-    result = user.model_blend(clipboard_text, destination_text)
+    result = user.gpt_blend(clipboard_text, destination_text)
     user.gpt_insert_response(result, "")
 
 # Say your prompt directly and the AI will apply it to the selected text

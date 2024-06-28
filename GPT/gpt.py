@@ -78,7 +78,7 @@ class UserActions:
         """
         return gpt_query(prompt, source_text)
 
-    def model_blend_list(source_text: list[str], destination_text: str):
+    def gpt_blend_list(source_text: list[str], destination_text: str):
         """Blend all the source text as a list and send it to the destination"""
 
         return actions.user.gpt_blend("\n---\n".join(source_text), destination_text)
