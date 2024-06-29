@@ -4,7 +4,15 @@ app: vscode
 # can't match on user.cursorless without ORing the gpt.beta tag, so just match on vscode
 -
 
-# Blend the target with the destination in order to update the destination
+# Model Blend
+# Combines source texts with a destination, preserving some of the destination's structure.
+# ## Use Cases
+# - Merging sentences
+# - Adding types to a definition
+# - Combining a template test with another, including comments for modifications
+# - Prototyping the combination of two functions to see what a refactor would look like
+# ## Example
+# `model blend block this to block next`
 model blend <user.cursorless_target> to <user.cursorless_target>:
     target_text = user.cursorless_get_text_list(cursorless_target_1)
     destination_text = user.cursorless_get_text(cursorless_target_2)
@@ -22,4 +30,4 @@ model blend to <user.cursorless_target>:
 model blend <user.cursorless_target>:
     target_text = user.cursorless_get_text_list(cursorless_target)
     result = user.gpt_blend_list(target_text, edit.selected_text())
-    user.cursorless_or_paste_helper(0, result)
+    user.paste(result)
