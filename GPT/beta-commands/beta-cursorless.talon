@@ -4,7 +4,9 @@ app: vscode
 # can't match on user.cursorless without ORing the gpt.beta tag, so just match on vscode
 -
 
-# model blend takes a X and a Y and returns a Z, where Z is a blend of X and Y
+# model blend takes source texts and a destination and combines the source text with the destination preserving the destination structure to some degree.
+#   this can be useful if you want to combine two sentences or add some types to a type definition, or if you want to take a template test and combine it
+#   with another test with some comments telling it how to change the resulting text.
 #   Example `model blend block this to block next`
 model blend <user.cursorless_target> to <user.cursorless_target>:
     target_text = user.cursorless_get_text_list(cursorless_target_1)
