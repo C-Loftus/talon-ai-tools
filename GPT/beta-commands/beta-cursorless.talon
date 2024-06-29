@@ -6,12 +6,11 @@ app: vscode
 
 # Model Blend
 # Combines source texts with a destination, preserving some of the destination's structure.
-
 # ## Use Cases
 # - Merging sentences
 # - Adding types to a definition
-# - Combining a template test with another, including comments for modifications.
-
+# - Combining a template test with another, including comments for modifications
+# - Prototyping the combination of two functions to see what a refactor would look like
 # ## Example
 # `model blend block this to block next`
 model blend <user.cursorless_target> to <user.cursorless_target>:
