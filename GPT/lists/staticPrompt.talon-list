@@ -7,7 +7,7 @@ list:  user.staticPrompt
 ## FIXES
 fix grammar formally: Fix any mistakes or irregularities in grammar, spelling, or formatting. Use a professional business tone.  The text was created used voice dictation. Thus, there is likely to be issues regarding homophones and other misrecognitions. Do not change the original structure of the text.
 fix grammar: Fix any mistakes or irregularities in grammar, spelling, or formatting. The text was created used voice dictation. Thus, there is likely to be issues regarding homophones and other misrecognitions. Do not change the tone.  Do not change the original structure of the text.
-fix grammar casually:  Fix any mistakes or irregularities in grammar, spelling, or formatting. Keep a casual tone appropriate for a blog. Do not change the original structure of the text. The text was created used voice dictation. Thus, there is likely to be issues regarding homophones and other misrecognitions.
+fix syntax: Fix any syntax errors in this code selection. Do not change any behavior. 
 
 ## FORMATTING
 format table: The following markdown text is raw data. There is no index. Return the text in a markdown table format. Each row has a new line in the original data.
@@ -18,7 +18,7 @@ format comment: format the following text as a comment for the current programmi
 ## TEXT GENERATION
 explain: explain this text in a way that is easier to understand for a layman without technical knowledge
 summarize: Summarize this text into a format suitable for project notes
-add context: Add additional text to the sentence that would be appropriate to the situation and useful in a consulting project.
+add context: Add additional text to the select text that would be appropriate to the situation and add useful information
 fit schema: the given text has a series of responses that need to be categorized. Each response has a key that needs to be mapped to a value. Infer the schema from the text unless it is given at the top of the text with prior examples. Return the key value pairs in a json format unless you infer a different format.
 answer: generate text that satisfies the question or request given in the input
 shell: generate a shell script that performs the following actions. Output only the command. Do not output any comments or explanations. Default to the bash shell unless otherwise specified.
@@ -26,8 +26,8 @@ add emoji: return the same exact text verbatim with the same formatting, but add
 
 ## FILE CONVERSIONS
 convert to jason:  Convert the following data into a json format.
-convert to markdown: Convert the following plain text into a markdown format.
-convert to python: Convert the following key value pairs into the syntax for a python dictionary. This is essentially just serializing it into a native python format.
+convert to markdown: Convert the following text into a markdown format.
+convert to python: Convert the following key value pairs into the syntax for a python dictionary. So you should serialize the key value pairs into a native python format.
 convert to sheet: Convert the following data into a csv format.
 convert to yam: Convert the following data into a yaml format.
 
@@ -41,6 +41,4 @@ check structure: Skim the structure and layout of the following text. Tell me if
 translate to english: Translate the following text into English.
 
 ## CODE GENERATION
-generate loop: the following plaintext describes an iterative process in code in the language that is specified by the system prompt. Please output the code necessary to do this.
-generate conditional: the following plaintext describes a conditional branching process in code in the language that is specified by the system prompt. Please output the code necessary to do this.
 generate code: the following plaintext describes a process in code in the language that is specified by the system prompt. Please output the code necessary to do this.

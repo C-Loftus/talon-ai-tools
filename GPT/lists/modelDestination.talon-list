@@ -1,23 +1,23 @@
-list:  user.modelResponseMethod
+list:  user.modelDestination
 
 -
 
 # A list of adjectives/adverbs describing how the result of the GPT query should be returned
 
+# paste in place
+to this: paste
+
 # Paste above the current selection
-above
+above: above
 
 # Past below the current selection
-below
+below: below
 
 # Instead of pasting, return the result to the clipboard
-clipped
-
-# After pasting, select the text
-selected
+to clip: clipboard
 
 # Open the result in the browser
-windowed
+to browser: browser
 
 # Speak the result with TTS
-verbal
+to speech: textToSpeech
