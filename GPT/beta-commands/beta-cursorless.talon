@@ -21,8 +21,8 @@ model blend <user.cursorless_target> to <user.cursorless_target>:
     user.cursorless_insert(default_destination, result)
 
 model blend clip to <user.cursorless_target>:
-    target_text = edit.selected_text()
+    clipboard_text = clip.text()
     destination_text = user.cursorless_get_text(cursorless_target)
     default_destination = user.cursorless_create_destination(cursorless_target)
-    result = user.gpt_blend(target_text, destination_text)
+    result = user.gpt_blend(clipboard_text, destination_text)
     user.cursorless_insert(default_destination, result)
