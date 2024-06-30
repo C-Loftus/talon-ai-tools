@@ -11,5 +11,5 @@ this: selection
 # Apply the prompt to the previously returned GPT response
 response: gptResponse
 
-# TODO: implement a source that was the last dictated Talon phrase
+# Apply the prompt to the last phrase typed by Talon via a user's dictation
 last: lastTalonDictation
