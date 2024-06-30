@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Any, ClassVar, Literal
+from typing import Any, ClassVar
 
 import requests
 from talon import Module, actions, clip, imgui, settings
@@ -224,12 +224,3 @@ class UserActions:
                 return GPTState.last_response
             case "this" | _:
                 return actions.edit.selected_text()
-
-    def cursorless_or_paste_helper(
-        cursorless_destination: Any | Literal[0], text: str
-    ) -> None:
-        """If a destination is specified, use cursorless to insert text. Otherwise, paste the text."""
-        if cursorless_destination == 0:
-            actions.user.paste(text)
-        else:
-            actions.user.cursorless_insert(cursorless_destination, text)
