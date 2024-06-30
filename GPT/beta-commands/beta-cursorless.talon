@@ -32,7 +32,6 @@ model blend <user.cursorless_target>:
     result = user.gpt_blend_list(target_text, edit.selected_text())
     user.paste(result)
 
-
 on <user.cursorless_target> [responding {user.modelResponseMethod}] model (<user.modelPrompt> | please <user.text>):
     source_text = user.cursorless_get_text_list(cursorless_target)
     result = user.gpt_apply_prompt(modelPrompt or text, source_text)
