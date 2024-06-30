@@ -1,0 +1,11 @@
+list:  user.modelTextSource
+
+-
+# Apply the prompt to the text on the clipboard
+clipboard
+
+# Apply the prompt to the currently selected text
+this
+
+# Apply the prompt to the previously returned GPT response
+last 

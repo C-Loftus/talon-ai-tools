@@ -12,8 +12,9 @@ from ..lib.pureHelpers import strip_markdown
 mod = Module()
 
 
-class GuiState:
+class GPTState:
     text_to_confirm: ClassVar[str] = ""
+    last_response: ClassVar[str] = ""
 
 
 @imgui.open()
@@ -21,7 +22,7 @@ def confirmation_gui(gui: imgui.GUI):
     gui.text("Confirm model output before pasting")
     gui.line()
     gui.spacer()
-    gui.text(GuiState.text_to_confirm)
+    gui.text(GPTState.text_to_confirm)
 
     gui.spacer()
     if gui.button("Paste model output"):
@@ -47,8 +48,8 @@ def gpt_query(prompt: str, content: str) -> str:
             notify("GPT Task Completed")
             resp = response.json()["choices"][0]["message"]["content"].strip()
             formatted_resp = strip_markdown(resp)
+            GPTState.last_response = formatted_resp
             return formatted_resp
-
         case _:
             notify("GPT Failure: Check the Talon Log")
             raise Exception(response.json())
@@ -110,25 +111,25 @@ class UserActions:
 
     def add_to_confirmation_gui(model_output: str):
         """Add text to the confirmation gui"""
-        GuiState.text_to_confirm = model_output
+        GPTState.text_to_confirm = model_output
         confirmation_gui.show()
 
     def close_model_confirmation_gui():
         """Close the model output without pasting it"""
-        GuiState.text_to_confirm = ""
+        GPTState.text_to_confirm = ""
         confirmation_gui.hide()
 
     def copy_model_confirmation_gui():
         """Copy the model output to the clipboard"""
-        clip.set_text(GuiState.text_to_confirm)
-        GuiState.text_to_confirm = ""
+        clip.set_text(GPTState.text_to_confirm)
+        GPTState.text_to_confirm = ""
 
         confirmation_gui.hide()
 
     def paste_model_confirmation_gui():
         """Paste the model output"""
-        actions.user.paste(GuiState.text_to_confirm)
-        GuiState.text_to_confirm = ""
+        actions.user.paste(GPTState.text_to_confirm)
+        GPTState.text_to_confirm = ""
         confirmation_gui.hide()
 
     def paste_and_select(result: str):
@@ -193,13 +194,32 @@ class UserActions:
                 clip.set_text(result)
             case "selected":
                 actions.user.paste_and_select(result)
-            case "browser":
+            case "windowed":
                 builder = Builder()
                 builder.h1("Talon GPT Result")
                 builder.p(result)
                 builder.render()
+            case "verbal":
+                try:
+                    actions.user.tts(result)
+                except KeyError:
+                    notify("GPT Failure: text to speech is not installed")
             case _:
                 actions.user.paste(result)
+
+    def gpt_get_source_text(spoken_text: str) -> str:
+        """Get the source text that is will have the prompt applied to it"""
+        match spoken_text:
+            case "clipboard":
+                return clip.text()
+            case "last":
+                if GPTState.last_response == "":
+                    raise Exception(
+                        "GPT Failure: User applied a prompt to the phrase GPT response, but there was no GPT response stored"
+                    )
+                return GPTState.last_response
+            case "this" | _:
+                return actions.edit.selected_text()
 
     def cursorless_or_paste_helper(
         cursorless_destination: Any | Literal[0], text: str

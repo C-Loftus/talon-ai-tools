@@ -4,8 +4,8 @@ from typing import Any, Optional
 import requests
 from talon import Module, actions
 
-from ...lib.modelHelpers import generate_payload, notify
-from ...lib.modelTypes import ChatCompletionResponse, InsertOption, Message
+from ....lib.modelHelpers import generate_payload, notify
+from ....lib.modelTypes import ChatCompletionResponse, InsertOption, Message
 from .gpt_callables import (
     display_response,
     function_specs,
