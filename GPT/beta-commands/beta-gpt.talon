@@ -22,7 +22,6 @@ on <user.cursorless_target> responding at <user.cursorless_target> model (<user.
     default_destination = user.cursorless_create_destination(cursorless_target_2)
     user.cursorless_insert(default_destination, result)
 
-
 # Find all Talon commands that match the user's text
 model find <user.text>: user.gpt_find_talon_commands(user.text)
 
