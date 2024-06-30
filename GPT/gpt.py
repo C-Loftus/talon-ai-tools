@@ -136,7 +136,11 @@ class UserActions:
 
         actions.user.paste(result)
 
-        for _ in result:
+        lines = result.split("\n")
+        for _ in lines[:-1]:
+            actions.edit.extend_up()
+        actions.edit.extend_line_end()
+        for _ in lines[0]:
             actions.edit.extend_left()
 
     def gpt_apply_prompt(prompt: str, text_to_process: str | list[str]) -> str:
