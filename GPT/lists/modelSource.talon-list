@@ -10,3 +10,6 @@ this: selection
 
 # Apply the prompt to the previously returned GPT response
 last: previous
+
+
+# TODO: implement a source that was the last dictated Talon phrase
