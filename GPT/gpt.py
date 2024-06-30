@@ -178,7 +178,9 @@ class UserActions:
             notify("No text to reformat")
             raise Exception("No text to reformat")
 
-    def gpt_insert_response(result: str, method: str = ""):
+    def gpt_insert_response(
+        result: str, method: str = "", cursorless_destination: Any = None
+    ):
         """Insert a GPT result in a specified way"""
 
         match method:
@@ -204,6 +206,8 @@ class UserActions:
                     actions.user.tts(result)
                 except KeyError:
                     notify("GPT Failure: text to speech is not installed")
+            case "cursorless":
+                actions.user.cursorless_insert(cursorless_destination, result)
             case _:
                 actions.user.paste(result)
 
