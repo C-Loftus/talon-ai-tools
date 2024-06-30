@@ -228,7 +228,7 @@ class UserActions:
         match spoken_text:
             case "clipboard":
                 return clip.text()
-            case "last":
+            case "gptResponse":
                 if GPTState.last_response == "":
                     raise Exception(
                         "GPT Failure: User applied a prompt to the phrase GPT response, but there was no GPT response stored"
