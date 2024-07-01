@@ -1,0 +1,15 @@
+list:  user.modelSource
+
+-
+
+# Apply the prompt to the text on the clipboard
+clip: clipboard
+
+# Apply the prompt to the currently selected text
+this: selection
+
+# Apply the prompt to the previously returned GPT response
+response: gptResponse
+
+# Apply the prompt to the last phrase typed by Talon via a user's dictation
+last: lastTalonDictation

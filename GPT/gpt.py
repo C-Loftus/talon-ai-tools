@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Any, ClassVar, Literal
+from typing import Any, ClassVar
 
 import requests
 from talon import Module, actions, clip, imgui, settings
@@ -12,8 +12,10 @@ from ..lib.pureHelpers import strip_markdown
 mod = Module()
 
 
-class GuiState:
+class GPTState:
     text_to_confirm: ClassVar[str] = ""
+    last_response: ClassVar[str] = ""
+    last_was_pasted: ClassVar[bool] = False
 
 
 @imgui.open()
@@ -21,7 +23,7 @@ def confirmation_gui(gui: imgui.GUI):
     gui.text("Confirm model output before pasting")
     gui.line()
     gui.spacer()
-    gui.text(GuiState.text_to_confirm)
+    gui.text(GPTState.text_to_confirm)
 
     gui.spacer()
     if gui.button("Paste model output"):
@@ -37,6 +39,11 @@ def confirmation_gui(gui: imgui.GUI):
 
 
 def gpt_query(prompt: str, content: str) -> str:
+    """Send a prompt to the GPT API and return the response"""
+
+    # Reset state before pasting
+    GPTState.last_was_pasted = False
+
     url = settings.get("user.model_endpoint")
 
     headers, data = generate_payload(prompt, content)
@@ -47,8 +54,8 @@ def gpt_query(prompt: str, content: str) -> str:
             notify("GPT Task Completed")
             resp = response.json()["choices"][0]["message"]["content"].strip()
             formatted_resp = strip_markdown(resp)
+            GPTState.last_response = formatted_resp
             return formatted_resp
-
         case _:
             notify("GPT Failure: Check the Talon Log")
             raise Exception(response.json())
@@ -56,12 +63,6 @@ def gpt_query(prompt: str, content: str) -> str:
 
 @mod.action_class
 class UserActions:
-    def gpt_answer_question(text_to_process: str) -> str:
-        """Answer an arbitrary question"""
-        prompt = """
-        Generate text that satisfies the question or request given in the input.
-        """
-        return gpt_query(prompt, text_to_process)
 
     def gpt_blend(source_text: str, destination_text: str):
         """Blend all the source text and send it to the destination"""
@@ -110,33 +111,34 @@ class UserActions:
 
     def add_to_confirmation_gui(model_output: str):
         """Add text to the confirmation gui"""
-        GuiState.text_to_confirm = model_output
+        GPTState.text_to_confirm = model_output
         confirmation_gui.show()
 
     def close_model_confirmation_gui():
         """Close the model output without pasting it"""
-        GuiState.text_to_confirm = ""
+        GPTState.text_to_confirm = ""
         confirmation_gui.hide()
 
     def copy_model_confirmation_gui():
         """Copy the model output to the clipboard"""
-        clip.set_text(GuiState.text_to_confirm)
-        GuiState.text_to_confirm = ""
+        clip.set_text(GPTState.text_to_confirm)
+        GPTState.text_to_confirm = ""
 
         confirmation_gui.hide()
 
     def paste_model_confirmation_gui():
         """Paste the model output"""
-        actions.user.paste(GuiState.text_to_confirm)
-        GuiState.text_to_confirm = ""
+        actions.user.paste(GPTState.text_to_confirm)
+        GPTState.text_to_confirm = ""
         confirmation_gui.hide()
 
-    def paste_and_select(result: str):
-        """Paste and select the pasted text"""
+    def gpt_select_last():
+        """select all the text in the last GPT output"""
+        if not GPTState.last_was_pasted:
+            notify("Tried to select GPT output, but it was not pasted in an editor")
+            return
 
-        actions.user.paste(result)
-
-        lines = result.split("\n")
+        lines = GPTState.last_response.split("\n")
         for _ in lines[:-1]:
             actions.edit.extend_up()
         actions.edit.extend_line_end()
@@ -150,6 +152,15 @@ class UserActions:
             if isinstance(text_to_process, list)
             else text_to_process
         )
+
+        # Ask is a special case, where the text to process is the prompted question, not the selected text
+        if prompt.startswith("ask"):
+            text_to_process = prompt.removeprefix("ask")
+            prompt = """Generate text that satisfies the question or request given in the input."""
+        # If the user is just moving the source to the destination, we don't need to apply a query
+        elif prompt == "pass":
+            return text_to_process
+
         return gpt_query(prompt, text_to_process)
 
     def gpt_help():
@@ -181,35 +192,61 @@ class UserActions:
             notify("No text to reformat")
             raise Exception("No text to reformat")
 
-    def gpt_insert_response(result: str, method: str = ""):
+    def gpt_insert_response(
+        result: str, method: str = "", cursorless_destination: Any = None
+    ):
         """Insert a GPT result in a specified way"""
-
         match method:
             case "above":
                 actions.key("left")
                 actions.edit.line_insert_up()
                 actions.user.paste(result)
+                GPTState.last_was_pasted = True
             case "below":
                 actions.key("right")
                 actions.edit.line_insert_down()
                 actions.user.paste(result)
-            case "clipped":
+                GPTState.last_was_pasted = True
+            case "clipboard":
                 clip.set_text(result)
-            case "selected":
-                actions.user.paste_and_select(result)
             case "browser":
                 builder = Builder()
                 builder.h1("Talon GPT Result")
-                builder.p(result)
+                for line in result.split("\n"):
+                    builder.p(line)
                 builder.render()
-            case _:
+            case "textToSpeech":
+                try:
+                    actions.user.tts(result)
+                except KeyError:
+                    notify("GPT Failure: text to speech is not installed")
+            # Although we can insert to a cursorless dpestination, the cursorless_target capture
+            # Greatly increases DFA compliation times and should be avoided if possible
+            case "cursorless":
+                actions.user.cursorless_insert(cursorless_destination, result)
+            case "paste" | _:
                 actions.user.paste(result)
+                GPTState.last_was_pasted = True
 
-    def cursorless_or_paste_helper(
-        cursorless_destination: Any | Literal[0], text: str
-    ) -> None:
-        """If a destination is specified, use cursorless to insert text. Otherwise, paste the text."""
-        if cursorless_destination == 0:
-            actions.user.paste(text)
-        else:
-            actions.user.cursorless_insert(cursorless_destination, text)
+    def gpt_get_source_text(spoken_text: str) -> str:
+        """Get the source text that is will have the prompt applied to it"""
+        match spoken_text:
+            case "clipboard":
+                return clip.text()
+            case "gptResponse":
+                if GPTState.last_response == "":
+                    raise Exception(
+                        "GPT Failure: User applied a prompt to the phrase GPT response, but there was no GPT response stored"
+                    )
+                return GPTState.last_response
+
+            case "lastTalonDictation":
+                last_output = actions.user.get_last_phrase()
+                if last_output:
+                    actions.user.clear_last_phrase()
+                    return last_output
+                else:
+                    notify("No text to reformat")
+                    raise Exception("No text to reformat")
+            case "this" | _:
+                return actions.edit.selected_text()

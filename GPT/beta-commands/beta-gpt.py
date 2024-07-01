@@ -2,9 +2,9 @@ from concurrent.futures import ThreadPoolExecutor
 
 from talon import Module, registry
 
+from ...lib.HTMLBuilder import Builder
+from ...lib.pureHelpers import remove_wrapper
 from ..gpt import gpt_query
-from ..lib.HTMLBuilder import Builder
-from ..lib.pureHelpers import remove_wrapper
 
 mod = Module()
 

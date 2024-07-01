@@ -16,7 +16,7 @@ Query language models with voice commands. Helpful to automatically generate tex
 
 ## Help
 
-- See [the list of prompts](./staticPrompt.talon-list) for all the prompts that can be used with the `model` command.
+- See [the list of prompts](lists/staticPrompt.talon-list) for all the prompts that can be used with the `model` command.
 
 - See the [examples file](../docs/usage-examples/examples.md) for gifs that show how to use the commands.
 
@@ -26,7 +26,7 @@ The OpenAI API that is used in this repo, through which you make queries to GPT 
 
 ## Configuration
 
-To add additional prompts, copy the [Talon list for custom prompts](./customPrompt.talon-list.example) to anywhere in your user directory and add your desired prompts. These prompts will automatically be added into the `<user.modelPrompt>` capture.
+To add additional prompts, copy the [Talon list for custom prompts](lists/customPrompt.talon-list.example) to anywhere in your user directory and add your desired prompts. These prompts will automatically be added into the `<user.modelPrompt>` capture.
 
 If you wish to change any configuration settings, copy the [example configuration file](../talon-ai-settings.talon.example) into your user directory and modify settings that you want to change.
 

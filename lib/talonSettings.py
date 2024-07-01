@@ -10,11 +10,14 @@ mod.tag("gpt_beta", desc="Tag for enabling beta GPT commands")
 mod.list("staticPrompt", desc="GPT Prompts Without Dynamic Arguments")
 mod.list("customPrompt", desc="Custom user-defined GPT prompts")
 mod.list("modelPrompt", desc="GPT Prompts")
-mod.list("modelInsertionMethod", desc="What to do after returning the model response")
+mod.list("modelDestination", desc="What to do after returning the model response")
+mod.list("modelSource", desc="Where to get the text from for the GPT")
 
 
-# model prompts can be either static in this repo or custom outside of it
-@mod.capture(rule="{user.staticPrompt} | {user.customPrompt}")
+# model prompts can be either static and predefined by this repo or custom outside of it
+@mod.capture(
+    rule="{user.staticPrompt} | {user.customPrompt} | (please <user.text>) | (ask <user.text>) | pass"
+)
 def modelPrompt(matched_prompt) -> str:
     return str(matched_prompt)
 
