@@ -1,6 +1,5 @@
 mode: command
 tag: user.cursorless
-
 -
 
 # Apply a prompt to any text, and output it any target
