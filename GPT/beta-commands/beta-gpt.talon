@@ -6,7 +6,7 @@ tag: user.gpt_beta
 model find <user.text>: user.gpt_find_talon_commands(user.text)
 
 # Using the context of the text on the clipboard, update the selected text
-model blend clipboard:
+model blend clip:
     clipboard_text = clip.text()
     destination_text = edit.selected_text()
     result = user.gpt_blend(clipboard_text, destination_text)

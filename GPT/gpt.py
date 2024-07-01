@@ -167,7 +167,7 @@ class UserActions:
         """Open the GPT help file in the web browser"""
         # get the text from the file and open it in the web browser
         current_dir = os.path.dirname(__file__)
-        file_path = os.path.join(current_dir, "staticPrompt.talon-list")
+        file_path = os.path.join(current_dir, "lists", "staticPrompt.talon-list")
         with open(file_path, "r") as f:
             lines = f.readlines()[2:]
 
