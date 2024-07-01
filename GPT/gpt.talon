@@ -11,9 +11,8 @@ model <user.modelPrompt> [{user.modelSource}] [{user.modelDestination}]:
     user.gpt_insert_response(result, modelDestination or "")
 
 # Select the last GPT response so you can edit it further
-model take response:
-    user.gpt_select_last()
-    
+model take response: user.gpt_select_last()
+
 # Applies an arbitrary prompt from the clipboard to selected text and pastes the result.
 # Useful for applying complex/custom prompts that need to be drafted in a text editor.
 model apply [from] clip$:

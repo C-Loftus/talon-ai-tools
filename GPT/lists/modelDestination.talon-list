@@ -21,4 +21,3 @@ to browser: browser
 
 # Speak the result with TTS
 to speech: textToSpeech
-

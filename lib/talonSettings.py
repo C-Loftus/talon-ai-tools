@@ -13,8 +13,11 @@ mod.list("modelPrompt", desc="GPT Prompts")
 mod.list("modelDestination", desc="What to do after returning the model response")
 mod.list("modelSource", desc="Where to get the text from for the GPT")
 
+
 # model prompts can be either static and predefined by this repo or custom outside of it
-@mod.capture(rule="{user.staticPrompt} | {user.customPrompt} | (please <user.text>) | (ask <user.text>) | pass")
+@mod.capture(
+    rule="{user.staticPrompt} | {user.customPrompt} | (please <user.text>) | (ask <user.text>) | pass"
+)
 def modelPrompt(matched_prompt) -> str:
     return str(matched_prompt)
 

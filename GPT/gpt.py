@@ -17,6 +17,7 @@ class GPTState:
     last_response: ClassVar[str] = ""
     last_was_pasted: ClassVar[bool] = False
 
+
 @imgui.open()
 def confirmation_gui(gui: imgui.GUI):
     gui.text("Confirm model output before pasting")
@@ -58,7 +59,8 @@ def gpt_query(prompt: str, content: str) -> str:
         case _:
             notify("GPT Failure: Check the Talon Log")
             raise Exception(response.json())
-            
+
+
 @mod.action_class
 class UserActions:
 
@@ -237,7 +239,7 @@ class UserActions:
                         "GPT Failure: User applied a prompt to the phrase GPT response, but there was no GPT response stored"
                     )
                 return GPTState.last_response
-            
+
             case "lastTalonDictation":
                 last_output = actions.user.get_last_phrase()
                 if last_output:
