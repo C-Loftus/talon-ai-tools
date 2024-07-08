@@ -7,7 +7,7 @@ model help$: user.gpt_help()
 #   Example: `model fix grammar clip to browser` -> Fixes the grammar of the text on the clipboard and opens in browser`
 model <user.modelPrompt> [{user.modelSource}] [{user.modelDestination}]:
     text = user.gpt_get_source_text(modelSource or "")
-    result = user.gpt_apply_prompt(modelPrompt, text)
+    result = user.gpt_apply_prompt(modelPrompt, modelDestination, text)
     user.gpt_insert_response(result, modelDestination or "")
 
 # Select the last GPT response so you can edit it further

@@ -13,6 +13,9 @@ above: above
 # Past below the current selection
 below: below
 
+# Inserted as a snippet
+snip: snip
+
 # Instead of pasting, return the result to the clipboard
 to clip: clipboard
 

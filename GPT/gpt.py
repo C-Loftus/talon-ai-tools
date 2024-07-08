@@ -63,7 +63,6 @@ def gpt_query(prompt: str, content: str) -> str:
 
 @mod.action_class
 class UserActions:
-
     def gpt_blend(source_text: str, destination_text: str):
         """Blend all the source text and send it to the destination"""
         prompt = f"""
@@ -145,7 +144,9 @@ class UserActions:
         for _ in lines[0]:
             actions.edit.extend_left()
 
-    def gpt_apply_prompt(prompt: str, text_to_process: str | list[str]) -> str:
+    def gpt_apply_prompt(
+        prompt: str, insertionDestination: str, text_to_process: str | list[str]
+    ) -> str:
         """Apply an arbitrary prompt to arbitrary text"""
         text_to_process = (
             " ".join(text_to_process)
@@ -160,6 +161,9 @@ class UserActions:
         # If the user is just moving the source to the destination, we don't need to apply a query
         elif prompt == "pass":
             return text_to_process
+
+        if insertionDestination == "snip":
+            prompt += "\n\nPlease return the response as a textmate snippet for insertion into an editor with placeholders that the user should edit. Return just the snippet content - no XML and no heading."
 
         return gpt_query(prompt, text_to_process)
 
@@ -215,6 +219,8 @@ class UserActions:
                 for line in result.split("\n"):
                     builder.p(line)
                 builder.render()
+            case "snip":
+                actions.user.insert_snippet(result)
             case "textToSpeech":
                 try:
                     actions.user.tts(result)
