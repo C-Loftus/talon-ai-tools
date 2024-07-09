@@ -197,10 +197,7 @@ class UserActions:
 
     def gpt_paste_with_modifiers(text: str, modifiers: list[str] = ""):
         """Paste and apply modifications"""
-        # WIP:# WIP:
-        print(f"Modifiers: {modifiers}\n")
         for modifier in modifiers:
-            print(f"Modifier: {modifier}\n")
             match modifier:
                 case "above":
                     actions.edit.line_insert_up()
