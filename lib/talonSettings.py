@@ -11,6 +11,8 @@ mod.list("staticPrompt", desc="GPT Prompts Without Dynamic Arguments")
 mod.list("customPrompt", desc="Custom user-defined GPT prompts")
 mod.list("modelPrompt", desc="GPT Prompts")
 mod.list("modelDestination", desc="What to do after returning the model response")
+mod.list("modelInsertionModifier", desc="How to insert the response when pasting")
+mod.list("modelPasteDestination", desc="Paste destinations")
 mod.list("modelSource", desc="Where to get the text from for the GPT")
 
 

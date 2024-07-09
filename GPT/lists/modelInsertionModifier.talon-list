@@ -1,0 +1,8 @@
+list:  user.modelInsertionModifier
+
+-
+
+# A list of adjectives/adverbs describing how the result of the GPT query should be returned
+
+# Inserted as a snippet
+snip: snip

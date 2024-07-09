@@ -40,7 +40,6 @@ def confirmation_gui(gui: imgui.GUI):
 
 def gpt_query(prompt: str, content: str) -> str:
     """Send a prompt to the GPT API and return the response"""
-
     # Reset state before pasting
     GPTState.last_was_pasted = False
 
@@ -145,9 +144,10 @@ class UserActions:
             actions.edit.extend_left()
 
     def gpt_apply_prompt(
-        prompt: str, insertionDestination: str, text_to_process: str | list[str]
+        prompt: str, insertionModifier: str, text_to_process: str | list[str]
     ) -> str:
         """Apply an arbitrary prompt to arbitrary text"""
+        print(insertionModifier)
         text_to_process = (
             " ".join(text_to_process)
             if isinstance(text_to_process, list)
@@ -162,7 +162,7 @@ class UserActions:
         elif prompt == "pass":
             return text_to_process
 
-        if insertionDestination == "snip":
+        if insertionModifier == "snip":
             prompt += "\n\nPlease return the response as a textmate snippet for insertion into an editor with placeholders that the user should edit. Return just the snippet content - no XML and no heading."
 
         return gpt_query(prompt, text_to_process)
@@ -196,20 +196,31 @@ class UserActions:
             notify("No text to reformat")
             raise Exception("No text to reformat")
 
+    def gpt_paste_with_modifier(text: str, modifier: str = ""):
+        """Paste and apply modifications"""
+        match modifier:
+            case "snip":
+                actions.user.insert_snippet(text)
+            case _:
+                actions.user.paste(text)
+
     def gpt_insert_response(
-        result: str, method: str = "", cursorless_destination: Any = None
+        result: str,
+        modifier: str = "",
+        method: str = "",
+        cursorless_destination: Any = None,
     ):
         """Insert a GPT result in a specified way"""
         match method:
             case "above":
                 actions.key("left")
                 actions.edit.line_insert_up()
-                actions.user.paste(result)
+                actions.user.gpt_paste_with_modifier(result, modifier)
                 GPTState.last_was_pasted = True
             case "below":
                 actions.key("right")
                 actions.edit.line_insert_down()
-                actions.user.paste(result)
+                actions.user.gpt_paste_with_modifier(result, modifier)
                 GPTState.last_was_pasted = True
             case "clipboard":
                 clip.set_text(result)
@@ -219,8 +230,6 @@ class UserActions:
                 for line in result.split("\n"):
                     builder.p(line)
                 builder.render()
-            case "snip":
-                actions.user.insert_snippet(result)
             case "textToSpeech":
                 try:
                     actions.user.tts(result)
@@ -231,7 +240,7 @@ class UserActions:
             case "cursorless":
                 actions.user.cursorless_insert(cursorless_destination, result)
             case "paste" | _:
-                actions.user.paste(result)
+                actions.user.gpt_paste_with_modifier(result, modifier)
                 GPTState.last_was_pasted = True
 
     def gpt_get_source_text(spoken_text: str) -> str:

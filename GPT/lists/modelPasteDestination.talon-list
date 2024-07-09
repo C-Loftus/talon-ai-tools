@@ -1,0 +1,14 @@
+list:  user.modelPasteDestination
+
+-
+
+# A list of adjectives/adverbs describing how the result of the GPT query should be returned
+
+# paste in place
+to this: paste
+
+# Paste above the current selection
+above: above
+
+# Past below the current selection
+below: below
