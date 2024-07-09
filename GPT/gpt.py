@@ -153,11 +153,10 @@ class UserActions:
             else text_to_process
         )
 
-
         """
         Handle special prompts that require arbitrary text.
 
-        These prompts treat <user.text> as the source by setting 
+        These prompts treat <user.text> as the source by setting
         text_to_process to the natural language request.
         """
 
