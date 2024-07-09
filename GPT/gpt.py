@@ -153,11 +153,21 @@ class UserActions:
             else text_to_process
         )
 
-        # Ask is a special case, where the text to process is the prompted question, not the selected text
+
+        """
+        Handle special prompts that require arbitrary text.
+
+        These prompts treat <user.text> as the source by setting 
+        text_to_process to the natural language request.
+        """
+
         if prompt.startswith("ask"):
             text_to_process = prompt.removeprefix("ask")
             prompt = """Generate text that satisfies the question or request given in the input."""
         # If the user is just moving the source to the destination, we don't need to apply a query
+        elif prompt.startswith("snip"):
+            text_to_process = prompt.removeprefix("snip")
+            prompt = "Please return the response as a textmate snippet for insertion into an editor with placeholders that the user should edit. Return just the snippet content - no XML and no heading."
         elif prompt == "pass":
             return text_to_process
 
@@ -220,8 +230,6 @@ class UserActions:
                     actions.user.tts(result)
                 except KeyError:
                     notify("GPT Failure: text to speech is not installed")
-            # Although we can insert to a cursorless dpestination, the cursorless_target capture
-            # Greatly increases DFA compliation times and should be avoided if possible
             case "cursorless":
                 actions.user.cursorless_insert(cursorless_destination, result)
             case "paste" | _:

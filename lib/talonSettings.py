@@ -16,7 +16,7 @@ mod.list("modelSource", desc="Where to get the text from for the GPT")
 
 # model prompts can be either static and predefined by this repo or custom outside of it
 @mod.capture(
-    rule="{user.staticPrompt} | {user.customPrompt} | (please <user.text>) | (ask <user.text>) | pass"
+    rule="{user.staticPrompt} | {user.customPrompt} | (please <user.text>) | (ask <user.text>) | snip <user.text> | pass"
 )
 def modelPrompt(matched_prompt) -> str:
     return str(matched_prompt)
@@ -39,6 +39,7 @@ mod.setting(
     default="https://api.openai.com/v1/chat/completions",
     desc="The endpoint to send the model requests to",
 )
+
 
 mod.setting(
     "model_system_prompt",
