@@ -144,7 +144,7 @@ class UserActions:
             actions.edit.extend_left()
 
     def gpt_apply_prompt(
-        prompt: str, insertionModifier: str, text_to_process: str | list[str]
+        prompt: str, insertionModifiers: list[str], text_to_process: str | list[str]
     ) -> str:
         """Apply an arbitrary prompt to arbitrary text"""
         text_to_process = (
@@ -161,7 +161,7 @@ class UserActions:
         elif prompt == "pass":
             return text_to_process
 
-        if insertionModifier == "snip":
+        if "snip" in insertionModifiers:
             prompt += "\n\nPlease return the response as a textmate snippet for insertion into an editor with placeholders that the user should edit. Return just the snippet content - no XML and no heading."
 
         return gpt_query(prompt, text_to_process)
@@ -195,33 +195,31 @@ class UserActions:
             notify("No text to reformat")
             raise Exception("No text to reformat")
 
-    def gpt_paste_with_modifier(text: str, modifier: str = ""):
+    def gpt_paste_with_modifiers(text: str, modifiers: list[str] = ""):
         """Paste and apply modifications"""
-        match modifier:
-            case "snip":
-                actions.user.insert_snippet(text)
-            case _:
-                actions.user.paste(text)
+        # WIP:# WIP:
+        print(f"Modifiers: {modifiers}\n")
+        for modifier in modifiers:
+            print(f"Modifier: {modifier}\n")
+            match modifier:
+                case "above":
+                    actions.edit.line_insert_up()
+                case "below":
+                    actions.edit.line_insert_down()
+                case "snip":
+                    actions.user.insert_snippet(text)
+                    return
+
+        actions.user.paste(text)
 
     def gpt_insert_response(
         result: str,
-        modifier: str = "",
-        pasteDestination: str = "",
+        modifier: list[str] = [""],
         method: str = "",
         cursorless_destination: Any = None,
     ):
         """Insert a GPT result in a specified way"""
-        match method or pasteDestination:
-            case "above":
-                actions.key("left")
-                actions.edit.line_insert_up()
-                actions.user.gpt_paste_with_modifier(result, modifier)
-                GPTState.last_was_pasted = True
-            case "below":
-                actions.key("right")
-                actions.edit.line_insert_down()
-                actions.user.gpt_paste_with_modifier(result, modifier)
-                GPTState.last_was_pasted = True
+        match method:
             case "clipboard":
                 clip.set_text(result)
             case "browser":
@@ -239,8 +237,8 @@ class UserActions:
             # Greatly increases DFA compliation times and should be avoided if possible
             case "cursorless":
                 actions.user.cursorless_insert(cursorless_destination, result)
-            case "paste" | _:
-                actions.user.gpt_paste_with_modifier(result, modifier)
+            case _:
+                actions.user.gpt_paste_with_modifiers(result, modifier)
                 GPTState.last_was_pasted = True
 
     def gpt_get_source_text(spoken_text: str) -> str:
