@@ -206,11 +206,12 @@ class UserActions:
     def gpt_insert_response(
         result: str,
         modifier: str = "",
+        pasteDestination: str = "",
         method: str = "",
         cursorless_destination: Any = None,
     ):
         """Insert a GPT result in a specified way"""
-        match method:
+        match method or pasteDestination:
             case "above":
                 actions.key("left")
                 actions.edit.line_insert_up()
