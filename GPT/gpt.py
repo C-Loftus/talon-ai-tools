@@ -147,7 +147,6 @@ class UserActions:
         prompt: str, insertionModifier: str, text_to_process: str | list[str]
     ) -> str:
         """Apply an arbitrary prompt to arbitrary text"""
-        print(insertionModifier)
         text_to_process = (
             " ".join(text_to_process)
             if isinstance(text_to_process, list)
