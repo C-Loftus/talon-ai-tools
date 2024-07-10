@@ -8,7 +8,7 @@ model help$: user.gpt_help()
 model <user.modelPrompt> [{user.modelSource}] [{user.modelDestination}]:
     text = user.gpt_get_source_text(modelSource or "")
     result = user.gpt_apply_prompt(modelPrompt, text)
-    user.gpt_insert_response(result, modelDestination or "")
+    user.gpt_insert_response(result, modelPrompt, modelDestination or "")
 
 # Select the last GPT response so you can edit it further
 model take response: user.gpt_select_last()

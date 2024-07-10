@@ -191,20 +191,31 @@ class UserActions:
             notify("No text to reformat")
             raise Exception("No text to reformat")
 
+    def paste_or_snippet(result: str, is_snippet: bool):
+        """Paste or insert the result of a GPT query as a snippet"""
+        if is_snippet:
+            actions.user.insert_snippet(result)
+        else:
+            actions.user.paste(result)
+
     def gpt_insert_response(
-        result: str, method: str = "", cursorless_destination: Any = None
+        result: str,
+        prompt: str = "",
+        method: str = "",
+        cursorless_destination: Any = None,
     ):
         """Insert a GPT result in a specified way"""
+        is_snippet = prompt.startswith("snip")
         match method:
             case "above":
                 actions.key("left")
                 actions.edit.line_insert_up()
-                actions.user.insert_snippet(result)
+                actions.user.paste_or_snippet(result, is_snippet)
                 GPTState.last_was_pasted = True
             case "below":
                 actions.key("right")
                 actions.edit.line_insert_down()
-                actions.user.insert_snippet(result)
+                actions.user.paste_or_snippet(result, is_snippet)
                 GPTState.last_was_pasted = True
             case "clipboard":
                 clip.set_text(result)
@@ -226,7 +237,7 @@ class UserActions:
             case "cursorless":
                 actions.user.cursorless_insert(cursorless_destination, result)
             case "paste" | _:
-                actions.user.insert_snippet(result)
+                actions.user.paste_or_snippet(result, is_snippet)
                 GPTState.last_was_pasted = True
 
     def gpt_get_source_text(spoken_text: str) -> str:
