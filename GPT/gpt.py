@@ -199,12 +199,12 @@ class UserActions:
             case "above":
                 actions.key("left")
                 actions.edit.line_insert_up()
-                actions.user.paste(result)
+                actions.user.insert_snippet(result)
                 GPTState.last_was_pasted = True
             case "below":
                 actions.key("right")
                 actions.edit.line_insert_down()
-                actions.user.paste(result)
+                actions.user.insert_snippet(result)
                 GPTState.last_was_pasted = True
             case "clipboard":
                 clip.set_text(result)
@@ -226,7 +226,7 @@ class UserActions:
             case "cursorless":
                 actions.user.cursorless_insert(cursorless_destination, result)
             case "paste" | _:
-                actions.user.paste(result)
+                actions.user.insert_snippet(result)
                 GPTState.last_was_pasted = True
 
     def gpt_get_source_text(spoken_text: str) -> str:
