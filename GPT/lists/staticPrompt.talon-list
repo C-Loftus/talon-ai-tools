@@ -43,4 +43,3 @@ translate to english: Translate the following text into English.
 ## CODE GENERATION
 generate code: the following plaintext describes a process in code in the language that is specified by the system prompt. Please output the code necessary to do this.
 snip: Make a textmate snippet for insertion into an editor with placeholders that the user should edit. Return just the snippet content - no XML and no heading.
-
