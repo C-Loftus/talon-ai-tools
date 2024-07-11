@@ -208,7 +208,7 @@ class UserActions:
                 GPTState.last_was_pasted = True
             case "clipboard":
                 clip.set_text(result)
-            case "append clipboard":
+            case "appendClipboard":
                 clip.set_text(clip.text() + "\n" + result)
             case "browser":
                 builder = Builder()
