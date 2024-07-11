@@ -16,6 +16,9 @@ below: below
 # Instead of pasting, return the result to the clipboard
 to clip: clipboard
 
+# Instead of pasting, append the result to the clipboard
+to after clip: appendClipboard
+
 # Open the result in the browser
 to browser: browser
 

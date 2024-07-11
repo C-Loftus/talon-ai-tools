@@ -63,7 +63,6 @@ def gpt_query(prompt: str, content: str) -> str:
 
 @mod.action_class
 class UserActions:
-
     def gpt_blend(source_text: str, destination_text: str):
         """Blend all the source text and send it to the destination"""
         prompt = f"""
@@ -209,6 +208,8 @@ class UserActions:
                 GPTState.last_was_pasted = True
             case "clipboard":
                 clip.set_text(result)
+            case "appendClipboard":
+                clip.set_text(clip.text() + "\n" + result)
             case "browser":
                 builder = Builder()
                 builder.h1("Talon GPT Result")
