@@ -17,8 +17,11 @@ model snip <user.modelPrompt> [{user.modelSource}] [{user.modelDestination}]:
     result = user.gpt_apply_prompt(modelPrompt, text, "snip")
     user.gpt_insert_response(result, modelDestination or "", "snip")
 
-# Modifiers a prompt to be pasted with the output selected for chaining follow up prompts
-# Otherwise same grammar as standard `model` command
+model snip [{user.modelSource}] [{user.modelDestination}]:
+    text = user.gpt_get_source_text(modelSource or "")
+    result = user.gpt_apply_prompt("", text, "snip")
+    user.gpt_insert_response(result, modelDestination or "", "snip")
+
 model chain <user.modelPrompt> [{user.modelSource}] [{user.modelDestination}]:
     text = user.gpt_get_source_text(modelSource or "")
     result = user.gpt_apply_prompt(modelPrompt, text)
