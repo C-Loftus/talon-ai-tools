@@ -6,7 +6,7 @@ import requests
 from talon import Module, actions, clip, imgui, settings
 
 from ..lib.HTMLBuilder import Builder
-from ..lib.modelHelpers import generate_payload, notify
+from ..lib.modelHelpers import generate_payload, notify, paste_and_modify
 from ..lib.pureHelpers import strip_markdown
 
 mod = Module()
@@ -161,10 +161,11 @@ class UserActions:
         # If the user is just moving the source to the destination, we don't need to apply a query
         elif prompt == "pass":
             return text_to_process
-
-        if "snip" in modifier:
-            prompt += "\n\nPlease return the response as a textmate snippet for insertion into an editor with placeholders that the user should edit. Return just the snippet content - no XML and no heading."
-
+        
+        match modifier:
+            case "snip":
+                prompt += "\n\nPlease return the response as a textmate snippet for insertion into an editor with placeholders that the user should edit. Return just the snippet content - no XML and no heading."
+    
         return gpt_query(prompt, text_to_process)
 
     def gpt_help():
@@ -196,13 +197,6 @@ class UserActions:
             notify("No text to reformat")
             raise Exception("No text to reformat")
 
-    def paste_or_snippet(result: str, is_snippet: bool):
-        """Paste or insert the result of a GPT query as a snippet"""
-        if is_snippet:
-            actions.user.insert_snippet(result)
-        else:
-            actions.user.paste(result)
-
     def gpt_insert_response(
         result: str,
         method: str = "",
@@ -214,12 +208,12 @@ class UserActions:
             case "above":
                 actions.key("left")
                 actions.edit.line_insert_up()
-                actions.user.paste_or_snippet(result, modifier == "snip")
+                paste_and_modify(result, modifier)
                 GPTState.last_was_pasted = True
             case "below":
                 actions.key("right")
                 actions.edit.line_insert_down()
-                actions.user.paste_or_snippet(result, modifier == "snip")
+                paste_and_modify(result, modifier)
                 GPTState.last_was_pasted = True
             case "clipboard":
                 clip.set_text(result)
@@ -236,15 +230,15 @@ class UserActions:
                     actions.user.tts(result)
                 except KeyError:
                     notify("GPT Failure: text to speech is not installed")
+
             # Although we can insert to a cursorless dpestination, the cursorless_target capture
             # Greatly increases DFA compliation times and should be avoided if possible
             case "cursorless":
                 actions.user.cursorless_insert(cursorless_destination, result)
             case "paste" | _:
-                actions.user.paste_or_snippet(result, modifier == "snip")
+                paste_and_modify(result, modifier)
                 GPTState.last_was_pasted = True
-        if modifier == "chain":
-            actions.user.gpt_select_last()
+
 
     def gpt_get_source_text(spoken_text: str) -> str:
         """Get the source text that is will have the prompt applied to it"""
