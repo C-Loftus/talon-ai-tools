@@ -159,7 +159,7 @@ class UserActions:
             text_to_process = prompt.removeprefix("ask")
             prompt = """Generate text that satisfies the question or request given in the input."""
         # If the user is just moving the source to the destination, we don't need to apply a query
-        elif prompt == "pass":
+        elif prompt == "pass" and modifier != "snip":
             return text_to_process
 
         match modifier:
