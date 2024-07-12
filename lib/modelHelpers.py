@@ -88,12 +88,13 @@ def get_clipboard_image():
         print(e)
         raise Exception("Invalid image in clipboard")
 
+
 def paste_and_modify(result: str, modifier: str = ""):
     """Paste or insert the result of a GPT query in a special way, e.g. as a snippet or selected"""
     match modifier:
-        case "snip":    
+        case "snip":
             actions.user.insert_snippet(result)
-        case "" |  _:
+        case "" | _:
             actions.user.paste(result)
 
     # Snip is mutually exclusive with pasting, but chain can be run additionally after pasting

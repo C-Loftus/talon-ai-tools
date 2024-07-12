@@ -161,11 +161,11 @@ class UserActions:
         # If the user is just moving the source to the destination, we don't need to apply a query
         elif prompt == "pass":
             return text_to_process
-        
+
         match modifier:
             case "snip":
                 prompt += "\n\nPlease return the response as a textmate snippet for insertion into an editor with placeholders that the user should edit. Return just the snippet content - no XML and no heading."
-    
+
         return gpt_query(prompt, text_to_process)
 
     def gpt_help():
@@ -238,7 +238,6 @@ class UserActions:
             case "paste" | _:
                 paste_and_modify(result, modifier)
                 GPTState.last_was_pasted = True
-
 
     def gpt_get_source_text(spoken_text: str) -> str:
         """Get the source text that is will have the prompt applied to it"""
