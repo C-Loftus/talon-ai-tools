@@ -154,7 +154,6 @@ class UserActions:
             else text_to_process
         )
 
-
         # Apply modifiers to prompt before handling special cases
         match modifier:
             case "snip":

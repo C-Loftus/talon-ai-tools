@@ -15,4 +15,3 @@ model blend clip:
 # Pass the raw text of a prompt to a destination without actually calling GPT with it
 model pass <user.modelPrompt> [{user.modelDestination}]:
     user.gpt_insert_response(modelPrompt, modelDestination or "")
-
