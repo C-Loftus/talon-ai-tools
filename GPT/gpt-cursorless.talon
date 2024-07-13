@@ -10,7 +10,7 @@ model <user.modelPrompt> <user.cursorless_target> [<user.cursorless_destination>
     default_destination = user.cursorless_create_destination(cursorless_target)
     user.cursorless_insert(cursorless_destination or default_destination, result)
 
-# Applies an arbitrary prompt from the clipboard to selected text and pastes the result.
+# Applies an arbitrary prompt from the clipboard to a cursorless target.
 # Useful for applying complex/custom prompts that need to be drafted in a text editor.
 model apply [from] clip <user.cursorless_target>$:
     prompt = clip.text()
