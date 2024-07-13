@@ -6,7 +6,7 @@ import requests
 from talon import Module, actions, clip, imgui, settings
 
 from ..lib.HTMLBuilder import Builder
-from ..lib.modelHelpers import generate_payload, notify
+from ..lib.modelHelpers import generate_payload, notify, paste_and_modify
 from ..lib.pureHelpers import strip_markdown
 
 mod = Module()
@@ -144,7 +144,9 @@ class UserActions:
         for _ in lines[0]:
             actions.edit.extend_left()
 
-    def gpt_apply_prompt(prompt: str, text_to_process: str | list[str]) -> str:
+    def gpt_apply_prompt(
+        prompt: str, text_to_process: str | list[str], modifier: str = ""
+    ) -> str:
         """Apply an arbitrary prompt to arbitrary text"""
         text_to_process = (
             " ".join(text_to_process)
@@ -159,6 +161,10 @@ class UserActions:
         # If the user is just moving the source to the destination, we don't need to apply a query
         elif prompt == "pass":
             return text_to_process
+
+        match modifier:
+            case "snip":
+                prompt += "\n\nPlease return the response as a textmate snippet for insertion into an editor with placeholders that the user should edit. Return just the snippet content - no XML and no heading."
 
         return gpt_query(prompt, text_to_process)
 
@@ -192,19 +198,22 @@ class UserActions:
             raise Exception("No text to reformat")
 
     def gpt_insert_response(
-        result: str, method: str = "", cursorless_destination: Any = None
+        result: str,
+        method: str = "",
+        modifier: str = "",
+        cursorless_destination: Any = None,
     ):
         """Insert a GPT result in a specified way"""
         match method:
             case "above":
                 actions.key("left")
                 actions.edit.line_insert_up()
-                actions.user.paste(result)
+                paste_and_modify(result, modifier)
                 GPTState.last_was_pasted = True
             case "below":
                 actions.key("right")
                 actions.edit.line_insert_down()
-                actions.user.paste(result)
+                paste_and_modify(result, modifier)
                 GPTState.last_was_pasted = True
             case "clipboard":
                 clip.set_text(result)
@@ -221,12 +230,13 @@ class UserActions:
                     actions.user.tts(result)
                 except KeyError:
                     notify("GPT Failure: text to speech is not installed")
+
             # Although we can insert to a cursorless dpestination, the cursorless_target capture
             # Greatly increases DFA compliation times and should be avoided if possible
             case "cursorless":
                 actions.user.cursorless_insert(cursorless_destination, result)
             case "paste" | _:
-                actions.user.paste(result)
+                paste_and_modify(result, modifier)
                 GPTState.last_was_pasted = True
 
     def gpt_get_source_text(spoken_text: str) -> str:

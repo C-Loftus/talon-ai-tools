@@ -10,6 +10,18 @@ model <user.modelPrompt> [{user.modelSource}] [{user.modelDestination}]:
     result = user.gpt_apply_prompt(modelPrompt, text)
     user.gpt_insert_response(result, modelDestination or "")
 
+# Modifies a model command to be inserted as a snippet instead of a standard paste
+# Otherwise same grammar as standard `model` command
+model snip <user.modelPrompt> [{user.modelSource}] [{user.modelDestination}]:
+    text = user.gpt_get_source_text(modelSource or "")
+    result = user.gpt_apply_prompt(modelPrompt, text, "snip")
+    user.gpt_insert_response(result, modelDestination or "", "snip")
+
+model chain <user.modelPrompt> [{user.modelSource}] [{user.modelDestination}]:
+    text = user.gpt_get_source_text(modelSource or "")
+    result = user.gpt_apply_prompt(modelPrompt, text)
+    user.gpt_insert_response(result, modelDestination or "", "chain")
+
 # Select the last GPT response so you can edit it further
 model take response: user.gpt_select_last()
 
