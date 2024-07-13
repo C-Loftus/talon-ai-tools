@@ -154,6 +154,11 @@ class UserActions:
             else text_to_process
         )
 
+        # Apply modifiers to prompt before handling special cases
+        match modifier:
+            case "snip":
+                prompt += "\n\nPlease return the response as a textmate snippet for insertion into an editor with placeholders that the user should edit. Return just the snippet content - no XML and no heading."
+
         # Ask is a special case, where the text to process is the prompted question, not the selected text
         if prompt.startswith("ask"):
             text_to_process = prompt.removeprefix("ask")
@@ -161,10 +166,6 @@ class UserActions:
         # If the user is just moving the source to the destination, we don't need to apply a query
         elif prompt == "pass":
             return text_to_process
-
-        match modifier:
-            case "snip":
-                prompt += "\n\nPlease return the response as a textmate snippet for insertion into an editor with placeholders that the user should edit. Return just the snippet content - no XML and no heading."
 
         return gpt_query(prompt, text_to_process)
 

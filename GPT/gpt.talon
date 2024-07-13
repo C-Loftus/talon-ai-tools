@@ -10,20 +10,23 @@ model <user.modelPrompt> [{user.modelSource}] [{user.modelDestination}]:
     result = user.gpt_apply_prompt(modelPrompt, text)
     user.gpt_insert_response(result, modelDestination or "")
 
-# Modifies a model command to be inserted as a snippet instead of a standard paste
+# Select the last GPT response so you can edit it further
+model take response: user.gpt_select_last()
+
+# Modifies a model command to be inserted as a snippet for VSCode instead of a standard paste
 # Otherwise same grammar as standard `model` command
 model snip <user.modelPrompt> [{user.modelSource}] [{user.modelDestination}]:
     text = user.gpt_get_source_text(modelSource or "")
     result = user.gpt_apply_prompt(modelPrompt, text, "snip")
     user.gpt_insert_response(result, modelDestination or "", "snip")
 
+# Modifies a model comand to always insert with the text selected
+# Useful for chaining together prompts immediately after they return
+# Otherwise same grammar as standard `model` command
 model chain <user.modelPrompt> [{user.modelSource}] [{user.modelDestination}]:
     text = user.gpt_get_source_text(modelSource or "")
     result = user.gpt_apply_prompt(modelPrompt, text)
     user.gpt_insert_response(result, modelDestination or "", "chain")
-
-# Select the last GPT response so you can edit it further
-model take response: user.gpt_select_last()
 
 # Applies an arbitrary prompt from the clipboard to selected text and pastes the result.
 # Useful for applying complex/custom prompts that need to be drafted in a text editor.
