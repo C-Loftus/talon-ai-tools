@@ -47,6 +47,7 @@ def gpt_query(prompt: str, content: str) -> str:
     url = settings.get("user.model_endpoint")
 
     headers, data = generate_payload(prompt, content)
+    print(headers, json.dumps(data))
     response = requests.post(url, headers=headers, data=json.dumps(data))
 
     match response.status_code:
@@ -244,7 +245,7 @@ class UserActions:
         """Get the source text that is will have the prompt applied to it"""
         match spoken_text:
             case "clipboard":
-                return clip.text()
+                return "clip"
             case "gptResponse":
                 if GPTState.last_response == "":
                     raise Exception(
