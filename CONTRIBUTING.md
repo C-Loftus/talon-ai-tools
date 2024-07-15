@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for your interest in contributing to `talon-ai-tools`. We are happy to recieve new contributions. If you have any questions about contributing, feel free to ask.
+Thank you for your interest in contributing to `talon-ai-tools`. We are happy to receive new contributions. If you have any questions about contributing, feel free to ask.
 
 ## Contributing Python
 
