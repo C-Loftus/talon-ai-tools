@@ -281,4 +281,4 @@ class UserActions:
                     raise Exception("No text to reformat")
             case "this" | _:
                 user_content = actions.edit.selected_text()
-        return [format_user_content(prompt, user_content)]
+        return format_user_content(prompt, user_content)
