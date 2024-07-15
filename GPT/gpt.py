@@ -1,3 +1,4 @@
+import base64
 import json
 import os
 from typing import Any, ClassVar
@@ -38,7 +39,7 @@ def confirmation_gui(gui: imgui.GUI):
         actions.user.close_model_confirmation_gui()
 
 
-def gpt_query(content: dict[str, any]) -> str:
+def gpt_query(content: list[dict[str, any]]) -> str:
     """Send a prompt to the GPT API and return the response"""
 
     # Reset state before pasting
@@ -61,8 +62,8 @@ def gpt_query(content: dict[str, any]) -> str:
             raise Exception(response.json())
 
 
-def format_user_content(prompt: str, content: str) -> dict[str, any]:
-    return {"role": "user", "content": f"{prompt}:\n{content}"}
+def format_user_content(prompt: str, content: str) -> list[dict[str, any]]:
+    return [{"role": "user", "content": f"{prompt}:\n{content}"}]
 
 
 @mod.action_class
@@ -148,13 +149,8 @@ class UserActions:
         for _ in lines[0]:
             actions.edit.extend_left()
 
-    def gpt_apply_prompt(prompt: str, text_to_process: str | list[str]) -> str:
+    def gpt_apply_prompt(prompt: str, text_to_process: list[dict[str, any]]) -> str:
         """Apply an arbitrary prompt to arbitrary text"""
-        text_to_process = (
-            " ".join(text_to_process)
-            if isinstance(text_to_process, list)
-            else text_to_process
-        )
 
         # If the user is just moving the source to the destination, we don't need to apply a query
         if prompt == "pass":
@@ -235,7 +231,7 @@ class UserActions:
 
     def gpt_get_source_text(
         spoken_text: str, prompt: str, modifier: str = ""
-    ) -> dict[str, any]:
+    ) -> list[dict[str, any]]:
         """Get the source text that is will have the prompt applied to it"""
 
         # Apply modifiers to prompt before handling special cases
@@ -251,6 +247,22 @@ class UserActions:
         user_content = ""
         match spoken_text:
             case "clipboard":
+                clipped_image = clip.image()
+                if clipped_image:
+                    data = clipped_image.encode().data()
+                    base64_image = base64.b64encode(data).decode("utf-8")
+                    return [
+                        {
+                            "type": "text",
+                            "text": prompt,
+                        },
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{base64_image}"
+                            },
+                        },
+                    ]
                 user_content = clip.text()
             case "gptResponse":
                 if GPTState.last_response == "":
@@ -269,4 +281,4 @@ class UserActions:
                     raise Exception("No text to reformat")
             case "this" | _:
                 user_content = actions.edit.selected_text()
-        return format_user_content(prompt, user_content)
+        return [format_user_content(prompt, user_content)]

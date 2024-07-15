@@ -32,7 +32,7 @@ def get_token() -> str:
 
 
 def generate_payload(
-    content: dict[str, any], tools: Optional[list[Tool]] = None
+    content: list[dict[str, any]], tools: Optional[list[Tool]] = None
 ) -> Tuple[Headers, Data]:
     """Generate the headers and data for the OpenAI API GPT request.
     Does not return the URL given the fact not all openai-compatible endpoints support new features like tools
@@ -60,8 +60,8 @@ def generate_payload(
                 "content": settings.get("user.model_system_prompt")
                 + additional_context,
             },
-            content,
-        ],
+        ]
+        + content,
         "max_tokens": 2024,
         "temperature": settings.get("user.model_temperature"),
         "n": 1,
