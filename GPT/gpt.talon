@@ -20,6 +20,11 @@ model snip <user.modelPrompt> [{user.modelSource}] [{user.modelDestination}]:
     result = user.gpt_apply_prompt(modelPrompt, text, "snip")
     user.gpt_insert_response(result, modelDestination or "", "snip")
 
+# Applies a prompt to images in the clipboard
+model <user.modelPrompt> image [{user.modelDestination}]:
+    result = user.gpt_apply_prompt(modelPrompt, "", "image")
+    user.gpt_insert_response(result, modelDestination or "")
+
 # Modifies a model comand to always insert with the text selected
 # Useful for chaining together prompts immediately after they return
 # Otherwise same grammar as standard `model` command

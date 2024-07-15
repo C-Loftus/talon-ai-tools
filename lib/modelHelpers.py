@@ -32,7 +32,7 @@ def get_token() -> str:
 
 
 def generate_payload(
-    prompt: str, content: str, tools: Optional[list[Tool]] = None
+    prompt: str, type: str, content: str, tools: Optional[list[Tool]] = None
 ) -> Tuple[Headers, Data]:
     """Generate the headers and data for the OpenAI API GPT request.
     Does not return the URL given the fact not all openai-compatible endpoints support new features like tools
@@ -52,27 +52,60 @@ def generate_payload(
         "Content-Type": "application/json",
         "Authorization": f"Bearer {TOKEN}",
     }
+    data = {}
+    url = ""
+    if type == "chat":
+        url = settings.get("user.model_endpoint")
+        data = {
+            "messages": [
+                {
+                    "role": "system",
+                    "content": settings.get("user.model_system_prompt")
+                    + additional_context,
+                },
+                {"role": "user", "content": f"{prompt}:\n{content}"},
+            ],
+            "max_tokens": 2024,
+            "temperature": settings.get("user.model_temperature"),
+            "n": 1,
+            "stop": None,
+            "model": settings.get("user.openai_model"),
+        }
 
-    data = {
-        "messages": [
-            {
-                "role": "system",
-                "content": settings.get("user.model_system_prompt")
-                + additional_context,
-            },
-            {"role": "user", "content": f"{prompt}:\n{content}"},
-        ],
-        "max_tokens": 2024,
-        "temperature": settings.get("user.model_temperature"),
-        "n": 1,
-        "stop": None,
-        "model": settings.get("user.openai_model"),
-    }
+        if tools is not None:
+            data["tools"] = tools
+    elif type == "vision":
+        url = settings.get("user.model_endpoint")
+        prompt = (
+            "I am a user with a visual impairment. Please describe to me what is in this image."
+            if prompt == ""
+            else prompt
+        )
+        base64_image = get_clipboard_image()
+        data = {
+            "model": settings.get("user.openai_model"),
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": prompt,
+                        },
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{base64_image}"
+                            },
+                        },
+                    ],
+                }
+            ],
+            # TODO not sure if this is the right number. Will depend a lot if we are trying to output HTML or just get a general description
+            "max_tokens": settings.get("user.maxDescriptionTokens"),
+        }
 
-    if tools is not None:
-        data["tools"] = tools
-
-    return headers, data
+    return headers, data, url
 
 
 def get_clipboard_image():

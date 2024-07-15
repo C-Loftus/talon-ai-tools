@@ -38,15 +38,13 @@ def confirmation_gui(gui: imgui.GUI):
         actions.user.close_model_confirmation_gui()
 
 
-def gpt_query(prompt: str, content: str) -> str:
+def gpt_query(prompt: str, type: str, content: str) -> str:
     """Send a prompt to the GPT API and return the response"""
 
     # Reset state before pasting
     GPTState.last_was_pasted = False
 
-    url = settings.get("user.model_endpoint")
-
-    headers, data = generate_payload(prompt, content)
+    headers, data, url = generate_payload(prompt, type, content)
     response = requests.post(url, headers=headers, data=json.dumps(data))
 
     match response.status_code:
@@ -75,7 +73,7 @@ class UserActions:
 
         Please return only the final text. What follows is all of the source texts separated by '---'.
         """
-        return gpt_query(prompt, source_text)
+        return gpt_query(prompt, "chat", source_text)
 
     def gpt_blend_list(source_text: list[str], destination_text: str):
         """Blend all the source text as a list and send it to the destination"""
@@ -94,7 +92,7 @@ class UserActions:
         Condense the code into a single line such that it can be ran in the terminal.
         """
 
-        result = gpt_query(prompt, text_to_process)
+        result = gpt_query(prompt, "chat", text_to_process)
         return result
 
     def gpt_generate_sql(text_to_process: str) -> str:
@@ -106,7 +104,7 @@ class UserActions:
        Do not output comments, backticks, or natural language explanations.
        Prioritize SQL queries that are database agnostic.
         """
-        return gpt_query(prompt, text_to_process)
+        return gpt_query(prompt, "chat", text_to_process)
 
     def add_to_confirmation_gui(model_output: str):
         """Add text to the confirmation gui"""
@@ -154,10 +152,14 @@ class UserActions:
             else text_to_process
         )
 
+        type = "chat"
+
         # Apply modifiers to prompt before handling special cases
         match modifier:
             case "snip":
                 prompt += "\n\nPlease return the response as a textmate snippet for insertion into an editor with placeholders that the user should edit. Return just the snippet content - no XML and no heading."
+            case "image":
+                type = "vision"
 
         # Ask is a special case, where the text to process is the prompted question, not the selected text
         if prompt.startswith("ask"):
@@ -167,7 +169,7 @@ class UserActions:
         elif prompt == "pass":
             return text_to_process
 
-        return gpt_query(prompt, text_to_process)
+        return gpt_query(prompt, type, text_to_process)
 
     def gpt_help():
         """Open the GPT help file in the web browser"""
