@@ -38,7 +38,7 @@ def confirmation_gui(gui: imgui.GUI):
         actions.user.close_model_confirmation_gui()
 
 
-def gpt_query(prompt: str, content: str) -> str:
+def gpt_query(content: dict[str, any]) -> str:
     """Send a prompt to the GPT API and return the response"""
 
     # Reset state before pasting
@@ -46,7 +46,7 @@ def gpt_query(prompt: str, content: str) -> str:
 
     url = settings.get("user.model_endpoint")
 
-    headers, data = generate_payload(prompt, content)
+    headers, data = generate_payload(content)
     response = requests.post(url, headers=headers, data=json.dumps(data))
 
     match response.status_code:
@@ -59,6 +59,10 @@ def gpt_query(prompt: str, content: str) -> str:
         case _:
             notify("GPT Failure: Check the Talon Log")
             raise Exception(response.json())
+
+
+def format_user_content(prompt: str, content: str) -> dict[str, any]:
+    return {"role": "user", "content": f"{prompt}:\n{content}"}
 
 
 @mod.action_class
@@ -75,7 +79,7 @@ class UserActions:
 
         Please return only the final text. What follows is all of the source texts separated by '---'.
         """
-        return gpt_query(prompt, source_text)
+        return gpt_query(format_user_content(prompt, source_text))
 
     def gpt_blend_list(source_text: list[str], destination_text: str):
         """Blend all the source text as a list and send it to the destination"""
@@ -94,7 +98,7 @@ class UserActions:
         Condense the code into a single line such that it can be ran in the terminal.
         """
 
-        result = gpt_query(prompt, text_to_process)
+        result = gpt_query(format_user_content(prompt, text_to_process))
         return result
 
     def gpt_generate_sql(text_to_process: str) -> str:
@@ -106,7 +110,7 @@ class UserActions:
        Do not output comments, backticks, or natural language explanations.
        Prioritize SQL queries that are database agnostic.
         """
-        return gpt_query(prompt, text_to_process)
+        return gpt_query(format_user_content(prompt, text_to_process))
 
     def add_to_confirmation_gui(model_output: str):
         """Add text to the confirmation gui"""
@@ -144,9 +148,7 @@ class UserActions:
         for _ in lines[0]:
             actions.edit.extend_left()
 
-    def gpt_apply_prompt(
-        prompt: str, text_to_process: str | list[str], modifier: str = ""
-    ) -> str:
+    def gpt_apply_prompt(prompt: str, text_to_process: str | list[str]) -> str:
         """Apply an arbitrary prompt to arbitrary text"""
         text_to_process = (
             " ".join(text_to_process)
@@ -154,20 +156,11 @@ class UserActions:
             else text_to_process
         )
 
-        # Apply modifiers to prompt before handling special cases
-        match modifier:
-            case "snip":
-                prompt += "\n\nPlease return the response as a textmate snippet for insertion into an editor with placeholders that the user should edit. Return just the snippet content - no XML and no heading."
-
-        # Ask is a special case, where the text to process is the prompted question, not the selected text
-        if prompt.startswith("ask"):
-            text_to_process = prompt.removeprefix("ask")
-            prompt = """Generate text that satisfies the question or request given in the input."""
         # If the user is just moving the source to the destination, we don't need to apply a query
-        elif prompt == "pass":
+        if prompt == "pass":
             return text_to_process
 
-        return gpt_query(prompt, text_to_process)
+        return gpt_query(format_user_content(prompt, text_to_process))
 
     def gpt_help():
         """Open the GPT help file in the web browser"""
@@ -193,7 +186,7 @@ class UserActions:
         last_output = actions.user.get_last_phrase()
         if last_output:
             actions.user.clear_last_phrase()
-            return gpt_query(PROMPT, last_output)
+            return gpt_query(format_user_content(PROMPT, last_output))
         else:
             notify("No text to reformat")
             raise Exception("No text to reformat")
@@ -240,25 +233,40 @@ class UserActions:
                 paste_and_modify(result, modifier)
                 GPTState.last_was_pasted = True
 
-    def gpt_get_source_text(spoken_text: str) -> str:
+    def gpt_get_source_text(
+        spoken_text: str, prompt: str, modifier: str = ""
+    ) -> dict[str, any]:
         """Get the source text that is will have the prompt applied to it"""
+
+        # Apply modifiers to prompt before handling special cases
+        match modifier:
+            case "snip":
+                prompt += "\n\nPlease return the response as a textmate snippet for insertion into an editor with placeholders that the user should edit. Return just the snippet content - no XML and no heading."
+
+        if prompt.startswith("ask"):
+            spoken_text = prompt.removeprefix("ask")
+            prompt = """Generate text that satisfies the question or request given in the input."""
+            return format_user_content(prompt, spoken_text)
+
+        user_content = ""
         match spoken_text:
             case "clipboard":
-                return clip.text()
+                user_content = clip.text()
             case "gptResponse":
                 if GPTState.last_response == "":
                     raise Exception(
                         "GPT Failure: User applied a prompt to the phrase GPT response, but there was no GPT response stored"
                     )
-                return GPTState.last_response
+                user_content = GPTState.last_response
 
             case "lastTalonDictation":
                 last_output = actions.user.get_last_phrase()
                 if last_output:
                     actions.user.clear_last_phrase()
-                    return last_output
+                    user_content = last_output
                 else:
                     notify("No text to reformat")
                     raise Exception("No text to reformat")
             case "this" | _:
-                return actions.edit.selected_text()
+                user_content = actions.edit.selected_text()
+        return format_user_content(prompt, user_content)

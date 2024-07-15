@@ -6,7 +6,7 @@ model help$: user.gpt_help()
 #   Example: `model explain this` -> Explains the selected text and pastes in place
 #   Example: `model fix grammar clip to browser` -> Fixes the grammar of the text on the clipboard and opens in browser`
 model <user.modelPrompt> [{user.modelSource}] [{user.modelDestination}]:
-    text = user.gpt_get_source_text(modelSource or "")
+    text = user.gpt_get_source_text(modelSource or "", modelPrompt)
     result = user.gpt_apply_prompt(modelPrompt, text)
     user.gpt_insert_response(result, modelDestination or "")
 
@@ -16,15 +16,15 @@ model take response: user.gpt_select_last()
 # Modifies a model command to be inserted as a snippet for VSCode instead of a standard paste
 # Otherwise same grammar as standard `model` command
 model snip <user.modelPrompt> [{user.modelSource}] [{user.modelDestination}]:
-    text = user.gpt_get_source_text(modelSource or "")
-    result = user.gpt_apply_prompt(modelPrompt, text, "snip")
+    text = user.gpt_get_source_text(modelSource or "", modelPrompt, "snip")
+    result = user.gpt_apply_prompt(modelPrompt, text)
     user.gpt_insert_response(result, modelDestination or "", "snip")
 
 # Modifies a model comand to always insert with the text selected
 # Useful for chaining together prompts immediately after they return
 # Otherwise same grammar as standard `model` command
 model chain <user.modelPrompt> [{user.modelSource}] [{user.modelDestination}]:
-    text = user.gpt_get_source_text(modelSource or "")
+    text = user.gpt_get_source_text(modelSource or "", modelPrompt)
     result = user.gpt_apply_prompt(modelPrompt, text)
     user.gpt_insert_response(result, modelDestination or "", "chain")
 
