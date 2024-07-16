@@ -165,6 +165,8 @@ class UserActions:
             prompt = """Generate text that satisfies the question or request given in the input."""
         # If the user is just moving the source to the destination, we don't need to apply a query
         elif prompt == "pass":
+            if text_to_process == "clip":
+                return clip.text()
             return text_to_process
 
         return gpt_query(prompt, text_to_process)
