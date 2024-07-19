@@ -249,7 +249,9 @@ class UserActions:
                     if clip.image():
                         return "image"
                     else:
-                        notify("GPT Failure: User applied a prompt to the phrase clipboard, but there was no clipboard text or image stored")
+                        notify(
+                            "GPT Failure: User applied a prompt to the phrase clipboard, but there was no clipboard text or image stored"
+                        )
                         return
                 return clipboard_text
             case "gptResponse":
@@ -265,7 +267,11 @@ class UserActions:
                     actions.user.clear_last_phrase()
                     return last_output
                 else:
-                    notify("GPT Failure: User applied a prompt to the phrase last Talon Dictation, but there was no text to reformat")
-                    raise Exception("GPT Failure: User applied a prompt to the phrase last Talon Dictation, but there was no text to reformat")
+                    notify(
+                        "GPT Failure: User applied a prompt to the phrase last Talon Dictation, but there was no text to reformat"
+                    )
+                    raise Exception(
+                        "GPT Failure: User applied a prompt to the phrase last Talon Dictation, but there was no text to reformat"
+                    )
             case "this" | _:
                 return actions.edit.selected_text()
