@@ -33,4 +33,3 @@ def strip_markdown(text: str) -> str:
     stripped_code = re.sub(pattern, r"\1", text)
 
     return stripped_code.strip()
-

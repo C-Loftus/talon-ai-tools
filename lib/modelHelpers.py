@@ -35,8 +35,12 @@ def make_prompt_from_editor_ctx(ctx: str):
     """Add the editor context to the prompt"""
     if not ctx:
         return ""
-    
-    return "\n The user is inside a code editor. Use the content of the editor to improve the response and make it tailored to the specific context. The content is as follows: \n\n\n" + ctx
+
+    return (
+        "\n The user is inside a code editor. Use the content of the editor to improve the response and make it tailored to the specific context. The content is as follows: \n\n\n"
+        + ctx
+    )
+
 
 def generate_payload(
     prompt: str, content: str, tools: Optional[list[Tool]] = None
@@ -59,7 +63,6 @@ def generate_payload(
         "Content-Type": "application/json",
         "Authorization": f"Bearer {TOKEN}",
     }
-    
 
     message = {"type": "text", "text": content}
     if content == "__IMAGE__":
@@ -77,7 +80,7 @@ def generate_payload(
             {
                 "role": "system",
                 "content": settings.get("user.model_system_prompt")
-                + additional_context 
+                + additional_context,
             },
             {"role": "user", "content": [{"type": "text", "text": prompt}, message]},
         ],
