@@ -1,12 +1,8 @@
-from dataclasses import dataclass
-from typing import Optional
+# Adapted from MIT licensed code here: 
+# https://github.com/phillco/talon-axkit/blob/main/dictation/dictation_context.py
 
-from talon import Context, Module, actions, settings, ui
+from talon import Context, Module, ui
 
-try:
-    from talon.ui import Element
-except ImportError:
-    Element = type(None)
 from talon.types import Span
 
 ctx = Context()
@@ -17,38 +13,39 @@ app: code
 
 mod = Module()
 
-# Default number of characters to use to acquire context. Somewhat arbitrary.
-# The current dictation formatter doesn't need very many, but that could change in the future.
-DEFAULT_CONTEXT_CHARACTERS = 30
-
-
 @mod.action_class
 class GenericActions:
-    def a11y_get_full_editor_context() -> str:
+    def a11y_get_context_of_editor(selection: str) -> str:
         """Creates a `AccessibilityContext` representing the state of the document"""    
+        # If we aren't in a valid editor on a valid platform, just return an empty string
         return ""
 
 @ctx.action_class('user')
 class Actions:
 
-    def a11y_get_full_editor_context() -> str:
+    def a11y_get_context_of_editor(selection: str) -> str:
         """Creates a `AccessibilityContext` representing the state of the document"""
 
         el = ui.focused_element()
-
-        if not el.get("AXRoleDescription") == "editor":
-            return ""
-
+        
         if not el or not el.attrs:
             raise ValueError("No valid a11y element")
+
+        
+        # Only return extra context if we are in an editor
+        if not el.get("AXRoleDescription") == "editor":
+            return ""
 
         context = el.get("AXValue")
 
         if context is None:
             raise ValueError("No accessibility information present")
+        # This probably means that a11y support is not enabled (we can't get more than just the current 
+        # selection)or that we selected the entire document
+        if context == selection:
+            return ""
 
         return context
-
 
 
 
