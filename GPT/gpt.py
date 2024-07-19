@@ -247,7 +247,7 @@ class UserActions:
                 clipboard_text = clip.text()
                 if clipboard_text is None:
                     if clip.image():
-                        return "image"
+                        return "__IMAGE__"
                     else:
                         notify(
                             "GPT Failure: User applied a prompt to the phrase clipboard, but there was no clipboard text or image stored"

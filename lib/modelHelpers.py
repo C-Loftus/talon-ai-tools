@@ -54,7 +54,7 @@ def generate_payload(
     }
 
     message = {"type": "text", "text": content}
-    if content == "image":
+    if content == "__IMAGE__":
         clipped_image = clip.image()
         if clipped_image:
             data = clipped_image.encode().data()
