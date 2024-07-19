@@ -1,1 +1,1 @@
-from talon import 
+from talon import
