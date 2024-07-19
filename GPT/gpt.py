@@ -209,13 +209,13 @@ class UserActions:
             case "above":
                 actions.key("left")
                 actions.edit.line_insert_up()
-                paste_and_modify(result, modifier)
                 GPTState.last_was_pasted = True
+                paste_and_modify(result, modifier)
             case "below":
                 actions.key("right")
                 actions.edit.line_insert_down()
-                paste_and_modify(result, modifier)
                 GPTState.last_was_pasted = True
+                paste_and_modify(result, modifier)
             case "clipboard":
                 clip.set_text(result)
             case "appendClipboard":
@@ -237,14 +237,23 @@ class UserActions:
             case "cursorless":
                 actions.user.cursorless_insert(cursorless_destination, result)
             case "paste" | _:
-                paste_and_modify(result, modifier)
                 GPTState.last_was_pasted = True
+                paste_and_modify(result, modifier)
 
     def gpt_get_source_text(spoken_text: str) -> str:
         """Get the source text that is will have the prompt applied to it"""
         match spoken_text:
             case "clipboard":
-                return clip.text()
+                clipboard_text = clip.text()
+                if clipboard_text is None:
+                    if clip.image():
+                        return "__IMAGE__"
+                    else:
+                        notify(
+                            "GPT Failure: User applied a prompt to the phrase clipboard, but there was no clipboard text or image stored"
+                        )
+                        return
+                return clipboard_text
             case "gptResponse":
                 if GPTState.last_response == "":
                     raise Exception(
@@ -258,7 +267,11 @@ class UserActions:
                     actions.user.clear_last_phrase()
                     return last_output
                 else:
-                    notify("No text to reformat")
-                    raise Exception("No text to reformat")
+                    notify(
+                        "GPT Failure: User applied a prompt to the phrase last Talon Dictation, but there was no text to reformat"
+                    )
+                    raise Exception(
+                        "GPT Failure: User applied a prompt to the phrase last Talon Dictation, but there was no text to reformat"
+                    )
             case "this" | _:
                 return actions.edit.selected_text()
