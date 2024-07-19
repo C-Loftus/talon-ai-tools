@@ -9,8 +9,7 @@ settings():
 
     # user.model_system_prompt = "You are an assistant helping an office worker to be more productive."
 
-    # Change to 'gpt-4' for GPT-4
-    # NOTE, you may not have access to GPT-4 yet: https://help.openai.com/en/articles/7102672-how-can-i-access-gpt-4
+    # Change to 'gpt-4' or the model of your choice
     # user.openai_model = 'gpt-3.5-turbo'
 
 # Only uncomment the line below if you want experimental behavior to parse Talon files

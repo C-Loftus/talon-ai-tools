@@ -60,6 +60,18 @@ def generate_payload(
         "Authorization": f"Bearer {TOKEN}",
     }
     
+
+    message = {"type": "text", "text": content}
+    if content == "__IMAGE__":
+        clipped_image = clip.image()
+        if clipped_image:
+            data = clipped_image.encode().data()
+            base64_image = base64.b64encode(data).decode("utf-8")
+            message = {
+                "type": "image_url",
+                "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"},
+            }
+
     data = {
         "messages": [
             {
@@ -67,15 +79,13 @@ def generate_payload(
                 "content": settings.get("user.model_system_prompt")
                 + additional_context 
             },
-            {"role": "user", "content": f"{prompt}:\n{content}"},
+            {"role": "user", "content": [{"type": "text", "text": prompt}, message]},
         ],
         "max_tokens": 2024,
         "temperature": settings.get("user.model_temperature"),
         "n": 1,
-        "stop": None,
         "model": settings.get("user.openai_model"),
     }
-
     if tools is not None:
         data["tools"] = tools
 
