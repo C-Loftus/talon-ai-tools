@@ -54,7 +54,7 @@ def generate_payload(
     }
 
     message = {"type": "text", "text": content}
-    if content == "clip":
+    if content == "image":
         clipped_image = clip.image()
         if clipped_image:
             data = clipped_image.encode().data()
@@ -63,8 +63,6 @@ def generate_payload(
                 "type": "image_url",
                 "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"},
             }
-        else:
-            message = {"type": "text", "text": clip.text()}
 
     data = {
         "messages": [

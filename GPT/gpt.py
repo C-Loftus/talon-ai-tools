@@ -165,8 +165,6 @@ class UserActions:
             prompt = """Generate text that satisfies the question or request given in the input."""
         # If the user is just moving the source to the destination, we don't need to apply a query
         elif prompt == "pass":
-            if text_to_process == "clip":
-                return clip.text()
             return text_to_process
 
         return gpt_query(prompt, text_to_process)
@@ -246,7 +244,10 @@ class UserActions:
         """Get the source text that is will have the prompt applied to it"""
         match spoken_text:
             case "clipboard":
-                return "clip"
+                clipboard_text = clip.text()
+                if clipboard_text is None:
+                    return "image"
+                return clipboard_text
             case "gptResponse":
                 if GPTState.last_response == "":
                     raise Exception(
