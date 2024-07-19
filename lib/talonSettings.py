@@ -23,7 +23,9 @@ def modelPrompt(matched_prompt) -> str:
 
 
 mod.setting(
-    "openai_model", type=Literal["gpt-3.5-turbo", "gpt-4"], default="gpt-3.5-turbo"
+    "openai_model",
+    type=Literal["gpt-3.5-turbo", "gpt-4", "gpt-4o-mini"],
+    default="gpt-4o-mini",
 )
 
 mod.setting(
