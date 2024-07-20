@@ -28,6 +28,11 @@ model chain <user.modelPrompt> [{user.modelSource}] [{user.modelDestination}]:
     result = user.gpt_apply_prompt(modelPrompt, text)
     user.gpt_insert_response(result, modelDestination or "", "chain")
 
+model {user.search_engine} [{user.modelSource}]:
+    text = user.gpt_get_source_text(modelSource or "")
+    result = user.gpt_search_engine(search_engine, text)
+    user.search_with_search_engine(search_engine, result)
+
 # Applies an arbitrary prompt from the clipboard to selected text and pastes the result.
 # Useful for applying complex/custom prompts that need to be drafted in a text editor.
 model apply [from] clip$:
