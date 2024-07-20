@@ -31,6 +31,17 @@ def get_token() -> str:
         raise Exception(message)
 
 
+def make_prompt_from_editor_ctx(ctx: str):
+    """Add the editor context to the prompt"""
+    if not ctx:
+        return ""
+
+    return (
+        "\n The user is inside a code editor. Use the content of the editor to improve the response and make it tailored to the specific context. The content is as follows: \n\n\n"
+        + ctx
+    )
+
+
 def generate_payload(
     prompt: str, content: str, tools: Optional[list[Tool]] = None
 ) -> Tuple[Headers, Data]:
@@ -46,7 +57,7 @@ def generate_payload(
         f"\nThe user is currently in a code editor for {language}."
         if language != ""
         else ""
-    )
+    ) + make_prompt_from_editor_ctx(actions.user.a11y_get_context_of_editor(content))
 
     headers = {
         "Content-Type": "application/json",
