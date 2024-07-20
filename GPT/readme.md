@@ -37,3 +37,22 @@ If you wish to change any configuration settings, copy the [example configuratio
 | user.model_endpoint      | `"https://api.openai.com/v1/chat/completions"`                                                                                                                                                                                                                     | Any OpenAI compatible endpoint address can be used (Azure, local llamafiles, etc)           |
 | user.model_shell_default | `"bash"`                                                                                                                                                                                                                                                           | The default shell for `model shell` commands                                                |
 | user.model_system_prompt | `"You are an assistant helping an office worker to be more productive. Output just the response to the request and no additional content. Do not generate any markdown formatting such as backticks for programming languages unless it is explicitly requested."` | The meta-prompt for how to respond to all prompts                                           |
+
+## Providing Additional User Context
+
+In case you want to provide additional context to the LLM, there is a hook that you can override in your own python code and anything that is returned will be sent with every request. This is useful for example if you would like to run a shell command and send its output along. Here is an example file that you can use as a template:
+
+```
+from talon import Context, Module, actions
+
+mod = Module()
+
+ctx = Context()
+
+
+@ctx.action_class("user")
+class UserActions:
+    def additional_user_context():
+        """This is an override function that can be used to add additional context to the prompt"""
+        return ["test from inside my additional user context function"]
+```
