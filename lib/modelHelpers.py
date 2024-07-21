@@ -85,7 +85,7 @@ def generate_payload(
                 ]
                 + [
                     {"type": "text", "text": item}
-                    for item in actions.user.additional_user_context()
+                    for item in actions.user.contextual_user_context()
                 ],
             },
             {"role": "user", "content": [{"type": "text", "text": prompt}, message]},
