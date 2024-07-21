@@ -28,14 +28,6 @@ import os
 os.environ["OPENAI_API_KEY"] = "YOUR-KEY-HERE"
 ```
 
-:::note
-
-You can use this repo without an OpenAI key by [customizing the endpoint url](./GPT/readme.md#configuration) to be your preferred model.
-
-You can also exclusively use this repo with just [Copilot](./copilot/README.md) if you do not need LLM integration
-:::
-
-
 ### Quickstart Video
 
-[![Talon-AI-Tools Quickstart](./video_thumbnail.jpg)](https://www.youtube.com/watch?v=FctiTs6D2tM "Talon-AI-Tools Quickstart")
+[![Talon-AI-Tools Quickstart](../../../../video_thumbnail.jpg)](https://www.youtube.com/watch?v=FctiTs6D2tM "Talon-AI-Tools Quickstart")
