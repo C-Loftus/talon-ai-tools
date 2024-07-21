@@ -14,6 +14,8 @@ format table: The following markdown text is raw data. There is no index. Return
 format bullets: Convert the every paragraph into a one heading with series of bullet points underneath it. Each paragraph is separated by a new line. Separate paragraphs should not have combined bullet points. This should all be done in markdown syntax. If it is a small paragraph than you can just leave it as a heading and not add bullet points. Do not reduce content, only reduce things that would be redundant. These bullet points should be in a useful format for notes for those who want to quickly look at it. If there is a citation in the markdown original then keep the citation just at the top and not within every individual bullet point.
 format mermaid: convert the following plain text into the text syntax for a mermaid diagram.
 format comment: format the following text as a comment for the current programming language. Use the proper comment syntax for the current language. Split the comment into multiple lines if the lines are too long
+group: Act as an organizer. The following text consists of various topics all put together. Please group these items into categories and label each category. Return just the results.
+join: Act as an editor. The following text is separated into multiple parts. Please group them together into one part maintaining the flow and meaning. Reorder in whatever way makes sense. Remove any redundant information. The result should be only one part with no additional structure. Return just the modified text.
 
 ## TEXT GENERATION
 explain: explain this text in a way that is easier to understand for a layman without technical knowledge
@@ -23,6 +25,8 @@ fit schema: the given text has a series of responses that need to be categorized
 answer: generate text that satisfies the question or request given in the input
 shell: generate a shell script that performs the following actions. Output only the command. Do not output any comments or explanations. Default to the bash shell unless otherwise specified.
 add emoji: return the same exact text verbatim with the same formatting, but add emoji when appropriate in order to make the text fun and easier to understand
+make softer: Act as an editor. I want you to make the following text softer in tone. Return just the modified text.
+make stronger: Act as an editor. I want you to make the following text stronger in tone. Return just the modified text.
 
 ## FILE CONVERSIONS
 convert to jason:  Convert the following data into a json format.
@@ -31,7 +35,7 @@ convert to python: Convert the following key value pairs into the syntax for a p
 convert to sheet: Convert the following data into a csv format.
 convert to yam: Convert the following data into a yaml format.
 
-## ACCESSIBILITY
+## CHECKERS
 describe code: explain what the following code does in natural language at a high level without getting into the specifics of the syntax.
 check grammar: Check the grammar and formatting of the following text. Return a list of all potential errors.
 check spelling: Check the spelling of the following text. Return a list of all potential errors.
@@ -41,40 +45,7 @@ check structure: Skim the structure and layout of the following text. Tell me if
 translate to english: Translate the following text into English.
 
 ## CODE GENERATION
-generate code: the following plaintext describes a process in code in the language that is specified by the system prompt. Please output the code necessary to do this.
-
-add questions: I want you to help me think about this question from various perspectives. Please take various perspectives and ask followup questions. For each perspective please tell me what the perspective is. Please annotate the entire conversation so it is clear that this is a dialogue between you and me since I intend to paste this into slack and I want others to know that this was a generated response. Please respond only with the perspectives and the questions that they generated.
-coach: I want you to evaluate this code. Pay close attention to the ways in which it might need to change. For any unit of code it should have only one reason to change. Give me a sense of the ways it might need to change, so that I can improve the design.
-split: Act as an editor. The following text consists of multiple topics. Please separate those topics and organize them so the structure is clear. Return just the modified text.
-join: Act as an editor. The following text is separated into multiple parts. Please group them together into one part maintaining the flow and meaning. Reorder in whatever way makes sense. Remove any redundant information. The result should be only one part with no additional structure. Return just the modified text.
-group: Act as an organizer. The following text consists of various topics all put together. Please group these items into categories and label each category. Return just the results.
-guard: Act as a software engineer. The following code is checking for error cases. Please change the code so that all the error cases are handled first. Return from the function if possible with a guard clause, or throw an error if that works better. Return just the modified text for insertion directly into code without any adornment.
-shorten: Act as an editor. The following text is too long. Please shorten it while maintaining the same meaning. Return just the modified text.
-add API docs: Act as a software engineer. Please look at the following code and add API documentation. Makes sure to include any documentation for parameters that are used in the code. Return just the modified text.
-update comments: Act as a software engineer. The following code may be missing comments or the comments could be out of date. Please update the comments. If you are unsure how to comment something ask a question in a comment instead. Return just the modified text.
-flatten: Act as an editor. The following text has various structures in place to organize the text. Restructured the text to be a single chunk of text with no additional structure. Make sure that it is grammatically correct by interpreting the current structure for me. Return just the modified text.
-
-describe split: Act as an editor. The following text seems to consists of multiple interrelated topics. Starting from the topics in the text, tell me some different ways to categorize or split this.
-
-make abstract: Act as an editor. The following text is operating at various layers of abstraction.  Please make the text operate at just one level of abstraction by making any specifics more abstract. If the text is already operating at one layer of abstraction, make the whole more abstract. Please return just the modified text.
-make softer: Act as an editor. I want you to make the following text softer in tone. Return just the modified text.
-make stronger: Act as an editor. I want you to make the following text stronger in tone. Return just the modified text.
-
-sort interest: Act as an editor. Please order this text such that the most surprising or interesting part comes first. Preserve the current tone. Return just the modified text.
-sort abstraction: Act as an editor. Reorder the following text in order of abstraction. Start with the most abstract and then decrease abstraction as you continue through the text. Add transitions and labels as necessary to make it flow. The sorted text is going to be used in the same context as the original text so it should read like a substitution. Return just the modified text.
-sort complexity: Act as a software engineer. Please reorder the following code so the most complex parts are first. Return just the modified text.
-sort direct: Act as an editor. Reorder the following text to be more direct. Lead with the main point and then back it up with auxiliary information. Return just the text and nothing else. Return just the modified text.
-sort indirect: Act as an editor. Reorder the following text to be more indirect. Lead with the auxiliary information and finish with the main point. Return just the text and nothing else. Return just the modified text.
-
-fix duplication: Act as a software engineer. The following code has too much duplication. Please do what you can to reduce duplication without changing the behavior of this code. Return just the new code. Return just the modified text for insertion directly into code.
-list obscure: Act as a reader. I want you to find all of the terms listed in the following text that are not defined here. Return just the list of dependencies.
-list dependencies: Act as a reader. I want you to find all of the dependencies listed in the following text and what they depend on. Consider something to be a dependency if both the dependency and what it depends on are listed in the text. Return just the list of dependencies.
-list flow: Act as a project manager. I want you to find the process flow in the following text. Please return just the flow.
-
-generate liberated exercise: Act as facilitator. Design a process to solve this problem with full group participation using liberating structures or similar techniques. This process should be usable for an online meeting such as zoom, and may (as needed) leverage tools that allow group collaboration online. Since this group is not going to be very familiar with this exercise format, please limit the number of activities to no more than three. Return just the process you recommend.
-generate traditional exercise: Act as facilitator. Design a process to solve this problem with full group participation without using any breakouts. Do your best to make this engaging and fun. This process should be usable for an online meeting such as zoom, and may (as needed) leverage tools that allow group collaboration online. Since this group is not going to be very familiar with this exercise format, please limit the number of activities to no more than three. Return just the process you recommend.
-
-format todo: Act as an organizational expert who knows the GTD (getting things done) framework. The following text contains various action items. I want you to annotate each task with a tag to describe the context (context defines what you need to be able to carry out an action) and a tag describing the relative size of the task. Output the tasks as a markdown todo list. Return just the tasks.
-format heading: Act as an editor. Please make a heading that encapsulates everything in the text below. Return just the heading.
-format gherkin: Act as a product manager. The following text completely describes a desired process but is not written in gherkin. Please reformat this into proper gherkin without adding any additional criteria. You can use Jira markup to format the text with bold and italics as necessary. Return just the modified text.
-format HTML: Act as a frontend web developer. Please format the following as semantic HTML. Return just the formatted HTML.
+generate code: the following plaintext describes a process in code in the language that is specified by the system prompt. Please output the code necessary to do this. Return just code and not any natural language explanations.
+update comments: Act as a software engineer. The following code may be missing comments or the comments could be out of date. Please update the comments. If you are unsure how to comment something ask a question in a comment instead. Return just the code and not any explanations.
+clean code: Act as a software engineer. Reduce any duplication in the selected code and improve it to be more idiomatic and clear for other users. However, do not change the behavior or functionality. Return just the code and not any explanations.
+improve semantics: The following is an HTML document. Keep the same structure and layout but if it is needed, change any elements to use proper semantic HTML and make sure it is implementing best practices for user accessibility. Output just the HTML and not any extra explanations.
