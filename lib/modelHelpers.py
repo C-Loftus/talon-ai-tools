@@ -79,8 +79,14 @@ def generate_payload(
         "messages": [
             {
                 "role": "system",
-                "content": settings.get("user.model_system_prompt")
-                + additional_context,
+                "content": [
+                    {"type": "text", "text": settings.get("user.model_system_prompt")},
+                    {"type": "text", "text": additional_context},
+                ]
+                + [
+                    {"type": "text", "text": item}
+                    for item in actions.user.contextual_user_context()
+                ],
             },
             {"role": "user", "content": [{"type": "text", "text": prompt}, message]},
         ],
@@ -91,7 +97,6 @@ def generate_payload(
     }
     if tools is not None:
         data["tools"] = tools
-
     return headers, data
 
 
