@@ -43,7 +43,9 @@ class Actions:
         context = el.get("AXValue")
 
         if context is None:
-            print("GPT Warning: Tried to get a11y info but no accessibility information present in the focused element")
+            print(
+                "GPT Warning: Tried to get a11y info but no accessibility information present in the focused element"
+            )
         # This probably means that a11y support is not enabled (we can't get more than just the current
         # selection)or that we selected the entire document
         if not context or context == selection:
