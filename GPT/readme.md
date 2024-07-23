@@ -54,5 +54,8 @@ ctx = Context()
 class UserActions:
     def contextual_user_context():
         """This is an override function that can be used to add additional context to the prompt"""
-        return ["test from inside my additional user context function"]
+        result = actions.user.talon_get_active_context()
+        return [
+            f"The following describes the currently focused application:\n\n{result}"
+        ]
 ```
