@@ -125,6 +125,10 @@ class UserActions:
         GPTState.text_to_confirm = model_output
         confirmation_gui.show()
 
+    def contextual_user_context():
+        """This is an override function that can be used to add additional context to the prompt"""
+        return []
+
     def close_model_confirmation_gui():
         """Close the model output without pasting it"""
         GPTState.text_to_confirm = ""
