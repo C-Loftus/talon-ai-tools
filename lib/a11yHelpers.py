@@ -9,7 +9,6 @@ ctx.matches = r"""
 os: mac
 app: code
 """
-
 mod = Module()
 
 
@@ -25,7 +24,7 @@ class GenericActions:
 class Actions:
 
     def a11y_get_context_of_editor(selection: str) -> str:
-        """Creates a `AccessibilityContext` representing the state of the documbent"""
+        """Creates a `AccessibilityContext` representing the state of the document"""
 
         try:
             el = ui.focused_element()
