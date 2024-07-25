@@ -161,7 +161,7 @@ class UserActions:
         # Apply modifiers to prompt before handling special cases
         match modifier:
             case "snip":
-                prompt += "\n\nPlease return the response as a textmate snippet for insertion into an editor with placeholders that the user should edit. Return just the snippet content - no XML and no heading."
+                prompt += "\n\nPlease return the response as a snippet with placeholders. A snippet can control cursors and text insertion using constructs like tabstops ($1, $2, etc., with $0 as the final position). Linked tabstops update together. Placeholders, such as ${1:foo}, allow easy changes and can be nested (${1:another ${2:placeholder}}). Choices, using ${1|one,two,three|}, prompt user selection."
 
         # Ask is a special case, where the text to process is the prompted question, not the selected text
         if prompt.startswith("ask"):
