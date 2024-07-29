@@ -3,13 +3,14 @@ const { data } = Astro.props; // Receive the data as a prop
 const response = await fetch(data);
 const fetchedData = await response.text();
 
-// Function to extract the basename from a URL
-const getBasename = (url: string | URL) => {
-  const urlObj = new URL(url);
-  return urlObj.pathname.split('/').filter(Boolean).pop() || 'Index';
-};
+// // Function to extract the basename from a URL
+// const getBasename = (url: string | URL) => {
+//   const urlObj = new URL(url);
+//   return urlObj.pathname.split('/').filter(Boolean).pop() || 'Index';
+// };
 
-const basename = getBasename(data);
+// const basename = getBasename(data);
+
 import { Code } from 'astro:components';
 ---
 
