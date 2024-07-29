@@ -16,7 +16,7 @@ This assumes you have Talon installed. If you are new to Talon check out the Qui
 1. Set the key environment variable within the Python file
 
 :::caution
- 
+
 Make sure you do not push the key to a public repo!
 
 :::
