@@ -3,9 +3,9 @@ title: talon-ai-tools
 description: Control your favorite large language model across your entire desktop
 template: splash
 hero:
-    tagline: Control your favorite large language model across your entire desktop
+    tagline: Control your favorite large language models across your entire desktop
     image:
-        file: ../../assets/houston.webp
+        file: ../../assets/talon.png
     actions:
         - text: Quickstart
           link: /guides/quickstart/
@@ -16,8 +16,8 @@ hero:
           icon: external
 ---
 
-import { Card, CardGrid } from "@astrojs/starlight/components";
-
+<!-- import { Card, CardGrid } from "@astrojs/starlight/components"; -->
+<!-- 
 ## Next steps
 
 <CardGrid stagger>
@@ -33,4 +33,4 @@ import { Card, CardGrid } from "@astrojs/starlight/components";
     <Card title="Read the docs" icon="open-book">
         Learn more in [the Starlight Docs](https://starlight.astro.build/).
     </Card>
-</CardGrid>
+</CardGrid> -->

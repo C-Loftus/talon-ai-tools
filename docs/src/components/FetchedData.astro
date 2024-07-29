@@ -10,6 +10,7 @@ const getBasename = (url: string | URL) => {
 };
 
 const basename = getBasename(data);
+import { Code } from 'astro:components';
 ---
 
 <style>
@@ -25,7 +26,6 @@ const basename = getBasename(data);
   }
 </style>
 
-<div class="data-container">
-  <i>Data from <a href={data}>{basename}</a></i>
-  <pre>{fetchedData}</pre> <!-- Display the raw data inside a <pre> tag for formatting -->
-</div>
+
+<Code code={fetchedData} lang="yml" />
+
