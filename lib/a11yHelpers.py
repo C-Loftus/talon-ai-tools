@@ -9,7 +9,6 @@ ctx.matches = r"""
 os: mac
 app: code
 """
-
 mod = Module()
 
 
@@ -27,10 +26,15 @@ class Actions:
     def a11y_get_context_of_editor(selection: str) -> str:
         """Creates a `AccessibilityContext` representing the state of the document"""
 
-        el = ui.focused_element()
+        try:
+            el = ui.focused_element()
+        # Weird edge case where certain MacOS systems do not have a focused element. If this is the case
+        # just return an empty string as the context. We can't get anything better
+        except RuntimeError:
+            return ""
 
         if not el or not el.attrs:
-            raise ValueError("No valid a11y element")
+            return ""
 
         # Only return extra context if we are in an editor
         if not el.get("AXRoleDescription") == "editor":
@@ -39,10 +43,12 @@ class Actions:
         context = el.get("AXValue")
 
         if context is None:
-            raise ValueError("No accessibility information present")
+            print(
+                "GPT Warning: Tried to get a11y info but no accessibility information present in the focused element"
+            )
         # This probably means that a11y support is not enabled (we can't get more than just the current
         # selection)or that we selected the entire document
-        if context == selection:
+        if not context or context == selection:
             return ""
 
         return context
