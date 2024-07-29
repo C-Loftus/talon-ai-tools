@@ -2,7 +2,6 @@
 
 Query language models with voice commands. Helpful to automatically generate text, fix errors from dictation automatically, and generally speed up your Talon workflow.
 
-
 ## Help
 
 - See [the list of prompts](lists/staticPrompt.talon-list) for all the prompts that can be used with the `model` command.
