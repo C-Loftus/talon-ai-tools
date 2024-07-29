@@ -53,15 +53,20 @@ def generate_payload(
     TOKEN = get_token()
 
     language = actions.code.language()
-    additional_context = (
-        (
-            f"\nThe user is currently in a code editor for {language}."
-            if language != ""
-            else ""
-        )
-        + make_prompt_from_editor_ctx(actions.user.a11y_get_context_of_editor(content))
-        + f"\n\nThe following describes the currently focused application:\n\n{actions.user.talon_get_active_context()}"
-    )
+    additional_context = [
+        {"type": "text", "text": item}
+        for item in [
+            (
+                f"\nThe user is currently in a code editor for {language}."
+                if language != ""
+                else ""
+            )
+            + make_prompt_from_editor_ctx(
+                actions.user.a11y_get_context_of_editor(content)
+            )
+            + f"The following describes the currently focused application:\n\n{actions.user.talon_get_active_context()}"
+        ]
+    ]
 
     headers = {
         "Content-Type": "application/json",
@@ -85,8 +90,8 @@ def generate_payload(
                 "role": "system",
                 "content": [
                     {"type": "text", "text": settings.get("user.model_system_prompt")},
-                    {"type": "text", "text": additional_context},
                 ]
+                + additional_context
                 + [
                     {"type": "text", "text": item}
                     for item in actions.user.contextual_user_context()
