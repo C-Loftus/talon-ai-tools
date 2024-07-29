@@ -3,21 +3,21 @@ title: talon-ai-tools
 description: Control your favorite large language model across your entire desktop
 template: splash
 hero:
-    tagline: Control your favorite large language models across your entire desktop
-    image:
-        file: ../../assets/talon.png
-    actions:
-        - text: Quickstart
-          link: /guides/quickstart/
-          icon: right-arrow
-          variant: primary
-        - text: View on Github
-          link: https://github.com/C-Loftus/talon-ai-tools
-          icon: external
+  tagline: Control your favorite large language models across your entire desktop
+  image:
+    file: ../../assets/talon.png
+  actions:
+    - text: Quickstart
+      link: /guides/quickstart/
+      icon: right-arrow
+      variant: primary
+    - text: View on Github
+      link: https://github.com/C-Loftus/talon-ai-tools
+      icon: external
 ---
 
 <!-- import { Card, CardGrid } from "@astrojs/starlight/components"; -->
-<!-- 
+<!--
 ## Next steps
 
 <CardGrid stagger>

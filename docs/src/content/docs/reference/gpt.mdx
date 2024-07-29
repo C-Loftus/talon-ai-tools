@@ -3,48 +3,45 @@ title: GPT Commands
 description: Run
 ---
 
-import FetchedData from "../../../components/FetchedData.astro"
+import FetchedData from "../../../components/FetchedData.astro";
 
 GPT commands make requests to an LLM endpoint. In talon each GPT command is prefixed with the word `model`. A model command has 4 parts
 
-- `model`
-- A prompt name
-- A source _(optional)_
-- A destination  _(optional)_
+-   `model`
+-   A prompt name
+-   A source _(optional)_
+-   A destination _(optional)_
 
+## Examples
 
-## Examples 
-
-
-| Command                        | Explanation                                                                                          |
-|--------------------------------|------------------------------------------------------------------------------------------------------|
-| `model fix grammar`            | Fix typos in the selected text and paste the response. `fix grammar` is the prompt name.             |
-| `model fix grammar to clip`    | Fix typos in the selected text and put the result on the clipboard. `to clip` is a destination.       |
+| Command                        | Explanation                                                                                                                             |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `model fix grammar`            | Fix typos in the selected text and paste the response. `fix grammar` is the prompt name.                                                |
+| `model fix grammar to clip`    | Fix typos in the selected text and put the result on the clipboard. `to clip` is a destination.                                         |
 | `model explain clip to window` | Explains the text on the clipboard and puts the response in a new browser window. `clip` is the source. `to window` is the destination. |
 
-You can mix and match any combination of prompt, source, and destination. 
+You can mix and match any combination of prompt, source, and destination.
 
 There are also a few other special commands like `model please` and `model ask` that don't use a prompt, but instead the user's arbitrary natural language request.
 
-
 ## Other model commands
-| Command                                                       | Description                                                          | Example                                       |
-| ------------------------------------------------------------- | -------------------------------------------------------------------- | --------------------------------------------- |
-| `model help`                                                  | Show the help menu with all the prompts                              | "model help"                                  |
-| `model please <text>`                                         | Say an arbitrary prompt and then apply it                            | "model please translate this to Japanese"     |
-| `model ask <text>`                                            | Ask a question to the model                                          | "model ask what is the meaning of life"       |
 
+| Command               | Description                               | Example                                   |
+| --------------------- | ----------------------------------------- | ----------------------------------------- |
+| `model help`          | Show the help menu with all the prompts   | "model help"                              |
+| `model please <text>` | Say an arbitrary prompt and then apply it | "model please translate this to Japanese" |
+| `model ask <text>`    | Ask a question to the model               | "model ask what is the meaning of life"   |
 
 ## All model options
 
 ### Mappings of prompts to their spoken name
- 
+
 <FetchedData data="https://raw.githubusercontent.com/C-Loftus/talon-ai-tools/main/GPT/lists/staticPrompt.talon-list" />
 
 ### Sources that the model can operate on
 
-<FetchedData data="https://raw.githubusercontent.com/C-Loftus/talon-ai-tools/main/GPT/lists/modelSource.talon-list"/>
+<FetchedData data="https://raw.githubusercontent.com/C-Loftus/talon-ai-tools/main/GPT/lists/modelSource.talon-list" />
 
-### Destinations that the model can insert into 
+### Destinations that the model can insert into
 
-<FetchedData data="https://raw.githubusercontent.com/C-Loftus/talon-ai-tools/main/GPT/lists/modelDestination.talon-list"/>
+<FetchedData data="https://raw.githubusercontent.com/C-Loftus/talon-ai-tools/main/GPT/lists/modelDestination.talon-list" />
