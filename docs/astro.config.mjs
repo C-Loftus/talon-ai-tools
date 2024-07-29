@@ -3,8 +3,8 @@ import starlight from "@astrojs/starlight";
 
 // https://astro.build/config
 export default defineConfig({
-    site: "https://colton.place/",
-    base: "talon-ai-tools",
+    site: "https://colton.place/talon-ai-tools",
+    base: "/",
     integrations: [
         starlight({
             title: "talon-ai-tools Docs",
@@ -16,7 +16,7 @@ export default defineConfig({
                     label: "Guides",
                     items: [
                         // Each item here is one entry in the navigation menu.
-                        { label: "Example Guide", slug: "guides/example" },
+                        { label: "Quickstart", slug: "guides/quickstart" },
                     ],
                 },
                 {
