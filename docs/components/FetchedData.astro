@@ -1,0 +1,31 @@
+---
+const { data } = Astro.props; // Receive the data as a prop
+const response = await fetch(data);
+const fetchedData = await response.text();
+
+// Function to extract the basename from a URL
+const getBasename = (url: string | URL) => {
+  const urlObj = new URL(url);
+  return urlObj.pathname.split('/').filter(Boolean).pop() || 'Index';
+};
+
+const basename = getBasename(data);
+---
+
+<style>
+  .data-container pre {
+    white-space: pre-wrap; /* Allows wrapping of long lines */
+    word-wrap: break-word; /* Ensures long words break and wrap */
+    overflow-x: auto; /* Adds horizontal scrollbar if necessary */
+  }
+
+  .data-container a {
+    text-decoration: none; /* Removes underline from link */
+    color: #007bff; /* Link color */
+  }
+</style>
+
+<div class="data-container">
+  <h2>Data from <a href={data}>{basename}</a></h2>
+  <pre>{fetchedData}</pre> <!-- Display the raw data inside a <pre> tag for formatting -->
+</div>
