@@ -50,7 +50,6 @@ def gpt_query(prompt: str, content: str) -> str:
     GPTState.last_was_pasted = False
 
     headers, data = generate_payload(prompt, content)
-    print(data)
     response = gpt_send_request(headers, data)
     GPTState.last_response = response
     return response
