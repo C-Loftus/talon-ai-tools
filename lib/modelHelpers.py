@@ -1,13 +1,13 @@
 import base64
-import os
-import requests
 import json
+import os
 from typing import Optional, Tuple
 
+import requests
 from talon import actions, app, clip, settings
 
-from .modelTypes import Data, Headers, Tool
 from ..lib.pureHelpers import strip_markdown
+from .modelTypes import Data, Headers, Tool
 
 """"
 All functions in this this file have impure dependencies on either the model or the talon APIs

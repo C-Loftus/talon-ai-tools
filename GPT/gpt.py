@@ -5,13 +5,13 @@ from talon import Module, actions, clip, imgui, settings
 
 from ..lib.HTMLBuilder import Builder
 from ..lib.modelHelpers import (
-    generate_payload,
     clear_context,
+    generate_payload,
     gpt_send_request,
-    optimize_context,
-    push_context,
     notify,
+    optimize_context,
     paste_and_modify,
+    push_context,
 )
 
 mod = Module()
