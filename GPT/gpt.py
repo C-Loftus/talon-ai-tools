@@ -1,13 +1,18 @@
-import json
 import os
 from typing import Any, ClassVar
 
-import requests
 from talon import Module, actions, clip, imgui, settings
 
 from ..lib.HTMLBuilder import Builder
-from ..lib.modelHelpers import generate_payload, notify, paste_and_modify
-from ..lib.pureHelpers import strip_markdown
+from ..lib.modelHelpers import (
+    generate_payload,
+    clear_context,
+    gpt_send_request,
+    optimize_context,
+    push_context,
+    notify,
+    paste_and_modify,
+)
 
 mod = Module()
 
@@ -44,21 +49,11 @@ def gpt_query(prompt: str, content: str) -> str:
     # Reset state before pasting
     GPTState.last_was_pasted = False
 
-    url = settings.get("user.model_endpoint")
-
     headers, data = generate_payload(prompt, content)
-    response = requests.post(url, headers=headers, data=json.dumps(data))
-
-    match response.status_code:
-        case 200:
-            notify("GPT Task Completed")
-            resp = response.json()["choices"][0]["message"]["content"].strip()
-            formatted_resp = strip_markdown(resp)
-            GPTState.last_response = formatted_resp
-            return formatted_resp
-        case _:
-            notify("GPT Failure: Check the Talon Log")
-            raise Exception(response.json())
+    print(data)
+    response = gpt_send_request(headers, data)
+    GPTState.last_response = response
+    return response
 
 
 @mod.action_class
@@ -112,6 +107,18 @@ class UserActions:
         """Add text to the confirmation gui"""
         GPTState.text_to_confirm = model_output
         confirmation_gui.show()
+
+    def gpt_clear_context():
+        """Reset the stored context"""
+        clear_context()
+
+    def gpt_optimize_context():
+        """Optimize the reused context to save tokens"""
+        optimize_context()
+
+    def gpt_push_context(context: str):
+        """Add the selected text to the stored context"""
+        push_context(context)
 
     def contextual_user_context():
         """This is an override function that can be used to add additional context to the prompt"""
@@ -171,7 +178,13 @@ class UserActions:
         elif prompt == "pass":
             return text_to_process
 
-        return gpt_query(prompt, text_to_process)
+        response = gpt_query(prompt, text_to_process)
+        match modifier:
+            case "thread":
+                push_context(prompt)
+                push_context(text_to_process)
+                push_context(response)
+        return response
 
     def gpt_help():
         """Open the GPT help file in the web browser"""

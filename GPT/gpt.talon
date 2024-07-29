@@ -36,6 +36,16 @@ model apply [from] clip$:
     result = user.gpt_apply_prompt(prompt, text)
     user.paste(result)
 
+model context add [{user.modelSource}]:
+    text = user.gpt_get_source_text(modelSource or "")
+    user.gpt_push_context(text)
+model context clear: user.gpt_clear_context()
+model context optimize: user.gpt_optimize_context()
+model thread <user.modelPrompt> [{user.modelSource}] [{user.modelDestination}]:
+    text = user.gpt_get_source_text(modelSource or "")
+    result = user.gpt_apply_prompt(modelPrompt, text, "thread")
+    user.gpt_insert_response(result, modelDestination or "", "thread")
+
 # Reformat the last dictation with additional context or formatting instructions
 model [nope] that was <user.text>$:
     result = user.gpt_reformat_last(text)
