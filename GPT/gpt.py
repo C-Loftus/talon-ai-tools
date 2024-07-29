@@ -8,10 +8,13 @@ from ..lib.modelHelpers import (
     clear_context,
     generate_payload,
     gpt_send_request,
+    new_thread,
     notify,
     optimize_context,
+    optimize_thread,
     paste_and_modify,
     push_context,
+    push_thread,
 )
 
 mod = Module()
@@ -43,15 +46,20 @@ def confirmation_gui(gui: imgui.GUI):
         actions.user.close_model_confirmation_gui()
 
 
-def gpt_query(prompt: str, content: str) -> str:
+def gpt_query(prompt: str, content: str, modifier: str = "") -> str:
     """Send a prompt to the GPT API and return the response"""
 
     # Reset state before pasting
     GPTState.last_was_pasted = False
 
-    headers, data = generate_payload(prompt, content)
+    headers, data = generate_payload(prompt, content, None, modifier)
+
     response = gpt_send_request(headers, data)
     GPTState.last_response = response
+    if modifier == "thread":
+        push_thread(prompt)
+        push_thread(content)
+        push_thread(response)
     return response
 
 
@@ -111,9 +119,17 @@ class UserActions:
         """Reset the stored context"""
         clear_context()
 
+    def gpt_new_thread():
+        """Create a new thread"""
+        new_thread()
+
     def gpt_optimize_context():
         """Optimize the reused context to save tokens"""
         optimize_context()
+
+    def gpt_optimize_thread():
+        """Optimize the thread to save tokens"""
+        optimize_thread()
 
     def gpt_push_context(context: str):
         """Add the selected text to the stored context"""
@@ -177,12 +193,8 @@ class UserActions:
         elif prompt == "pass":
             return text_to_process
 
-        response = gpt_query(prompt, text_to_process)
-        match modifier:
-            case "thread":
-                push_context(prompt)
-                push_context(text_to_process)
-                push_context(response)
+        response = gpt_query(prompt, text_to_process, modifier)
+
         return response
 
     def gpt_help():

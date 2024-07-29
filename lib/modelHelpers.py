@@ -15,6 +15,7 @@ All functions in this this file have impure dependencies on either the model or 
 
 
 stored_context = []
+thread_context = []
 
 
 def clear_context():
@@ -24,11 +25,35 @@ def clear_context():
     actions.app.notify("Cleared user context")
 
 
+def new_thread():
+    """Create a new thread"""
+    global thread_context
+    thread_context = []
+    actions.app.notify("Created a new thread")
+
+
 def push_context(context: str):
     """Add the selected text to the stored context"""
     global stored_context
     stored_context += [format_message(context)]
     actions.app.notify("Appended user context")
+
+
+def push_thread(context: str):
+    """Add the selected text to the stored context"""
+    global thread_context
+    thread_context += [format_message(context)]
+    actions.app.notify("Appended to thread")
+
+
+def optimize_thread():
+    """Optimize the context for reducing the space"""
+    global thread_context
+    prompt = "Please summarize this conversation to shorten it. I'm going to pass it back to you so this is only for your consumption. Make it as short as possible."
+
+    headers, data = generate_payload(prompt, "")
+    thread_context = [format_message(gpt_send_request(headers, data))]
+    actions.app.notify("Optimized thread context")
 
 
 def optimize_context():
@@ -102,12 +127,13 @@ def format_message(content: str):
 
 
 def generate_payload(
-    prompt: str, content: str, tools: Optional[list[Tool]] = None
+    prompt: str, content: str, tools: Optional[list[Tool]] = None, modifier: str = ""
 ) -> Tuple[Headers, Data]:
     """Generate the headers and data for the OpenAI API GPT request.
     Does not return the URL given the fact not all openai-compatible endpoints support new features like tools
     """
     global stored_context
+    global thread_context
     notification = "GPT Task"
     if len(stored_context) > 0:
         notification += ": Reusing Stored Context"
@@ -120,6 +146,9 @@ def generate_payload(
         if language != ""
         else ""
     ) + make_prompt_from_editor_ctx(actions.user.a11y_get_context_of_editor(content))
+    reused_context = stored_context
+    if modifier == "thread":
+        reused_context += thread_context
 
     headers = {
         "Content-Type": "application/json",
@@ -141,7 +170,7 @@ def generate_payload(
             },
             {
                 "role": "user",
-                "content": stored_context
+                "content": reused_context
                 + [{"type": "text", "text": prompt}, format_message(content)],
             },
         ],
@@ -150,6 +179,7 @@ def generate_payload(
         "n": 1,
         "model": settings.get("user.openai_model"),
     }
+    print(data)
     if tools is not None:
         data["tools"] = tools
     return headers, data
