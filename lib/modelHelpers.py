@@ -54,10 +54,14 @@ def generate_payload(
 
     language = actions.code.language()
     additional_context = (
-        f"\nThe user is currently in a code editor for {language}."
-        if language != ""
-        else ""
-    ) + make_prompt_from_editor_ctx(actions.user.a11y_get_context_of_editor(content))
+        (
+            f"\nThe user is currently in a code editor for {language}."
+            if language != ""
+            else ""
+        )
+        + make_prompt_from_editor_ctx(actions.user.a11y_get_context_of_editor(content))
+        + f"\n\nThe following describes the currently focused application:\n\n{actions.user.talon_get_active_context()}"
+    )
 
     headers = {
         "Content-Type": "application/json",
