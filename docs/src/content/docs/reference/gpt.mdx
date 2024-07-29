@@ -1,18 +1,17 @@
 ---
 title: GPT Commands
-description: Run 
+description: Run
 ---
-import FetchedData from "../../../components/FetchedData.astro"
 
+import FetchedData from "../../../components/FetchedData.astro";
 
 GPT commands make requests to an LLM endpoint. In talon each GPT command is prefixed with the word `model`. A model command has 4 parts
 
-- The prefix "model"
-- An alias for a prompt 
-- An optional source 
-- An optional destination 
-
+-   The prefix "model"
+-   An alias for a prompt
+-   An optional source
+-   An optional destination
 
 ## All Mappings of Prompts to their Spoken Name
- 
+
 <FetchedData data="https://raw.githubusercontent.com/C-Loftus/talon-ai-tools/main/GPT/lists/staticPrompt.talon-list" />
