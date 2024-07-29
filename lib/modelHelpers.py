@@ -179,7 +179,6 @@ def generate_payload(
         "n": 1,
         "model": settings.get("user.openai_model"),
     }
-    print(data)
     if tools is not None:
         data["tools"] = tools
     return headers, data
