@@ -1,4 +1,6 @@
 ---
+import Code from "astro/components/Code.astro";
+
 const { data } = Astro.props; // Receive the data as a prop
 const response = await fetch(data);
 const fetchedData = await response.text();
@@ -11,7 +13,6 @@ const fetchedData = await response.text();
 
 // const basename = getBasename(data);
 
-import { Code } from 'astro:components';
 ---
 
 <style>

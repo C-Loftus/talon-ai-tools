@@ -43,4 +43,4 @@ os.environ["OPENAI_API_KEY"] = "YOUR-KEY-HERE"
 
 ### Quickstart Video
 
-[![Talon-AI-Tools Quickstart](docs/video_thumbnail.jpg)](https://www.youtube.com/watch?v=FctiTs6D2tM "Talon-AI-Tools Quickstart")
+[![Talon-AI-Tools Quickstart](./.docs/video_thumbnail.jpg)](https://www.youtube.com/watch?v=FctiTs6D2tM "Talon-AI-Tools Quickstart")

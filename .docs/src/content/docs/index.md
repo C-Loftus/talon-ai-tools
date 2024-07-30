@@ -8,7 +8,7 @@ hero:
     file: ../../assets/talon.png
   actions:
     - text: Quickstart
-      link: /guides/quickstart/
+      link: /talon-ai-tools/guides/quickstart/
       icon: right-arrow
       variant: primary
     - text: View on Github
