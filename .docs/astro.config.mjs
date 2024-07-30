@@ -4,6 +4,7 @@ import starlight from "@astrojs/starlight";
 // https://astro.build/config
 export default defineConfig({
     site: "https://colton.place/talon-ai-tools",
+    base: "talon-ai-tools",
     integrations: [
         starlight({
             title: "talon-ai-tools Docs",
