@@ -30,7 +30,7 @@ If you wish to change any configuration settings, copy the [example configuratio
 
 In case you want to provide additional context to the LLM, there is a hook that you can override in your own python code and anything that is returned will be sent with every request. This is useful for example if you would like to run a shell command and send its output along. Here is an example file that you can use as a template:
 
-```
+```py
 from talon import Context, Module, actions
 
 mod = Module()
