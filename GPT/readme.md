@@ -2,18 +2,6 @@
 
 Query language models with voice commands. Helpful to automatically generate text, fix errors from dictation automatically, and generally speed up your Talon workflow.
 
-## Usage
-
-| Command                                                       | Description                                                          | Example                                       |
-| ------------------------------------------------------------- | -------------------------------------------------------------------- | --------------------------------------------- |
-| `model <prompt>`                                              | Generate text from a prompt and paste it                             | "model summarize"                             |
-| `model help`                                                  | Show the help menu with all the prompts                              | "model help"                                  |
-| `model please <text>`                                         | Say an arbitrary prompt and then apply it                            | "model please translate this to Japanese"     |
-| `model ask <text>`                                            | Ask a question to the model                                          | "model ask what is the meaning of life"       |
-| `model <prompt> <cursorless_target> <cursorless_destination>` | Select with cursorless, apply a prompt, and paste to the destination | "model explain line this after block red air" |
-| `model <prompt> below`                                        | Apply a prompt and then paste the result below the cursor            | "model format bullets below"                  |
-| `model <prompt> clipped`                                      | Apply a prompt and return the result in the clipboard                | "model explain this clipped"                  |
-
 ## Help
 
 - See [the list of prompts](lists/staticPrompt.talon-list) for all the prompts that can be used with the `model` command.
