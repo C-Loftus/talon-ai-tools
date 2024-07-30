@@ -1,6 +1,6 @@
 # Talon-AI-Tools
 
-**Control large language models and AI tools through voice commands using the [Talon Voice](https://talon.wiki) dictation engine.**
+**Control large language models and AI tools through voice commands using the [Talon Voice](https://talon.wiki) dictation engine.**   
 
 This functionality is especially helpful for users who:
 
