@@ -2,23 +2,11 @@
 
 Query language models with voice commands. Helpful to automatically generate text, fix errors from dictation automatically, and generally speed up your Talon workflow.
 
-## Usage
-
-| Command                                                       | Description                                                          | Example                                       |
-| ------------------------------------------------------------- | -------------------------------------------------------------------- | --------------------------------------------- |
-| `model <prompt>`                                              | Generate text from a prompt and paste it                             | "model summarize"                             |
-| `model help`                                                  | Show the help menu with all the prompts                              | "model help"                                  |
-| `model please <text>`                                         | Say an arbitrary prompt and then apply it                            | "model please translate this to Japanese"     |
-| `model ask <text>`                                            | Ask a question to the model                                          | "model ask what is the meaning of life"       |
-| `model <prompt> <cursorless_target> <cursorless_destination>` | Select with cursorless, apply a prompt, and paste to the destination | "model explain line this after block red air" |
-| `model <prompt> below`                                        | Apply a prompt and then paste the result below the cursor            | "model format bullets below"                  |
-| `model <prompt> clipped`                                      | Apply a prompt and return the result in the clipboard                | "model explain this clipped"                  |
-
 ## Help
 
 - See [the list of prompts](lists/staticPrompt.talon-list) for all the prompts that can be used with the `model` command.
 
-- See the [examples file](../docs/usage-examples/examples.md) for gifs that show how to use the commands.
+- See the [examples file](../.docs/usage-examples/examples.md) for gifs that show how to use the commands.
 
 ## OpenAI API Pricing
 
@@ -42,7 +30,7 @@ If you wish to change any configuration settings, copy the [example configuratio
 
 In case you want to provide additional context to the LLM, there is a hook that you can override in your own python code and anything that is returned will be sent with every request. This is useful for example if you would like to run a shell command and send its output along. Here is an example file that you can use as a template:
 
-```
+```py
 from talon import Context, Module, actions
 
 mod = Module()
