@@ -22,6 +22,12 @@ def modelPrompt(matched_prompt) -> str:
     return str(matched_prompt)
 
 
+# model prompts can be either static and predefined by this repo or custom outside of it
+@mod.capture(rule="{user.staticPrompt} | {user.customPrompt}")
+def modelSimplePrompt(matched_prompt) -> str:
+    return str(matched_prompt)
+
+
 mod.setting(
     "openai_model",
     type=Literal["gpt-3.5-turbo", "gpt-4", "gpt-4o-mini"],
