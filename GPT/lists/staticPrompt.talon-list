@@ -28,11 +28,11 @@ make softer: Act as an editor. I want you to make the following text softer in t
 make stronger: Act as an editor. I want you to make the following text stronger in tone. Return just the modified text.
 
 ## FILE CONVERSIONS
-convert to json: Convert the following data into a JSON format.
+convert to jason: Convert the following data into a JSON format.
 convert to markdown: Convert the following text into a markdown format.
 convert to python: Convert the following key-value pairs into the syntax for a Python dictionary. So you should serialize the key-value pairs into a native Python format.
 convert to sheet: Convert the following data into a CSV format.
-convert to yaml: Convert the following data into a YAML format.
+convert to yam: Convert the following data into a YAML format.
 
 ## CHECKERS
 describe code: Explain what the following code does in natural language at a high level without getting into the specifics of the syntax.
