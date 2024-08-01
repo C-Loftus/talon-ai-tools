@@ -15,6 +15,8 @@ from ..lib.modelHelpers import (
     paste_and_modify,
     push_context,
     push_thread,
+    string_context,
+    string_thread,
 )
 
 mod = Module()
@@ -134,6 +136,14 @@ class UserActions:
     def gpt_push_context(context: str):
         """Add the selected text to the stored context"""
         push_context(context)
+
+    def gpt_get_context():
+        """Fetch the user context as a string"""
+        return string_context()
+
+    def gpt_get_thread():
+        """Fetch the user thread as a string"""
+        return string_thread()
 
     def contextual_user_context():
         """This is an override function that can be used to add additional context to the prompt"""

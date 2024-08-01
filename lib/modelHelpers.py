@@ -66,6 +66,29 @@ def optimize_context():
     actions.app.notify("Optimized user context")
 
 
+def messages_to_string(messages: list[dict[str, any]]) -> str:
+    """Format messages as a string"""
+    formatted_messages = []
+    for message in messages:
+        if message.get("type") == "image_url":
+            formatted_messages.append("image")
+        else:
+            formatted_messages.append(message.get("text", ""))
+    return "\n\n".join(formatted_messages)
+
+
+def string_context():
+    """Format the context for display"""
+    global stored_context
+    return messages_to_string(stored_context)
+
+
+def string_thread():
+    """Format the thread for display"""
+    global thread_context
+    return messages_to_string(thread_context)
+
+
 def gpt_send_request(headers: Headers, data: Data):
     url = settings.get("user.model_endpoint")
     response = requests.post(url, headers=headers, data=json.dumps(data))
