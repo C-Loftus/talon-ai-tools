@@ -36,9 +36,6 @@ model apply [from] clip$:
     result = user.gpt_apply_prompt(prompt, text)
     user.paste(result)
 
-model pass [{user.modelSource}] to context:
-    text = user.gpt_get_source_text(modelSource or "")
-    user.gpt_push_context(text)
 model pass context [{user.modelDestination}]:
     text = user.gpt_get_context()
     user.gpt_insert_response(text, modelDestination or "")

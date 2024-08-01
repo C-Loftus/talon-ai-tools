@@ -256,6 +256,11 @@ class UserActions:
                 paste_and_modify(result, modifier)
             case "clipboard":
                 clip.set_text(result)
+            case "context":
+                push_context(result)
+            case "newContext":
+                clear_context()
+                push_context(result)
             case "appendClipboard":
                 clip.set_text(clip.text() + "\n" + result)
             case "browser":
