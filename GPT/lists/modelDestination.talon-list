@@ -1,5 +1,4 @@
-list:  user.modelDestination
-
+list: user.modelDestination
 -
 
 # A list of adjectives/adverbs describing how the result of the GPT query should be returned
@@ -15,6 +14,12 @@ below: below
 
 # Instead of pasting, return the result to the clipboard
 to clip: clipboard
+
+# Instead of pasting, add the result to the context
+to context: context
+
+# Instead of pasting, add the result to a new context
+to new context: newContext
 
 # Instead of pasting, append the result to the clipboard
 to after clip: appendClipboard

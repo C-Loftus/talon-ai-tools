@@ -40,3 +40,27 @@ model apply [from] clip$:
 model [nope] that was <user.text>$:
     result = user.gpt_reformat_last(text)
     user.paste(result)
+
+# Clear the context stored in the model
+model context clear: user.gpt_clear_context()
+
+# Reduce the length of context stored in the model by using a GPT summarization
+model context optimize: user.gpt_optimize_context()
+
+# Create a new thread which is similar to a conversation with the model
+# A thread allows the model to access data from the previous queries in the same thread
+model thread new: user.gpt_new_thread()
+
+# Run a GPT command in a thread; This allows it to access context from previous requests in the thread
+model thread <user.modelPrompt> [{user.modelSource}] [{user.modelDestination}]:
+    text = user.gpt_get_source_text(modelSource or "")
+    result = user.gpt_apply_prompt(modelPrompt, text, "thread")
+    user.gpt_insert_response(result, modelDestination or "", "thread")
+
+# Reduce the length of the current thread by using a GPT summarization
+model thread optimize: user.gpt_optimize_thread()
+
+# Pass the data in the current thread to a destination
+model pass thread {user.modelDestination}:
+    text = user.gpt_get_thread()
+    user.gpt_insert_response(text, modelDestination or "")

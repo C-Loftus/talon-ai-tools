@@ -1,13 +1,23 @@
-import json
 import os
 from typing import Any, ClassVar
 
-import requests
 from talon import Module, actions, clip, imgui, settings
 
 from ..lib.HTMLBuilder import Builder
-from ..lib.modelHelpers import generate_payload, notify, paste_and_modify
-from ..lib.pureHelpers import strip_markdown
+from ..lib.modelHelpers import (
+    clear_context,
+    generate_payload,
+    gpt_send_request,
+    new_thread,
+    notify,
+    optimize_context,
+    optimize_thread,
+    paste_and_modify,
+    push_context,
+    push_thread,
+    string_context,
+    string_thread,
+)
 
 mod = Module()
 
@@ -38,27 +48,21 @@ def confirmation_gui(gui: imgui.GUI):
         actions.user.close_model_confirmation_gui()
 
 
-def gpt_query(prompt: str, content: str) -> str:
+def gpt_query(prompt: str, content: str, modifier: str = "") -> str:
     """Send a prompt to the GPT API and return the response"""
 
     # Reset state before pasting
     GPTState.last_was_pasted = False
 
-    url = settings.get("user.model_endpoint")
+    headers, data = generate_payload(prompt, content, None, modifier)
 
-    headers, data = generate_payload(prompt, content)
-    response = requests.post(url, headers=headers, data=json.dumps(data))
-
-    match response.status_code:
-        case 200:
-            notify("GPT Task Completed")
-            resp = response.json()["choices"][0]["message"]["content"].strip()
-            formatted_resp = strip_markdown(resp)
-            GPTState.last_response = formatted_resp
-            return formatted_resp
-        case _:
-            notify("GPT Failure: Check the Talon Log")
-            raise Exception(response.json())
+    response = gpt_send_request(headers, data)
+    GPTState.last_response = response
+    if modifier == "thread":
+        push_thread(prompt)
+        push_thread(content)
+        push_thread(response)
+    return response
 
 
 @mod.action_class
@@ -112,6 +116,34 @@ class UserActions:
         """Add text to the confirmation gui"""
         GPTState.text_to_confirm = model_output
         confirmation_gui.show()
+
+    def gpt_clear_context():
+        """Reset the stored context"""
+        clear_context()
+
+    def gpt_new_thread():
+        """Create a new thread"""
+        new_thread()
+
+    def gpt_optimize_context():
+        """Optimize the reused context to save tokens"""
+        optimize_context()
+
+    def gpt_optimize_thread():
+        """Optimize the thread to save tokens"""
+        optimize_thread()
+
+    def gpt_push_context(context: str):
+        """Add the selected text to the stored context"""
+        push_context(context)
+
+    def gpt_get_context():
+        """Fetch the user context as a string"""
+        return string_context()
+
+    def gpt_get_thread():
+        """Fetch the user thread as a string"""
+        return string_thread()
 
     def contextual_user_context():
         """This is an override function that can be used to add additional context to the prompt"""
@@ -169,9 +201,13 @@ class UserActions:
             prompt = """Generate text that satisfies the question or request given in the input."""
         # If the user is just moving the source to the destination, we don't need to apply a query
         elif prompt == "pass":
+            if text_to_process == "__CONTEXT__":
+                return string_context()
             return text_to_process
 
-        return gpt_query(prompt, text_to_process)
+        response = gpt_query(prompt, text_to_process, modifier)
+
+        return response
 
     def gpt_help():
         """Open the GPT help file in the web browser"""
@@ -222,6 +258,11 @@ class UserActions:
                 paste_and_modify(result, modifier)
             case "clipboard":
                 clip.set_text(result)
+            case "context":
+                push_context(result)
+            case "newContext":
+                clear_context()
+                push_context(result)
             case "appendClipboard":
                 clip.set_text(clip.text() + "\n" + result)
             case "browser":
@@ -258,6 +299,8 @@ class UserActions:
                         )
                         return
                 return clipboard_text
+            case "context":
+                return "__CONTEXT__"
             case "gptResponse":
                 if GPTState.last_response == "":
                     raise Exception(
