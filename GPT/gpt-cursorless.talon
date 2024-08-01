@@ -11,7 +11,7 @@ model <user.modelSimplePrompt> <user.cursorless_target> [<user.cursorless_destin
     user.cursorless_insert(cursorless_destination or default_destination, result)
 
 # Add the text from a cursorless target to your context
-model context add <user.cursorless_target>$:
+model pass <user.cursorless_target> to context$:
     text = user.cursorless_get_text(cursorless_target)
     user.gpt_push_context(text)
 

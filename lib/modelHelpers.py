@@ -183,6 +183,10 @@ def generate_payload(
     if modifier == "thread":
         reused_context += thread_context
 
+    current_query = [{"type": "text", "text": prompt}]
+    if content != "__CONTEXT__":
+        current_query += [format_message(content)]
+
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {TOKEN}",
@@ -203,8 +207,7 @@ def generate_payload(
             },
             {
                 "role": "user",
-                "content": reused_context
-                + [{"type": "text", "text": prompt}, format_message(content)],
+                "content": reused_context + current_query,
             },
         ],
         "max_tokens": 2024,

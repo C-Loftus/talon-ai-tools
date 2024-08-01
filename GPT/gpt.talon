@@ -36,9 +36,6 @@ model apply [from] clip$:
     result = user.gpt_apply_prompt(prompt, text)
     user.paste(result)
 
-model pass context [{user.modelDestination}]:
-    text = user.gpt_get_context()
-    user.gpt_insert_response(text, modelDestination or "")
 model context clear: user.gpt_clear_context()
 model context optimize: user.gpt_optimize_context()
 

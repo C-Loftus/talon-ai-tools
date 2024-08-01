@@ -1,9 +1,11 @@
-list:  user.modelSource
-
+list: user.modelSource
 -
 
 # Apply the prompt to the text on the clipboard
 clip: clipboard
+
+# Apply the prompt to the text in the context
+context: context
 
 # Apply the prompt to the currently selected text
 this: selection
