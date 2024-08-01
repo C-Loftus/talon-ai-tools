@@ -134,7 +134,7 @@ def generate_payload(
     """
     global stored_context
     global thread_context
-    notification = "GPT Task"
+    notification = "GPT Task Started"
     if len(stored_context) > 0:
         notification += ": Reusing Stored Context"
     notify(notification)
