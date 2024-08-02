@@ -203,7 +203,6 @@ def generate_payload(
     if tools is not None:
         data["tools"] = tools
 
-    print(data)
     return headers, data
 
 
