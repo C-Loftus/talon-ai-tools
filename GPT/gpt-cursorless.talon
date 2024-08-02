@@ -15,6 +15,23 @@ model pass <user.cursorless_target> to context$:
     text = user.cursorless_get_text(cursorless_target)
     user.gpt_push_context(text)
 
+# Add the text from a cursorless target to a new context
+model pass <user.cursorless_target> to new context'$:
+    text = user.cursorless_get_text(cursorless_target)
+    user.gpt_clear_context()
+    user.gpt_push_context(text)
+
+# Add the text from a cursorless target to the current thread
+model pass <user.cursorless_target> to thread$:
+    text = user.cursorless_get_text(cursorless_target)
+    user.gpt_push_thread(text)
+
+# Add the text from a cursorless target to a new thread
+model pass <user.cursorless_target> to new thread$:
+    text = user.cursorless_get_text(cursorless_target)
+    user.gpt_new_thread()
+    user.gpt_push_thread(text)
+
 # Applies an arbitrary prompt from the clipboard to a cursorless target.
 # Useful for applying complex/custom prompts that need to be drafted in a text editor.
 model apply [from] clip <user.cursorless_target>$:

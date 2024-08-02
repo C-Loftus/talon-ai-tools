@@ -10,8 +10,6 @@ from ..lib.modelHelpers import (
     gpt_send_request,
     new_thread,
     notify,
-    optimize_context,
-    optimize_thread,
     paste_and_modify,
     push_context,
     push_thread,
@@ -125,17 +123,13 @@ class UserActions:
         """Create a new thread"""
         new_thread()
 
-    def gpt_optimize_context():
-        """Optimize the reused context to save tokens"""
-        optimize_context()
-
-    def gpt_optimize_thread():
-        """Optimize the thread to save tokens"""
-        optimize_thread()
-
     def gpt_push_context(context: str):
         """Add the selected text to the stored context"""
         push_context(context)
+
+    def gpt_push_thread(content: str):
+        """Add the selected text to the active thread"""
+        push_thread(content)
 
     def gpt_get_context():
         """Fetch the user context as a string"""
