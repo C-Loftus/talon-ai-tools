@@ -40,7 +40,7 @@ def push_context(context: str):
 
 
 def push_thread(context: str):
-    """Add the selected text to the stored context"""
+    """Add the selected text to the current thread"""
     global thread_context
     thread_context += [format_message(context)]
     actions.app.notify("Appended to thread")

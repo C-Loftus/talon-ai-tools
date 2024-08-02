@@ -263,6 +263,11 @@ class UserActions:
             case "newContext":
                 clear_context()
                 push_context(result)
+            case "thread":
+                push_thread(result)
+            case "newThread":
+                new_thread()
+                push_thread(result)
             case "appendClipboard":
                 clip.set_text(clip.text() + "\n" + result)
             case "browser":
