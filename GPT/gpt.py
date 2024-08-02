@@ -68,14 +68,13 @@ class UserActions:
     def gpt_blend(source_text: str, destination_text: str):
         """Blend all the source text and send it to the destination"""
         prompt = f"""
-        Act as a text transformer. I'm going to give you some source text and destination text, and I want you to modify the destination text based on the contents of the source text in a way that combines both of them together. Use the structure of the destination text, reordering and renaming as necessary to ensure a natural and coherent flow. Please return only the final text with no decoration for insertion into a document in the specified language.
+        Act as a text transformer. I will provide source text and destination text. Your task is to modify the destination text based on the content of the source text, ensuring a natural and coherent flow by reordering and renaming as necessary. Return only the final text with no decoration for insertion into a document in the specified language.
 
         Here is the destination text:
-        ```
         {destination_text}
-        ```
 
-        Please return only the final text. What follows is all of the source texts separated by '---'.
+
+        Please return only the final text. The source texts are separated by '---'.
         """
         return gpt_query(prompt, source_text)
 
