@@ -53,8 +53,3 @@ model thread <user.modelPrompt> [{user.modelSource}] [{user.modelDestination}]:
     text = user.gpt_get_source_text(modelSource or "")
     result = user.gpt_apply_prompt(modelPrompt, text, "thread")
     user.gpt_insert_response(result, modelDestination or "", "thread")
-
-# Pass the data in the current thread to a destination
-model pass thread {user.modelDestination}:
-    text = user.gpt_get_thread()
-    user.gpt_insert_response(text, modelDestination or "")
