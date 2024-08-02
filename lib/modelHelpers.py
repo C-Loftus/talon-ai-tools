@@ -1,7 +1,7 @@
 import base64
 import json
 import os
-from typing import ClassVar, Optional, Tuple
+from typing import Optional, Tuple
 
 import requests
 from talon import actions, app, clip, settings
@@ -14,44 +14,56 @@ All functions in this this file have impure dependencies on either the model or 
 """
 
 
-class GPTState:
-    text_to_confirm: ClassVar[str] = ""
-    last_response: ClassVar[str] = ""
-    last_was_pasted: ClassVar[bool] = False
-    thread: ClassVar[str] = ""
-    context: ClassVar[str] = ""
-
-    @classmethod
-    def push_thread(cls, thread_text: str):
-        cls.thread += thread_text + "\n\n"
-        actions.app.notify("Pushed thread context")
-
-    @classmethod
-    def push_context(cls, context: str):
-        """Add the selected text to the stored context"""
-        cls.context += context + "\n\n"
-        actions.app.notify("Appended user context")
-
-    @classmethod
-    def new_thread(cls):
-        """Create a new thread"""
-        cls.thread = ""
-        actions.app.notify("Created a new thread")
-
-    @classmethod
-    def clear_context(cls):
-        cls.context = ""
-        actions.app.notify("Cleared user context")
+stored_context = []
+thread_context = []
 
 
-def summarize_context(context):
+def clear_context():
+    """Reset the stored context"""
+    global stored_context
+    stored_context = []
+    actions.app.notify("Cleared user context")
+
+
+def new_thread():
+    """Create a new thread"""
+    global thread_context
+    thread_context = []
+    actions.app.notify("Created a new thread")
+
+
+def push_context(context: str):
+    """Add the selected text to the stored context"""
+    global stored_context
+    stored_context += [format_message(context)]
+    actions.app.notify("Appended user context")
+
+
+def push_thread(context: str):
+    """Add the selected text to the current thread"""
+    global thread_context
+    thread_context += [format_message(context)]
+    actions.app.notify("Appended to thread")
+
+
+def optimize_thread():
     """Optimize the context for reducing the space"""
+    global thread_context
     prompt = "Please summarize this conversation to shorten it. I'm going to pass it back to you so this is only for your consumption. Make it as short as possible."
-    headers, data = generate_payload(prompt, context)
 
+    headers, data = generate_payload(prompt, "")
+    thread_context = [format_message(gpt_send_request(headers, data))]
+    actions.app.notify("Optimized thread context")
+
+
+def optimize_context():
+    """Optimize the context for reducing the space"""
+    global stored_context
+    prompt = "Please summarize this conversation to shorten it. I'm going to pass it back to you so this is only for your consumption. Make it as short as possible."
+
+    headers, data = generate_payload(prompt, "")
     stored_context = [format_message(gpt_send_request(headers, data))]
-    actions.app.notify("Summarized user context")
-    return stored_context
+    actions.app.notify("Optimized user context")
 
 
 def messages_to_string(messages: list[dict[str, any]]) -> str:
@@ -62,12 +74,22 @@ def messages_to_string(messages: list[dict[str, any]]) -> str:
             formatted_messages.append("image")
         else:
             formatted_messages.append(message.get("text", ""))
-
     return "\n\n".join(formatted_messages)
 
 
+def string_context():
+    """Format the context for display"""
+    global stored_context
+    return messages_to_string(stored_context)
+
+
+def string_thread():
+    """Format the thread for display"""
+    global thread_context
+    return messages_to_string(thread_context)
+
+
 def gpt_send_request(headers: Headers, data: Data):
-    """Send a request to the GPT model"""
     url = settings.get("user.model_endpoint")
     response = requests.post(url, headers=headers, data=json.dumps(data))
 
@@ -113,24 +135,20 @@ def make_prompt_from_editor_ctx(ctx: str):
     )
 
 
-def format_message(content: str) -> dict[str, dict | str]:
-    """Format the message for the OpenAI API based on the content type of the input"""
-    match content:
-        case "__IMAGE__":
-            clipped_image = clip.image()
-            if clipped_image:
-                data = clipped_image.encode().data()
-                base64_image: str = base64.b64encode(data).decode("utf-8")
-                message: dict[str, dict[str, str] | str] = {
-                    "type": "image_url",
-                    "image_url": {"url": f"data:image/;base64,{base64_image}"},
-                }
-                return message
-            else:
-                notify("User asked for an image, but there was no image stored")
-                raise RuntimeError
-        case _:
-            return {"type": "text", "text": content}
+def format_message(content: str):
+    message = {"type": "text", "text": content}
+    if content == "__IMAGE__":
+        clipped_image = clip.image()
+        if clipped_image:
+            data = clipped_image.encode().data()
+            base64_image = base64.b64encode(data).decode("utf-8")
+            message = {
+                "type": "image_url",
+                "image_url": {"url": f"data:image/;base64,{base64_image}"},
+            }
+    elif content == "__THREAD__":
+        message = {"type": "text", "text": string_thread()}
+    return message
 
 
 def generate_payload(
@@ -139,62 +157,61 @@ def generate_payload(
     """Generate the headers and data for the OpenAI API GPT request.
     Does not return the URL given the fact not all openai-compatible endpoints support new features like tools
     """
-
-    if len(GPTState.context) > 0:
-        notify("GPT Task Started: Reusing stored context")
-    else:
-        notify("GPT Task Started")
+    global stored_context
+    global thread_context
+    notification = "GPT Task Started"
+    if len(stored_context) > 0:
+        notification += ": Reusing Stored Context"
+    notify(notification)
+    TOKEN = get_token()
 
     language = actions.code.language()
 
+    additional_context = [
+        {"type": "text", "text": item}
+        for item in [
+            (
+                f"\nThe user is currently in a code editor for {language}."
+                if language != ""
+                else ""
+            )
+            + make_prompt_from_editor_ctx(
+                actions.user.a11y_get_context_of_editor(content)
+            )
+            + f"The following describes the currently focused application:\n\n{actions.user.talon_get_active_context()}"
+        ]
+    ]
+    reused_context = stored_context
+    if modifier == "thread":
+        reused_context += thread_context
+
+    current_query = [{"type": "text", "text": prompt}]
+    if content != "__CONTEXT__":
+        current_query += [format_message(content)]
+
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {get_token()}",
+        "Authorization": f"Bearer {TOKEN}",
     }
-
-    background_info = (
-        (
-            f"\nThe user is currently in a code editor for {language}."
-            if language != ""
-            else ""
-        )
-        + make_prompt_from_editor_ctx(actions.user.a11y_get_context_of_editor(content))
-        + f"The following describes the currently focused application:\n\n{actions.user.talon_get_active_context()}"
-    )
-
-    allMessages = []
-    system_prompt = {
-        "role": "system",
-        "content": settings.get("user.model_system_prompt") + background_info,
-    }
-
-    allMessages.append(system_prompt)
-
-    if modifier == "thread":
-        thread_conversation = {
-            "role": "user",
-            "content": "The user has had a previous conversation with you. Here are their questions and your previous associated responses: \n\n"
-            + GPTState.thread,
-        }
-        allMessages.append(thread_conversation)
-
-    if GPTState.context:
-        added_context = {
-            "role": "user",
-            "content": f"Note the following context: {GPTState.context}",
-        }
-        if actions.user.gpt_custom_user_context():
-            added_context["content"] += "as well as " + " ".join(
-                actions.user.gpt_custom_user_context()
-            )
-
-        allMessages.append(added_context)
-
-    current_query = {"role": "user", "content": f"{prompt}\n\n{content}"}
-    allMessages.append(current_query)
 
     data = {
-        "messages": allMessages,
+        "messages": [
+            {
+                "role": "system",
+                "content": [
+                    {"type": "text", "text": settings.get("user.model_system_prompt")},
+                ]
+                + additional_context
+                + [
+                    {"type": "text", "text": item}
+                    for item in actions.user.contextual_user_context()
+                ],
+            },
+            {
+                "role": "user",
+                "content": reused_context + current_query,
+            },
+        ],
         "max_tokens": 2024,
         "temperature": settings.get("user.model_temperature"),
         "n": 1,
@@ -202,7 +219,6 @@ def generate_payload(
     }
     if tools is not None:
         data["tools"] = tools
-
     return headers, data
 
 
