@@ -1,51 +1,18 @@
 import os
-from typing import Any, ClassVar
+from typing import Any
 
-from talon import Module, actions, clip, imgui, settings
+from talon import Module, actions, clip
 
 from ..lib.HTMLBuilder import Builder
 from ..lib.modelHelpers import (
-    clear_context,
     generate_payload,
     gpt_send_request,
-    new_thread,
     notify,
-    optimize_context,
-    optimize_thread,
     paste_and_modify,
-    push_context,
-    push_thread,
-    string_context,
-    string_thread,
+    GPTState,
 )
 
 mod = Module()
-
-
-class GPTState:
-    text_to_confirm: ClassVar[str] = ""
-    last_response: ClassVar[str] = ""
-    last_was_pasted: ClassVar[bool] = False
-
-
-@imgui.open()
-def confirmation_gui(gui: imgui.GUI):
-    gui.text("Confirm model output before pasting")
-    gui.line()
-    gui.spacer()
-    gui.text(GPTState.text_to_confirm)
-
-    gui.spacer()
-    if gui.button("Paste model output"):
-        actions.user.paste_model_confirmation_gui()
-
-    gui.spacer()
-    if gui.button("Copy model output"):
-        actions.user.copy_model_confirmation_gui()
-
-    gui.spacer()
-    if gui.button("Deny model output"):
-        actions.user.close_model_confirmation_gui()
 
 
 def gpt_query(prompt: str, content: str, modifier: str = "") -> str:
@@ -59,9 +26,9 @@ def gpt_query(prompt: str, content: str, modifier: str = "") -> str:
     response = gpt_send_request(headers, data)
     GPTState.last_response = response
     if modifier == "thread":
-        push_thread(prompt)
-        push_thread(content)
-        push_thread(response)
+        GPTState.push_thread(prompt)
+        GPTState.push_thread(content)
+        GPTState.push_thread(response)
     return response
 
 
@@ -86,92 +53,27 @@ class UserActions:
 
         return actions.user.gpt_blend("\n---\n".join(source_text), destination_text)
 
-    def gpt_generate_shell(text_to_process: str) -> str:
-        """Generate a shell command from a spoken instruction"""
-        shell_name = settings.get("user.model_shell_default")
-        if shell_name is None:
-            raise Exception("GPT Error: Shell name is not set. Set it in the settings.")
-
-        prompt = f"""
-        Generate a {shell_name} shell command that will perform the given task.
-        Only include the code. Do not include any comments, backticks, or natural language explanations. Do not output the shell name, only the code that is valid {shell_name}.
-        Condense the code into a single line such that it can be ran in the terminal.
-        """
-
-        result = gpt_query(prompt, text_to_process)
-        return result
-
-    def gpt_generate_sql(text_to_process: str) -> str:
-        """Generate a SQL query from a spoken instruction"""
-
-        prompt = """
-       Generate SQL to complete a given request.
-       Output only the SQL in one line without newlines.
-       Do not output comments, backticks, or natural language explanations.
-       Prioritize SQL queries that are database agnostic.
-        """
-        return gpt_query(prompt, text_to_process)
-
-    def add_to_confirmation_gui(model_output: str):
-        """Add text to the confirmation gui"""
-        GPTState.text_to_confirm = model_output
-        confirmation_gui.show()
-
     def gpt_clear_context():
         """Reset the stored context"""
-        clear_context()
+        GPTState.clear_context()
 
     def gpt_new_thread():
         """Create a new thread"""
-        new_thread()
-
-    def gpt_optimize_context():
-        """Optimize the reused context to save tokens"""
-        optimize_context()
-
-    def gpt_optimize_thread():
-        """Optimize the thread to save tokens"""
-        optimize_thread()
+        GPTState.new_thread()
 
     def gpt_push_context(context: str):
         """Add the selected text to the stored context"""
-        push_context(context)
+        GPTState.push_context(context)
 
-    def gpt_get_context():
-        """Fetch the user context as a string"""
-        return string_context()
-
-    def gpt_get_thread():
-        """Fetch the user thread as a string"""
-        return string_thread()
-
-    def contextual_user_context():
+    def gpt_custom_user_context() -> list[str]:
         """This is an override function that can be used to add additional context to the prompt"""
         return []
-
-    def close_model_confirmation_gui():
-        """Close the model output without pasting it"""
-        GPTState.text_to_confirm = ""
-        confirmation_gui.hide()
-
-    def copy_model_confirmation_gui():
-        """Copy the model output to the clipboard"""
-        clip.set_text(GPTState.text_to_confirm)
-        GPTState.text_to_confirm = ""
-
-        confirmation_gui.hide()
-
-    def paste_model_confirmation_gui():
-        """Paste the model output"""
-        actions.user.paste(GPTState.text_to_confirm)
-        GPTState.text_to_confirm = ""
-        confirmation_gui.hide()
 
     def gpt_select_last():
         """select all the text in the last GPT output"""
         if not GPTState.last_was_pasted:
-            notify("Tried to select GPT output, but it was not pasted in an editor")
-            return
+            notify("GPT Error: No text to select")
+            raise RuntimeError
 
         lines = GPTState.last_response.split("\n")
         for _ in lines[:-1]:
@@ -198,18 +100,14 @@ class UserActions:
         # Ask is a special case, where the text to process is the prompted question, not the selected text
         if prompt.startswith("ask"):
             text_to_process = prompt.removeprefix("ask")
-            prompt = """Generate text that satisfies the question or request given in the input."""
+            prompt = (
+                """Generate text that satisfies the question or request given here:"""
+            )
         # If the user is just moving the source to the destination, we don't need to apply a query
         elif prompt == "pass":
-            if text_to_process == "__CONTEXT__":
-                return string_context()
-            elif text_to_process == "__THREAD__":
-                return string_thread()
             return text_to_process
 
-        response = gpt_query(prompt, text_to_process, modifier)
-
-        return response
+        return gpt_query(prompt, text_to_process, modifier)
 
     def gpt_help():
         """Open the GPT help file in the web browser"""
@@ -237,8 +135,8 @@ class UserActions:
             actions.user.clear_last_phrase()
             return gpt_query(PROMPT, last_output)
         else:
-            notify("No text to reformat")
-            raise Exception("No text to reformat")
+            notify("GPT Error: No text to reformat")
+            raise RuntimeError
 
     def gpt_insert_response(
         result: str,
@@ -261,15 +159,15 @@ class UserActions:
             case "clipboard":
                 clip.set_text(result)
             case "context":
-                push_context(result)
+                GPTState.push_context(result)
             case "newContext":
-                clear_context()
-                push_context(result)
+                GPTState.clear_context()
+                GPTState.push_context(result)
             case "thread":
-                push_thread(result)
+                GPTState.push_thread(result)
             case "newThread":
-                new_thread()
-                push_thread(result)
+                GPTState.new_thread()
+                GPTState.push_thread(result)
             case "appendClipboard":
                 clip.set_text(clip.text() + "\n" + result)
             case "browser":
@@ -282,7 +180,8 @@ class UserActions:
                 try:
                     actions.user.tts(result)
                 except KeyError:
-                    notify("GPT Failure: text to speech is not installed")
+                    notify("GPT Error: Text to speech is not installed")
+                    raise RuntimeError
 
             # Although we can insert to a cursorless dpestination, the cursorless_target capture
             # Greatly increases DFA compliation times and should be avoided if possible
@@ -302,19 +201,24 @@ class UserActions:
                         return "__IMAGE__"
                     else:
                         notify(
-                            "GPT Failure: User applied a prompt to the phrase clipboard, but there was no clipboard text or image stored"
+                            "GPT Error: User applied a prompt to the clipboard, but there was no clipboard text or image stored"
                         )
-                        return
+                        raise RuntimeError
                 return clipboard_text
             case "context":
-                return "__CONTEXT__"
+                # We have to return this here since we don't want to return all the metadata associated with it
+                # We resolve the data inside at calltime
+                return GPTState.context
             case "thread":
-                return "__THREAD__"
+                # We have to return this here since we don't want to return all the metadata associated with it
+                # We resolve the data inside at calltime
+                return GPTState.thread
             case "gptResponse":
                 if GPTState.last_response == "":
-                    raise Exception(
-                        "GPT Failure: User applied a prompt to the phrase GPT response, but there was no GPT response stored"
+                    notify(
+                        "GPT Error: User applied a prompt to the phrase GPT response, but there was no GPT response stored"
                     )
+                    raise RuntimeError
                 return GPTState.last_response
 
             case "lastTalonDictation":
@@ -326,8 +230,6 @@ class UserActions:
                     notify(
                         "GPT Failure: User applied a prompt to the phrase last Talon Dictation, but there was no text to reformat"
                     )
-                    raise Exception(
-                        "GPT Failure: User applied a prompt to the phrase last Talon Dictation, but there was no text to reformat"
-                    )
+                    raise RuntimeError
             case "this" | _:
                 return actions.edit.selected_text()

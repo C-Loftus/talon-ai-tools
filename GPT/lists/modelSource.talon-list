@@ -4,7 +4,7 @@ list: user.modelSource
 # Apply the prompt to the text on the clipboard
 clip: clipboard
 
-# Apply the prompt to the text in the context
+# Apply the prompt to the text that the user stored as context in the model
 context: context
 
 # Apply the prompt to the text in the thread
