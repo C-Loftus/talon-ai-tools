@@ -10,8 +10,6 @@ from ..lib.modelHelpers import (
     gpt_send_request,
     new_thread,
     notify,
-    optimize_context,
-    optimize_thread,
     paste_and_modify,
     push_context,
     push_thread,
@@ -125,17 +123,13 @@ class UserActions:
         """Create a new thread"""
         new_thread()
 
-    def gpt_optimize_context():
-        """Optimize the reused context to save tokens"""
-        optimize_context()
-
-    def gpt_optimize_thread():
-        """Optimize the thread to save tokens"""
-        optimize_thread()
-
     def gpt_push_context(context: str):
         """Add the selected text to the stored context"""
         push_context(context)
+
+    def gpt_push_thread(content: str):
+        """Add the selected text to the active thread"""
+        push_thread(content)
 
     def gpt_get_context():
         """Fetch the user context as a string"""
@@ -203,6 +197,8 @@ class UserActions:
         elif prompt == "pass":
             if text_to_process == "__CONTEXT__":
                 return string_context()
+            elif text_to_process == "__THREAD__":
+                return string_thread()
             return text_to_process
 
         response = gpt_query(prompt, text_to_process, modifier)
@@ -263,6 +259,11 @@ class UserActions:
             case "newContext":
                 clear_context()
                 push_context(result)
+            case "thread":
+                push_thread(result)
+            case "newThread":
+                new_thread()
+                push_thread(result)
             case "appendClipboard":
                 clip.set_text(clip.text() + "\n" + result)
             case "browser":
@@ -301,6 +302,8 @@ class UserActions:
                 return clipboard_text
             case "context":
                 return "__CONTEXT__"
+            case "thread":
+                return "__THREAD__"
             case "gptResponse":
                 if GPTState.last_response == "":
                     raise Exception(
