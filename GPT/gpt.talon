@@ -40,4 +40,3 @@ model apply [from] clip$:
 model [nope] that was <user.text>$:
     result = user.gpt_reformat_last(text)
     user.paste(result)
-

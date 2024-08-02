@@ -5,11 +5,11 @@ from talon import Module, actions, clip
 
 from ..lib.HTMLBuilder import Builder
 from ..lib.modelHelpers import (
+    GPTState,
     generate_payload,
     gpt_send_request,
     notify,
     paste_and_modify,
-    GPTState,
 )
 
 mod = Module()

@@ -1,7 +1,6 @@
-from talon import imgui, actions, Module, settings, clip
+from talon import Module, actions, clip, imgui, settings
 
 from ..GPT.gpt import GPTState, gpt_query
-
 
 mod = Module()
 
