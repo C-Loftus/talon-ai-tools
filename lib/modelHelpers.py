@@ -146,6 +146,8 @@ def format_message(content: str):
                 "type": "image_url",
                 "image_url": {"url": f"data:image/;base64,{base64_image}"},
             }
+    elif content == "__THREAD__":
+        message = {"type": "text", "text": string_thread()}
     return message
 
 

@@ -203,6 +203,8 @@ class UserActions:
         elif prompt == "pass":
             if text_to_process == "__CONTEXT__":
                 return string_context()
+            elif text_to_process == "__THREAD__":
+                return string_thread()
             return text_to_process
 
         response = gpt_query(prompt, text_to_process, modifier)
@@ -306,6 +308,8 @@ class UserActions:
                 return clipboard_text
             case "context":
                 return "__CONTEXT__"
+            case "thread":
+                return "__THREAD__"
             case "gptResponse":
                 if GPTState.last_response == "":
                     raise Exception(
