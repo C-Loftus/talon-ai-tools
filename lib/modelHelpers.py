@@ -39,10 +39,10 @@ def push_context(context: str):
     actions.app.notify("Appended user context")
 
 
-def push_thread(context: str):
+def push_thread(context: dict[str, any]):
     """Add the selected text to the current thread"""
     global thread_context
-    thread_context += [format_message(context)]
+    thread_context += [context]
     actions.app.notify("Appended to thread")
 
 
@@ -98,7 +98,7 @@ def gpt_send_request(headers: Headers, data: Data):
             notify("GPT Task Completed")
             resp = response.json()["choices"][0]["message"]["content"].strip()
             formatted_resp = strip_markdown(resp)
-            return formatted_resp
+            return format_message(formatted_resp)
         case _:
             notify("GPT Failure: Check the Talon Log")
             raise Exception(response.json())
@@ -136,23 +136,27 @@ def make_prompt_from_editor_ctx(ctx: str):
 
 
 def format_message(content: str):
-    message = {"type": "text", "text": content}
-    if content == "__IMAGE__":
-        clipped_image = clip.image()
-        if clipped_image:
-            data = clipped_image.encode().data()
-            base64_image = base64.b64encode(data).decode("utf-8")
-            message = {
-                "type": "image_url",
-                "image_url": {"url": f"data:image/;base64,{base64_image}"},
-            }
-    elif content == "__THREAD__":
-        message = {"type": "text", "text": string_thread()}
-    return message
+    return {"type": "text", "text": content}
+
+
+def format_clipboard():
+    clipped_image = clip.image()
+    if clipped_image:
+        data = clipped_image.encode().data()
+        base64_image = base64.b64encode(data).decode("utf-8")
+        return {
+            "type": "image_url",
+            "image_url": {"url": f"data:image/;base64,{base64_image}"},
+        }
+    else:
+        return format_message(clip.text())
 
 
 def generate_payload(
-    prompt: str, content: str, tools: Optional[list[Tool]] = None, modifier: str = ""
+    prompt: dict[str, any],
+    content: dict[str, any],
+    tools: Optional[list[Tool]] = None,
+    modifier: str = "",
 ) -> Tuple[Headers, Data]:
     """Generate the headers and data for the OpenAI API GPT request.
     Does not return the URL given the fact not all openai-compatible endpoints support new features like tools
@@ -185,9 +189,9 @@ def generate_payload(
     if modifier == "thread":
         reused_context += thread_context
 
-    current_query = [{"type": "text", "text": prompt}]
+    current_query = [prompt]
     if content != "__CONTEXT__":
-        current_query += [format_message(content)]
+        current_query += [content]
 
     headers = {
         "Content-Type": "application/json",
