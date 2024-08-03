@@ -188,17 +188,13 @@ class UserActions:
         match mode:
             case "snip":
                 prompt += "\n\nPlease return the response as a snippet with placeholders. A snippet can control cursors and text insertion using constructs like tabstops ($1, $2, etc., with $0 as the final position). Linked tabstops update together. Placeholders, such as ${1:foo}, allow easy changes and can be nested (${1:another ${2:}}). Choices, using ${1|one,two,three|}, prompt user selection."
-                # If the user is just moving the source to the destination, we don't need to apply a query
-            case "context":
-                text_to_process = format_message(string_context())
-            case "thread":
-                text_to_process = format_message(string_thread())
 
         # Ask is a special case, where the text to process is the prompted question, not the selected text
         if prompt.startswith("ask"):
             text_to_process = format_message(prompt.removeprefix("ask"))
             prompt = """Generate text that satisfies the question or request given in the input."""
 
+        # If the user is just moving the source to the destination, we don't need to apply a query
         if prompt == "pass":
             response = text_to_process
         else:

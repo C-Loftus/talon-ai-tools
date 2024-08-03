@@ -12,6 +12,7 @@ mod.list("customPrompt", desc="Custom user-defined GPT prompts")
 mod.list("modelPrompt", desc="GPT Prompts")
 mod.list("modelDestination", desc="What to do after returning the model response")
 mod.list("modelSource", desc="Where to get the text from for the GPT")
+mod.list("modelModifier", desc="Guides how talon AI tools will process the message")
 
 
 # model prompts can be either static and predefined by this repo or custom outside of it
