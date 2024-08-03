@@ -174,10 +174,10 @@ class UserActions:
         for _ in lines[0]:
             actions.edit.extend_left()
 
-    def gpt_apply_prompt(
-        prompt: str, text_to_process: str | list[str], modifier: str = ""
-    ) -> str:
+    def gpt_apply_prompt(mode: str, prompt: str, source: str, destination: str):
         """Apply an arbitrary prompt to arbitrary text"""
+
+        text_to_process = actions.user.gpt_get_source_text(source)
         text_to_process = (
             " ".join(text_to_process)
             if isinstance(text_to_process, list)
@@ -185,9 +185,9 @@ class UserActions:
         )
 
         # Apply modifiers to prompt before handling special cases
-        match modifier:
+        match mode:
             case "snip":
-                prompt += "\n\nPlease return the response as a snippet with placeholders. A snippet can control cursors and text insertion using constructs like tabstops ($1, $2, etc., with $0 as the final position). Linked tabstops update together. Placeholders, such as ${1:foo}, allow easy changes and can be nested (${1:another ${2:placeholder}}). Choices, using ${1|one,two,three|}, prompt user selection."
+                prompt += "\n\nPlease return the response as a snippet with placeholders. A snippet can control cursors and text insertion using constructs like tabstops ($1, $2, etc., with $0 as the final position). Linked tabstops update together. Placeholders, such as ${1:foo}, allow easy changes and can be nested (${1:another ${2:}}). Choices, using ${1|one,two,three|}, prompt user selection."
 
         # Ask is a special case, where the text to process is the prompted question, not the selected text
         if prompt.startswith("ask"):
@@ -201,9 +201,8 @@ class UserActions:
                 return string_thread()
             return text_to_process
 
-        response = gpt_query(prompt, text_to_process, modifier)
-
-        return response
+        response = gpt_query(prompt, text_to_process, mode)
+        actions.user.gpt_insert_response(response, destination)
 
     def gpt_help():
         """Open the GPT help file in the web browser"""
