@@ -58,7 +58,7 @@ def gpt_query(prompt: dict[str, any], content: dict[str, any], modifier: str = "
     headers, data = generate_payload(prompt, content, None, modifier)
 
     response = gpt_send_request(headers, data)
-    GPTState.last_response = response["text"]
+    GPTState.last_response = response.get("text", "")
     if modifier == "thread":
         push_thread(prompt)
         push_thread(content)
