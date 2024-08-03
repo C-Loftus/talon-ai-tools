@@ -6,6 +6,7 @@ from talon import Module, actions, clip, imgui, settings
 from ..lib.HTMLBuilder import Builder
 from ..lib.modelHelpers import (
     clear_context,
+    extract_message,
     format_clipboard,
     format_message,
     generate_payload,
@@ -182,32 +183,26 @@ class UserActions:
         """Apply an arbitrary prompt to arbitrary text"""
 
         text_to_process = actions.user.gpt_get_source_text(source)
-        text_to_process = (
-            " ".join(text_to_process)
-            if isinstance(text_to_process, list)
-            else text_to_process
-        )
 
         # Apply modifiers to prompt before handling special cases
         match mode:
             case "snip":
                 prompt += "\n\nPlease return the response as a snippet with placeholders. A snippet can control cursors and text insertion using constructs like tabstops ($1, $2, etc., with $0 as the final position). Linked tabstops update together. Placeholders, such as ${1:foo}, allow easy changes and can be nested (${1:another ${2:}}). Choices, using ${1|one,two,three|}, prompt user selection."
+                # If the user is just moving the source to the destination, we don't need to apply a query
+            case "context":
+                text_to_process = format_message(string_context())
+            case "thread":
+                text_to_process = format_message(string_thread())
 
         # Ask is a special case, where the text to process is the prompted question, not the selected text
         if prompt.startswith("ask"):
-            text_to_process = prompt.removeprefix("ask")
+            text_to_process = format_message(prompt.removeprefix("ask"))
             prompt = """Generate text that satisfies the question or request given in the input."""
-        # If the user is just moving the source to the destination, we don't need to apply a query
-        elif prompt == "pass":
-            if text_to_process == "__CONTEXT__":
-                return string_context()
-            elif text_to_process == "__THREAD__":
-                return string_thread()
-            return text_to_process
 
-        response = gpt_query(
-            format_message(prompt), format_message(text_to_process), mode
-        )
+        if prompt == "pass":
+            response = text_to_process
+        else:
+            response = gpt_query(format_message(prompt), text_to_process, mode)
         actions.user.gpt_insert_response(response, destination)
 
     def gpt_help():
@@ -240,7 +235,7 @@ class UserActions:
             raise Exception("No text to reformat")
 
     def gpt_insert_response(
-        result: str,
+        result: dict[str, any],
         method: str = "",
         modifier: str = "",
         cursorless_destination: Any = None,
@@ -265,16 +260,16 @@ class UserActions:
                 clear_context()
                 push_context(result)
             case "thread":
-                push_thread(format_message(result))
+                push_thread(result)
             case "newThread":
                 new_thread()
-                push_thread(format_message(result))
+                push_thread(result)
             case "appendClipboard":
                 clip.set_text(clip.text() + "\n" + result)
             case "browser":
                 builder = Builder()
                 builder.h1("Talon GPT Result")
-                for line in result.split("\n"):
+                for line in extract_message(result).split("\n"):
                     builder.p(line)
                 builder.render()
             case "textToSpeech":

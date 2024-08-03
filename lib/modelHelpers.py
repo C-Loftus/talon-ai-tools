@@ -32,10 +32,10 @@ def new_thread():
     actions.app.notify("Created a new thread")
 
 
-def push_context(context: str):
+def push_context(context: dict[str, any]):
     """Add the selected text to the stored context"""
     global stored_context
-    stored_context += [format_message(context)]
+    stored_context += [context]
     actions.app.notify("Appended user context")
 
 
@@ -44,26 +44,6 @@ def push_thread(context: dict[str, any]):
     global thread_context
     thread_context += [context]
     actions.app.notify("Appended to thread")
-
-
-def optimize_thread():
-    """Optimize the context for reducing the space"""
-    global thread_context
-    prompt = "Please summarize this conversation to shorten it. I'm going to pass it back to you so this is only for your consumption. Make it as short as possible."
-
-    headers, data = generate_payload(prompt, "")
-    thread_context = [format_message(gpt_send_request(headers, data))]
-    actions.app.notify("Optimized thread context")
-
-
-def optimize_context():
-    """Optimize the context for reducing the space"""
-    global stored_context
-    prompt = "Please summarize this conversation to shorten it. I'm going to pass it back to you so this is only for your consumption. Make it as short as possible."
-
-    headers, data = generate_payload(prompt, "")
-    stored_context = [format_message(gpt_send_request(headers, data))]
-    actions.app.notify("Optimized user context")
 
 
 def messages_to_string(messages: list[dict[str, any]]) -> str:
@@ -137,6 +117,10 @@ def make_prompt_from_editor_ctx(ctx: str):
 
 def format_message(content: str):
     return {"type": "text", "text": content}
+
+
+def extract_message(content: dict[str, any]) -> str:
+    return content.get("text", "")
 
 
 def format_clipboard():
@@ -240,8 +224,10 @@ def get_clipboard_image():
         raise Exception("Invalid image in clipboard")
 
 
-def paste_and_modify(result: str, modifier: str = ""):
+def paste_and_modify(formatted_message: dict[str, any], modifier: str = ""):
     """Paste or insert the result of a GPT query in a special way, e.g. as a snippet or selected"""
+    print(formatted_message)
+    result = extract_message(formatted_message)
     match modifier:
         case "snip":
             actions.user.insert_snippet(result)
