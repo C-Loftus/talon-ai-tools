@@ -130,7 +130,7 @@ class UserActions:
 
     def gpt_push_context(context: str):
         """Add the selected text to the stored context"""
-        push_context(context)
+        push_context(format_message(context))
 
     def gpt_push_thread(content: str):
         """Add the selected text to the active thread"""
@@ -199,7 +199,7 @@ class UserActions:
             response = text_to_process
         else:
             response = gpt_query(format_message(prompt), text_to_process, mode)
-        actions.user.gpt_insert_response(response, destination)
+        actions.user.gpt_insert_response(response, destination, mode)
 
     def gpt_help():
         """Open the GPT help file in the web browser"""
