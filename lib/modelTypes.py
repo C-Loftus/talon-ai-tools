@@ -1,5 +1,35 @@
 import enum
-from typing import Optional, TypedDict
+from typing import Literal, Optional, TypedDict
+
+
+class MessageRole(enum.Enum):
+    USER = "user"
+    ASSISTANT = "assistant"
+    SYSTEM = "system"
+
+
+class GPTMessage:
+    type: Literal["text", "image_url"]
+    content: str
+
+    def __init__(self, content: str, type: Literal["text", "image_url"] = "text"):
+        self.content = content
+        self.type = type
+
+    def __str__(self):
+        return self.content
+
+    def to_string(self):
+        return str(self)
+
+    def to_dict(self):
+        return {
+            "type": self.type,
+            "content": self.content,
+        }
+
+    def get_content(self):
+        return self.content
 
 
 class FunctionArguments(TypedDict):

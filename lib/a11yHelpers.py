@@ -2,7 +2,6 @@
 # https://github.com/phillco/talon-axkit/blob/main/dictation/dictation_context.py
 
 from talon import Context, Module, ui
-from talon.types import Span
 
 ctx = Context()
 ctx.matches = r"""
