@@ -83,9 +83,9 @@ class UserActions:
        Do not output comments, backticks, or natural language explanations.
        Prioritize SQL queries that are database agnostic.
         """
-        return gpt_query(format_message(prompt), format_message(text_to_process))[
-            "text"
-        ]
+        return gpt_query(format_message(prompt), format_message(text_to_process)).get(
+            "text", ""
+        )
 
     def gpt_clear_context():
         """Reset the stored context"""
@@ -132,6 +132,14 @@ class UserActions:
         prompt: str, source: str = "", destination: str = "", modifier: str = ""
     ):
         """Apply an arbitrary prompt to arbitrary text"""
+        response = actions.user.gpt_run_prompt(modifier, prompt, source)
+        actions.user.gpt_insert_response(
+            format_message(response), destination, modifier
+        )
+        return response
+
+    def gpt_run_prompt(modifier: str, prompt: str, source: str) -> str:
+        """Apply an arbitrary prompt to arbitrary text and return the response as text"""
 
         text_to_process = actions.user.gpt_get_source_text(source)
 
@@ -150,8 +158,7 @@ class UserActions:
             response = text_to_process
         else:
             response = gpt_query(format_message(prompt), text_to_process, modifier)
-
-        actions.user.gpt_insert_response(response, destination, modifier)
+        return response.get("text", "")
 
     def gpt_help():
         """Open the GPT help file in the web browser"""
