@@ -100,7 +100,7 @@ class UserActions:
         """
 
         result = gpt_query(format_message(prompt), format_message(text_to_process))
-        return result["text"]
+        return result.get("text", "")
 
     def gpt_generate_sql(text_to_process: str) -> str:
         """Generate a SQL query from a spoken instruction"""
