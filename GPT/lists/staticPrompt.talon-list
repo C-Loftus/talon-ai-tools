@@ -48,3 +48,8 @@ generate code: The following plaintext describes a process in code in the langua
 update comments: Act as a software engineer. The following code may be missing comments or the comments could be out of date. Please update the comments. If you are unsure how to comment something, ask a question in a comment instead. Return just the code and not any explanations.
 clean code: Act as a software engineer. Reduce any duplication in the selected code and improve it to be more idiomatic and clear for other users. However, do not change the behavior or functionality. Return just the code and not any explanations.
 improve semantics: The following is an HTML document. Keep the same structure and layout but if it is needed, change any elements to use proper semantic HTML and make sure it is implementing best practices for user accessibility. Output just the HTML and not any extra explanations.
+
+## PROMPTS TO HELP WITH WRITING
+add questions: Help me explore this question from multiple perspectives. For each perspective, ask follow-up questions and indicate what perspective is being taken. Annotate the dialogue to show its a conversation between you and me, as this will be shared on Slack and needs to be clear that its a generated response. Respond with only the perspectives and the questions they generated.
+format outline: Create an outline that encapsulates the text below. Keep the number of sections between three and five to optimize for human working memory. Return just the outline.
+format prose: As an editor, format the following text as prose. You can have headings and paragraphs. Trying to avoid bullets. Reorder and add transitions as necessary to make the document flow. Return just the text.
