@@ -16,12 +16,6 @@ class GPTMessage:
         self.content = content
         self.type = type
 
-    def __str__(self):
-        return self.content
-
-    def to_string(self):
-        return str(self)
-
     def to_dict(self):
         return {
             "type": self.type,
