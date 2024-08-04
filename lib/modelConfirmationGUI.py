@@ -1,6 +1,6 @@
-from .modelHelpers import GPTState
-from talon import imgui, actions, Module, clip
+from talon import Module, actions, clip, imgui
 
+from .modelHelpers import GPTState
 
 mod = Module()
 
