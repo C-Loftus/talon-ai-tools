@@ -6,7 +6,7 @@ model help$: user.gpt_help()
 #   Example: `model explain this` -> Explains the selected text and pastes in place
 #   Example: `model fix grammar clip to browser` -> Fixes the grammar of the text on the clipboard and opens in browser`
 model [{user.modelModifier}] <user.modelPrompt> [{user.modelSource}] [{user.modelDestination}]:
-    user.gpt_apply_prompt(modelModifier or "normal", modelPrompt, modelSource or "", modelDestination or "")
+    user.gpt_apply_prompt(modelPrompt, modelSource or "", modelDestination or "", modelModifier or "")
 
 # Select the last GPT response so you can edit it further
 model take response: user.gpt_select_last()
@@ -23,10 +23,3 @@ model apply [from] clip$:
 model [nope] that was <user.text>$:
     result = user.gpt_reformat_last(text)
     user.paste(result)
-
-# Clear the context stored in the model
-model context clear: user.gpt_clear_context()
-
-# Create a new thread which is similar to a conversation with the model
-# A thread allows the model to access data from the previous queries in the same thread
-model thread new: user.gpt_new_thread()
