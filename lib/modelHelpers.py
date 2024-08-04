@@ -1,7 +1,7 @@
 import base64
 import json
 import os
-from typing import Optional, Tuple
+from typing import ClassVar, Optional, Tuple
 
 import requests
 from talon import actions, app, clip, settings
@@ -12,6 +12,12 @@ from .modelTypes import Data, Headers, Tool
 """"
 All functions in this this file have impure dependencies on either the model or the talon APIs
 """
+
+
+class GPTState:
+    text_to_confirm: ClassVar[str] = ""
+    last_response: ClassVar[str] = ""
+    last_was_pasted: ClassVar[bool] = False
 
 
 stored_context = []
