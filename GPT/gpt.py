@@ -6,6 +6,9 @@ from talon import Module, actions, clip, imgui, settings
 from ..lib.HTMLBuilder import Builder
 from ..lib.modelHelpers import (
     clear_context,
+    extract_message,
+    format_clipboard,
+    format_message,
     generate_payload,
     gpt_send_request,
     new_thread,
@@ -46,7 +49,7 @@ def confirmation_gui(gui: imgui.GUI):
         actions.user.close_model_confirmation_gui()
 
 
-def gpt_query(prompt: str, content: str, modifier: str = "") -> str:
+def gpt_query(prompt: dict[str, any], content: dict[str, any], modifier: str = ""):
     """Send a prompt to the GPT API and return the response"""
 
     # Reset state before pasting
@@ -55,7 +58,7 @@ def gpt_query(prompt: str, content: str, modifier: str = "") -> str:
     headers, data = generate_payload(prompt, content, None, modifier)
 
     response = gpt_send_request(headers, data)
-    GPTState.last_response = response
+    GPTState.last_response = extract_message(response)
     if modifier == "thread":
         push_thread(prompt)
         push_thread(content)
@@ -65,7 +68,7 @@ def gpt_query(prompt: str, content: str, modifier: str = "") -> str:
 
 @mod.action_class
 class UserActions:
-    def gpt_blend(source_text: str, destination_text: str):
+    def gpt_blend(source_text: str, destination_text: str) -> str:
         """Blend all the source text and send it to the destination"""
         prompt = f"""
         Act as a text transformer. I'm going to give you some source text and destination text, and I want you to modify the destination text based on the contents of the source text in a way that combines both of them together. Use the structure of the destination text, reordering and renaming as necessary to ensure a natural and coherent flow. Please return only the final text with no decoration for insertion into a document in the specified language.
@@ -77,7 +80,7 @@ class UserActions:
 
         Please return only the final text. What follows is all of the source texts separated by '---'.
         """
-        return gpt_query(prompt, source_text)
+        return gpt_query(format_message(prompt), format_message(source_text))["text"]
 
     def gpt_blend_list(source_text: list[str], destination_text: str):
         """Blend all the source text as a list and send it to the destination"""
@@ -96,8 +99,8 @@ class UserActions:
         Condense the code into a single line such that it can be ran in the terminal.
         """
 
-        result = gpt_query(prompt, text_to_process)
-        return result
+        result = gpt_query(format_message(prompt), format_message(text_to_process))
+        return result["text"]
 
     def gpt_generate_sql(text_to_process: str) -> str:
         """Generate a SQL query from a spoken instruction"""
@@ -108,7 +111,9 @@ class UserActions:
        Do not output comments, backticks, or natural language explanations.
        Prioritize SQL queries that are database agnostic.
         """
-        return gpt_query(prompt, text_to_process)
+        return gpt_query(format_message(prompt), format_message(text_to_process))[
+            "text"
+        ]
 
     def add_to_confirmation_gui(model_output: str):
         """Add text to the confirmation gui"""
@@ -125,11 +130,11 @@ class UserActions:
 
     def gpt_push_context(context: str):
         """Add the selected text to the stored context"""
-        push_context(context)
+        push_context(format_message(context))
 
     def gpt_push_thread(content: str):
         """Add the selected text to the active thread"""
-        push_thread(content)
+        push_thread(format_message(content))
 
     def gpt_get_context():
         """Fetch the user context as a string"""
@@ -174,36 +179,27 @@ class UserActions:
         for _ in lines[0]:
             actions.edit.extend_left()
 
-    def gpt_apply_prompt(
-        prompt: str, text_to_process: str | list[str], modifier: str = ""
-    ) -> str:
+    def gpt_apply_prompt(mode: str, prompt: str, source: str, destination: str):
         """Apply an arbitrary prompt to arbitrary text"""
-        text_to_process = (
-            " ".join(text_to_process)
-            if isinstance(text_to_process, list)
-            else text_to_process
-        )
+
+        text_to_process = actions.user.gpt_get_source_text(source)
 
         # Apply modifiers to prompt before handling special cases
-        match modifier:
+        match mode:
             case "snip":
-                prompt += "\n\nPlease return the response as a snippet with placeholders. A snippet can control cursors and text insertion using constructs like tabstops ($1, $2, etc., with $0 as the final position). Linked tabstops update together. Placeholders, such as ${1:foo}, allow easy changes and can be nested (${1:another ${2:placeholder}}). Choices, using ${1|one,two,three|}, prompt user selection."
+                prompt += "\n\nPlease return the response as a snippet with placeholders. A snippet can control cursors and text insertion using constructs like tabstops ($1, $2, etc., with $0 as the final position). Linked tabstops update together. Placeholders, such as ${1:foo}, allow easy changes and can be nested (${1:another ${2:}}). Choices, using ${1|one,two,three|}, prompt user selection."
 
         # Ask is a special case, where the text to process is the prompted question, not the selected text
         if prompt.startswith("ask"):
-            text_to_process = prompt.removeprefix("ask")
+            text_to_process = format_message(prompt.removeprefix("ask"))
             prompt = """Generate text that satisfies the question or request given in the input."""
+
         # If the user is just moving the source to the destination, we don't need to apply a query
-        elif prompt == "pass":
-            if text_to_process == "__CONTEXT__":
-                return string_context()
-            elif text_to_process == "__THREAD__":
-                return string_thread()
-            return text_to_process
-
-        response = gpt_query(prompt, text_to_process, modifier)
-
-        return response
+        if prompt == "pass":
+            response = text_to_process
+        else:
+            response = gpt_query(format_message(prompt), text_to_process, mode)
+        actions.user.gpt_insert_response(response, destination, mode)
 
     def gpt_help():
         """Open the GPT help file in the web browser"""
@@ -229,13 +225,13 @@ class UserActions:
         last_output = actions.user.get_last_phrase()
         if last_output:
             actions.user.clear_last_phrase()
-            return gpt_query(PROMPT, last_output)
+            return gpt_query(format_message(PROMPT), format_message(last_output))
         else:
             notify("No text to reformat")
             raise Exception("No text to reformat")
 
     def gpt_insert_response(
-        result: str,
+        result: dict[str, any],
         method: str = "",
         modifier: str = "",
         cursorless_destination: Any = None,
@@ -269,7 +265,7 @@ class UserActions:
             case "browser":
                 builder = Builder()
                 builder.h1("Talon GPT Result")
-                for line in result.split("\n"):
+                for line in extract_message(result).split("\n"):
                     builder.p(line)
                 builder.render()
             case "textToSpeech":
@@ -286,36 +282,27 @@ class UserActions:
                 GPTState.last_was_pasted = True
                 paste_and_modify(result, modifier)
 
-    def gpt_get_source_text(spoken_text: str) -> str:
+    def gpt_get_source_text(spoken_text: str) -> dict[str, any]:
         """Get the source text that is will have the prompt applied to it"""
         match spoken_text:
             case "clipboard":
-                clipboard_text = clip.text()
-                if clipboard_text is None:
-                    if clip.image():
-                        return "__IMAGE__"
-                    else:
-                        notify(
-                            "GPT Failure: User applied a prompt to the phrase clipboard, but there was no clipboard text or image stored"
-                        )
-                        return
-                return clipboard_text
+                return format_clipboard()
             case "context":
-                return "__CONTEXT__"
+                return format_message(string_context())
             case "thread":
-                return "__THREAD__"
+                return format_message(string_thread())
             case "gptResponse":
                 if GPTState.last_response == "":
                     raise Exception(
                         "GPT Failure: User applied a prompt to the phrase GPT response, but there was no GPT response stored"
                     )
-                return GPTState.last_response
+                return format_message(GPTState.last_response)
 
             case "lastTalonDictation":
                 last_output = actions.user.get_last_phrase()
                 if last_output:
                     actions.user.clear_last_phrase()
-                    return last_output
+                    return format_message(last_output)
                 else:
                     notify(
                         "GPT Failure: User applied a prompt to the phrase last Talon Dictation, but there was no text to reformat"
@@ -324,4 +311,4 @@ class UserActions:
                         "GPT Failure: User applied a prompt to the phrase last Talon Dictation, but there was no text to reformat"
                     )
             case "this" | _:
-                return actions.edit.selected_text()
+                return format_message(actions.edit.selected_text())
