@@ -1,10 +1,11 @@
 import os
-from typing import Any, ClassVar
+from typing import Any
 
-from talon import Module, actions, clip, imgui, settings
+from talon import Module, actions, clip, settings
 
 from ..lib.HTMLBuilder import Builder
 from ..lib.modelHelpers import (
+    GPTState,
     clear_context,
     extract_message,
     format_clipboard,
@@ -21,32 +22,6 @@ from ..lib.modelHelpers import (
 )
 
 mod = Module()
-
-
-class GPTState:
-    text_to_confirm: ClassVar[str] = ""
-    last_response: ClassVar[str] = ""
-    last_was_pasted: ClassVar[bool] = False
-
-
-@imgui.open()
-def confirmation_gui(gui: imgui.GUI):
-    gui.text("Confirm model output before pasting")
-    gui.line()
-    gui.spacer()
-    gui.text(GPTState.text_to_confirm)
-
-    gui.spacer()
-    if gui.button("Paste model output"):
-        actions.user.paste_model_confirmation_gui()
-
-    gui.spacer()
-    if gui.button("Copy model output"):
-        actions.user.copy_model_confirmation_gui()
-
-    gui.spacer()
-    if gui.button("Deny model output"):
-        actions.user.close_model_confirmation_gui()
 
 
 def gpt_query(prompt: dict[str, any], content: dict[str, any], modifier: str = ""):
@@ -117,11 +92,6 @@ class UserActions:
             "text"
         ]
 
-    def add_to_confirmation_gui(model_output: str):
-        """Add text to the confirmation gui"""
-        GPTState.text_to_confirm = model_output
-        confirmation_gui.show()
-
     def gpt_clear_context():
         """Reset the stored context"""
         clear_context()
@@ -149,24 +119,6 @@ class UserActions:
     def contextual_user_context():
         """This is an override function that can be used to add additional context to the prompt"""
         return []
-
-    def close_model_confirmation_gui():
-        """Close the model output without pasting it"""
-        GPTState.text_to_confirm = ""
-        confirmation_gui.hide()
-
-    def copy_model_confirmation_gui():
-        """Copy the model output to the clipboard"""
-        clip.set_text(GPTState.text_to_confirm)
-        GPTState.text_to_confirm = ""
-
-        confirmation_gui.hide()
-
-    def paste_model_confirmation_gui():
-        """Paste the model output"""
-        actions.user.paste(GPTState.text_to_confirm)
-        GPTState.text_to_confirm = ""
-        confirmation_gui.hide()
 
     def gpt_select_last():
         """select all the text in the last GPT output"""
