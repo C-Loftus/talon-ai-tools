@@ -1,5 +1,6 @@
-from talon import actions
 from typing import ClassVar
+
+from talon import actions
 
 
 class GPTState:

@@ -7,8 +7,8 @@ import requests
 from talon import actions, app, clip, settings
 
 from ..lib.pureHelpers import strip_markdown
-from .modelTypes import Data, Headers, Tool
 from .modelState import GPTState
+from .modelTypes import Data, Headers, Tool
 
 """"
 All functions in this this file have impure dependencies on either the model or the talon APIs
