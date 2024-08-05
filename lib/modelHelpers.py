@@ -128,9 +128,7 @@ def generate_payload(
     if modifier == "thread":
         reused_context += GPTState.thread
 
-    current_query = [prompt]
-    if content != "__CONTEXT__":
-        current_query += [content]
+    current_query = [prompt, content]
 
     headers = {
         "Content-Type": "application/json",
