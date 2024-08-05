@@ -1,6 +1,6 @@
 from talon import Module, actions, clip, imgui
 
-from .modelHelpers import GPTState
+from .modelHelpers import GPTState, notify
 
 mod = Module()
 
@@ -10,18 +10,19 @@ def confirmation_gui(gui: imgui.GUI):
     gui.text("Confirm model output before pasting")
     gui.line()
     gui.spacer()
-    gui.text(GPTState.text_to_confirm)
+    for line in GPTState.text_to_confirm.split("\n"):
+        gui.text(line)
 
     gui.spacer()
-    if gui.button("Paste model output"):
+    if gui.button("Model paste output"):
         actions.user.paste_model_confirmation_gui()
 
     gui.spacer()
-    if gui.button("Copy model output"):
+    if gui.button("Model copy output"):
         actions.user.copy_model_confirmation_gui()
 
     gui.spacer()
-    if gui.button("Deny model output"):
+    if gui.button("Model discard output"):
         actions.user.close_model_confirmation_gui()
 
 
@@ -46,6 +47,12 @@ class UserActions:
 
     def paste_model_confirmation_gui():
         """Paste the model output"""
-        actions.user.paste(GPTState.text_to_confirm)
-        GPTState.text_to_confirm = ""
-        confirmation_gui.hide()
+        if not GPTState.text_to_confirm:
+            notify("GPT error: No text in confirmation GUI to paste")
+            GPTState.text_to_confirm = ""
+            confirmation_gui.hide()
+            return
+        else:
+            actions.user.paste(GPTState.text_to_confirm)
+            GPTState.text_to_confirm = ""
+            confirmation_gui.hide()

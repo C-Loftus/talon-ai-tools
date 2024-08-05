@@ -35,3 +35,6 @@ to browser: browser
 
 # Speak the result with TTS
 to speech: textToSpeech
+
+# Output the result in a talon imgui window
+to window: window
