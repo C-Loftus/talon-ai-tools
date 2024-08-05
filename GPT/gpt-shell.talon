@@ -15,8 +15,7 @@ model (sequel | sql) <user.text>$:
 ^paste response$: user.paste_model_confirmation_gui()
 
 # Confirm and paste the output of the model selected
-^chain response$:
-    user.chain_model_confirmation_gui()
+^chain response$: user.chain_model_confirmation_gui()
 
 ^copy response$: user.copy_model_confirmation_gui()
 
