@@ -17,6 +17,10 @@ from ..lib.modelHelpers import (
 from ..lib.modelState import GPTState
 
 mod = Module()
+mod.tag(
+    "model_window_open",
+    desc="Tag for enabling the model window commands when the window is open",
+)
 
 
 def gpt_query(prompt: dict[str, any], content: dict[str, any], modifier: str = ""):
