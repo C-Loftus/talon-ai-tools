@@ -1,55 +1,18 @@
 import base64
 import json
 import os
-from typing import ClassVar, Optional, Tuple
+from typing import Optional, Tuple
 
 import requests
 from talon import actions, app, clip, settings
 
 from ..lib.pureHelpers import strip_markdown
+from .modelState import GPTState
 from .modelTypes import Data, Headers, Tool
 
 """"
 All functions in this this file have impure dependencies on either the model or the talon APIs
 """
-
-
-class GPTState:
-    text_to_confirm: ClassVar[str] = ""
-    last_response: ClassVar[str] = ""
-    last_was_pasted: ClassVar[bool] = False
-
-
-stored_context = []
-thread_context = []
-
-
-def clear_context():
-    """Reset the stored context"""
-    global stored_context
-    stored_context = []
-    actions.app.notify("Cleared user context")
-
-
-def new_thread():
-    """Create a new thread"""
-    global thread_context
-    thread_context = []
-    actions.app.notify("Created a new thread")
-
-
-def push_context(context: dict[str, any]):
-    """Add the selected text to the stored context"""
-    global stored_context
-    stored_context += [context]
-    actions.app.notify("Appended user context")
-
-
-def push_thread(context: dict[str, any]):
-    """Add the selected text to the current thread"""
-    global thread_context
-    thread_context += [context]
-    actions.app.notify("Appended to thread")
 
 
 def messages_to_string(messages: list[dict[str, any]]) -> str:
@@ -61,18 +24,6 @@ def messages_to_string(messages: list[dict[str, any]]) -> str:
         else:
             formatted_messages.append(message.get("text", ""))
     return "\n\n".join(formatted_messages)
-
-
-def string_context():
-    """Format the context for display"""
-    global stored_context
-    return messages_to_string(stored_context)
-
-
-def string_thread():
-    """Format the thread for display"""
-    global thread_context
-    return messages_to_string(thread_context)
 
 
 def gpt_send_request(headers: Headers, data: Data):
@@ -151,10 +102,8 @@ def generate_payload(
     """Generate the headers and data for the OpenAI API GPT request.
     Does not return the URL given the fact not all openai-compatible endpoints support new features like tools
     """
-    global stored_context
-    global thread_context
     notification = "GPT Task Started"
-    if len(stored_context) > 0:
+    if len(GPTState.context) > 0:
         notification += ": Reusing Stored Context"
     notify(notification)
     TOKEN = get_token()
@@ -175,9 +124,9 @@ def generate_payload(
             + f"The following describes the currently focused application:\n\n{actions.user.talon_get_active_context()}"
         ]
     ]
-    reused_context = stored_context
+    reused_context = GPTState.context
     if modifier == "thread":
-        reused_context += thread_context
+        reused_context += GPTState.thread
 
     current_query = [prompt]
     if content != "__CONTEXT__":

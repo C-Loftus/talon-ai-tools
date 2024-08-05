@@ -5,21 +5,16 @@ from talon import Module, actions, clip, settings
 
 from ..lib.HTMLBuilder import Builder
 from ..lib.modelHelpers import (
-    GPTState,
-    clear_context,
     extract_message,
     format_clipboard,
     format_message,
     generate_payload,
     gpt_send_request,
-    new_thread,
+    messages_to_string,
     notify,
     paste_and_modify,
-    push_context,
-    push_thread,
-    string_context,
-    string_thread,
 )
+from ..lib.modelState import GPTState
 
 mod = Module()
 
@@ -35,9 +30,9 @@ def gpt_query(prompt: dict[str, any], content: dict[str, any], modifier: str = "
     response = gpt_send_request(headers, data)
     GPTState.last_response = extract_message(response)
     if modifier == "thread":
-        push_thread(prompt)
-        push_thread(content)
-        push_thread(response)
+        GPTState.push_thread(prompt)
+        GPTState.push_thread(content)
+        GPTState.push_thread(response)
     return response
 
 
@@ -57,7 +52,7 @@ class UserActions:
         """
 
         result = gpt_query(format_message(prompt), format_message(source_text))
-        actions.user.gpt_insert_response(result, "this")
+        actions.user.gpt_insert_response(result, "paste")
 
     def gpt_blend_list(source_text: list[str], destination_text: str):
         """Blend all the source text as a list and send it to the destination"""
@@ -94,27 +89,27 @@ class UserActions:
 
     def gpt_clear_context():
         """Reset the stored context"""
-        clear_context()
+        GPTState.clear_context()
 
     def gpt_new_thread():
         """Create a new thread"""
-        new_thread()
+        GPTState.new_thread()
 
     def gpt_push_context(context: str):
         """Add the selected text to the stored context"""
-        push_context(format_message(context))
+        GPTState.push_context(format_message(context))
 
     def gpt_push_thread(content: str):
         """Add the selected text to the active thread"""
-        push_thread(format_message(content))
+        GPTState.push_thread(format_message(content))
 
     def gpt_get_context():
         """Fetch the user context as a string"""
-        return string_context()
+        return messages_to_string(GPTState.context)
 
     def gpt_get_thread():
         """Fetch the user thread as a string"""
-        return string_thread()
+        return messages_to_string(GPTState.thread)
 
     def contextual_user_context():
         """This is an override function that can be used to add additional context to the prompt"""
@@ -133,27 +128,30 @@ class UserActions:
         for _ in lines[0]:
             actions.edit.extend_left()
 
-    def gpt_apply_prompt(mode: str, prompt: str, source: str, destination: str):
+    def gpt_apply_prompt(
+        prompt: str, source: str = "", destination: str = "", modifier: str = ""
+    ):
         """Apply an arbitrary prompt to arbitrary text"""
 
         text_to_process = actions.user.gpt_get_source_text(source)
 
         # Apply modifiers to prompt before handling special cases
-        match mode:
-            case "snip":
-                prompt += "\n\nPlease return the response as a snippet with placeholders. A snippet can control cursors and text insertion using constructs like tabstops ($1, $2, etc., with $0 as the final position). Linked tabstops update together. Placeholders, such as ${1:foo}, allow easy changes and can be nested (${1:another ${2:}}). Choices, using ${1|one,two,three|}, prompt user selection."
+        if modifier == "snip":
+            prompt += "\n\nPlease return the response as a snippet with placeholders. A snippet can control cursors and text insertion using constructs like tabstops ($1, $2, etc., with $0 as the final position). Linked tabstops update together. Placeholders, such as ${1:foo}, allow easy changes and can be nested (${1:another ${2:}}). Choices, using ${1|one,two,three|}, prompt user selection."
 
-        # Ask is a special case, where the text to process is the prompted question, not the selected text
+        # Handle special cases in the prompt
+        ### Ask is a special case, where the text to process is the prompted question, not selected text
         if prompt.startswith("ask"):
             text_to_process = format_message(prompt.removeprefix("ask"))
-            prompt = """Generate text that satisfies the question or request given in the input."""
+            prompt = "Generate text that satisfies the question or request given in the input."
 
         # If the user is just moving the source to the destination, we don't need to apply a query
         if prompt == "pass":
             response = text_to_process
         else:
-            response = gpt_query(format_message(prompt), text_to_process, mode)
-        actions.user.gpt_insert_response(response, destination, mode)
+            response = gpt_query(format_message(prompt), text_to_process, modifier)
+
+        actions.user.gpt_insert_response(response, destination, modifier)
 
     def gpt_help():
         """Open the GPT help file in the web browser"""
@@ -205,15 +203,15 @@ class UserActions:
             case "clipboard":
                 clip.set_text(result)
             case "context":
-                push_context(result)
+                GPTState.push_context(result)
             case "newContext":
-                clear_context()
-                push_context(result)
+                GPTState.clear_context()
+                GPTState.push_context(result)
             case "thread":
-                push_thread(result)
+                GPTState.push_thread(result)
             case "newThread":
-                new_thread()
-                push_thread(result)
+                GPTState.new_thread()
+                GPTState.push_thread(result)
             case "appendClipboard":
                 clip.set_text(clip.text() + "\n" + result)
             case "browser":
@@ -228,7 +226,7 @@ class UserActions:
                 except KeyError:
                     notify("GPT Failure: text to speech is not installed")
 
-            # Although we can insert to a cursorless dpestination, the cursorless_target capture
+            # Although we can insert to a cursorless destination, the cursorless_target capture
             # Greatly increases DFA compliation times and should be avoided if possible
             case "cursorless":
                 actions.user.cursorless_insert(cursorless_destination, result)
@@ -242,9 +240,9 @@ class UserActions:
             case "clipboard":
                 return format_clipboard()
             case "context":
-                return format_message(string_context())
+                return format_message(messages_to_string(GPTState.context))
             case "thread":
-                return format_message(string_thread())
+                return format_message(messages_to_string(GPTState.thread))
             case "gptResponse":
                 if GPTState.last_response == "":
                     raise Exception(
