@@ -47,7 +47,7 @@ class UserActions:
         ctx.tags = []
 
     def copy_model_confirmation_gui():
-        """Copy the model ctx.tags = ["user.model_window_open"] to the clipboard"""
+        """Copy the model output to the clipboard"""
         clip.set_text(GPTState.text_to_confirm)
         GPTState.text_to_confirm = ""
 
