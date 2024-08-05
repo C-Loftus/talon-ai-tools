@@ -1,4 +1,4 @@
-from talon import Module, Context, actions, clip, imgui
+from talon import Context, Module, actions, clip, imgui
 
 from .modelHelpers import GPTState, notify
 
