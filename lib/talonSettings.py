@@ -52,9 +52,10 @@ mod.setting(
 mod.setting(
     "model_system_prompt",
     type=str,
-    default="You are an assistant helping an office worker to be more productive. Output just the response to the request and no additional content. Do not generate any markdown formatting such as backticks for programming languages unless it is explicitly requested.",
+    default="You are an assistant helping an office worker to be more productive. Output just the response to the request and no additional content. Do not generate any markdown formatting such as backticks for programming languages unless it is explicitly requested. If the user requests code generation, output just code and not additional natural language explanation.",
     desc="The default system prompt that informs the way the model should behave at a high level",
 )
+
 
 mod.setting(
     "model_shell_default",
