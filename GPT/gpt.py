@@ -229,14 +229,19 @@ class UserActions:
                 builder.render()
             case "textToSpeech":
                 try:
-                    actions.user.tts(result)
+                    actions.user.tts(extract_message(result))
                 except KeyError:
                     notify("GPT Failure: text to speech is not installed")
 
             # Although we can insert to a cursorless destination, the cursorless_target capture
             # Greatly increases DFA compliation times and should be avoided if possible
             case "cursorless":
-                actions.user.cursorless_insert(cursorless_destination, result)
+                actions.user.cursorless_insert(
+                    cursorless_destination, extract_message(result)
+                )
+            case "window":
+                actions.user.add_to_confirmation_gui(extract_message(result))
+
             case "paste" | _:
                 GPTState.last_was_pasted = True
                 paste_and_modify(result, modifier)
