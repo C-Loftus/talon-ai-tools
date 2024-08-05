@@ -12,9 +12,13 @@ model (sequel | sql) <user.text>$:
     user.add_to_confirmation_gui(result)
 
 # Confirm and paste the output of the model
-^model paste output$: user.paste_model_confirmation_gui()
+^paste response$: user.paste_model_confirmation_gui()
 
-^model copy output$: user.copy_model_confirmation_gui()
+# Confirm and paste the output of the model selected
+^chain response$:
+    user.chain_model_confirmation_gui()
+
+^copy response$: user.copy_model_confirmation_gui()
 
 # Deny the output of the model and discard it
-^model discard output$: user.close_model_confirmation_gui()
+^discard response$: user.close_model_confirmation_gui()

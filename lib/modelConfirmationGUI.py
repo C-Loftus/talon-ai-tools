@@ -14,15 +14,20 @@ def confirmation_gui(gui: imgui.GUI):
         gui.text(line)
 
     gui.spacer()
-    if gui.button("Model paste output"):
+    if gui.button("Paste response"):
         actions.user.paste_model_confirmation_gui()
 
     gui.spacer()
-    if gui.button("Model copy output"):
+    if gui.button("Chain response"):
+        actions.user.paste_model_confirmation_gui()
+        actions.user.gpt_select_last()
+
+    gui.spacer()
+    if gui.button("Copy response"):
         actions.user.copy_model_confirmation_gui()
 
     gui.spacer()
-    if gui.button("Model discard output"):
+    if gui.button("Discard response"):
         actions.user.close_model_confirmation_gui()
 
 
@@ -54,5 +59,12 @@ class UserActions:
             return
         else:
             actions.user.paste(GPTState.text_to_confirm)
+            GPTState.last_response = GPTState.text_to_confirm
+            GPTState.last_was_pasted = True
             GPTState.text_to_confirm = ""
             confirmation_gui.hide()
+
+    def chain_model_confirmation_gui():
+        """Chain the model output"""
+        actions.user.paste_model_confirmation_gui()
+        actions.user.gpt_select_last()
