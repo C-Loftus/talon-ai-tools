@@ -133,9 +133,7 @@ class UserActions:
     ):
         """Apply an arbitrary prompt to arbitrary text"""
         response = actions.user.gpt_run_prompt(modifier, prompt, source)
-        actions.user.gpt_insert_response(
-            format_message(response), destination, modifier
-        )
+        actions.user.gpt_insert_response(response, destination, modifier)
         return response
 
     def gpt_run_prompt(modifier: str, prompt: str, source: str) -> str:
@@ -190,7 +188,7 @@ class UserActions:
             raise Exception("No text to reformat")
 
     def gpt_insert_response(
-        result: dict[str, any],
+        result: str,
         method: str = "",
         modifier: str = "",
         cursorless_destination: Any = None,
@@ -210,37 +208,35 @@ class UserActions:
             case "clipboard":
                 clip.set_text(result)
             case "context":
-                GPTState.push_context(result)
+                GPTState.push_context(format_message(result))
             case "newContext":
                 GPTState.clear_context()
-                GPTState.push_context(result)
+                GPTState.push_context(format_message(result))
             case "thread":
-                GPTState.push_thread(result)
+                GPTState.push_thread(format_message(result))
             case "newThread":
                 GPTState.new_thread()
-                GPTState.push_thread(result)
+                GPTState.push_thread(format_message(result))
             case "appendClipboard":
                 clip.set_text(clip.text() + "\n" + result)
             case "browser":
                 builder = Builder()
                 builder.h1("Talon GPT Result")
-                for line in extract_message(result).split("\n"):
+                for line in result.split("\n"):
                     builder.p(line)
                 builder.render()
             case "textToSpeech":
                 try:
-                    actions.user.tts(extract_message(result))
+                    actions.user.tts(result)
                 except KeyError:
                     notify("GPT Failure: text to speech is not installed")
 
             # Although we can insert to a cursorless destination, the cursorless_target capture
             # Greatly increases DFA compliation times and should be avoided if possible
             case "cursorless":
-                actions.user.cursorless_insert(
-                    cursorless_destination, extract_message(result)
-                )
+                actions.user.cursorless_insert(cursorless_destination, result)
             case "window":
-                actions.user.add_to_confirmation_gui(extract_message(result))
+                actions.user.add_to_confirmation_gui(result)
 
             case "paste" | _:
                 GPTState.last_was_pasted = True
