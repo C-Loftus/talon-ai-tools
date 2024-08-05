@@ -24,6 +24,14 @@ def confirmation_gui(gui: imgui.GUI):
         actions.user.gpt_select_last()
 
     gui.spacer()
+    if gui.button("Pass response to context"):
+        actions.user.pass_context_model_confirmation_gui()
+
+    gui.spacer()
+    if gui.button("Pass response to thread"):
+        actions.user.pass_thread_model_confirmation_gui()
+
+    gui.spacer()
     if gui.button("Copy response"):
         actions.user.copy_model_confirmation_gui()
 
@@ -45,6 +53,18 @@ class UserActions:
         GPTState.text_to_confirm = ""
         confirmation_gui.hide()
         ctx.tags = []
+
+    def pass_context_model_confirmation_gui():
+        """Add the model output to the context"""
+        actions.user.gpt_push_context(GPTState.text_to_confirm)
+        GPTState.text_to_confirm = ""
+        actions.user.close_model_confirmation_gui()
+
+    def pass_thread_model_confirmation_gui():
+        """Add the model output to the thread"""
+        actions.user.gpt_push_thread(GPTState.text_to_confirm)
+        GPTState.text_to_confirm = ""
+        actions.user.close_model_confirmation_gui()
 
     def copy_model_confirmation_gui():
         """Copy the model output to the clipboard"""
