@@ -41,7 +41,7 @@ class UserActions:
         confirmation_gui.show()
 
     def close_model_confirmation_gui():
-        """Close the model output without pasting itp"""
+        """Close the model output without pasting it"""
         GPTState.text_to_confirm = ""
         confirmation_gui.hide()
         ctx.tags = []
