@@ -26,6 +26,18 @@ If you wish to change any configuration settings, copy the [example configuratio
 | user.model_shell_default | `"bash"`                                                                                                                                                                                                                                                           | The default shell for `model shell` commands                                                |
 | user.model_system_prompt | `"You are an assistant helping an office worker to be more productive. Output just the response to the request and no additional content. Do not generate any markdown formatting such as backticks for programming languages unless it is explicitly requested."` | The meta-prompt for how to respond to all prompts                                           |
 
+## Configuring Model Name
+
+The model name is used to invoke the large language model. By default it is named 'model' and you can use 'model' when you invoke any commands. For example you can ask the model to do something for you by saying 'model ask <text>'. You can override this in your own configuration without changing this repository. To do so just create another talon list with the same name and a higher specificity. Here is an example that you can copy and past into your own configuration files
+
+```talon
+list: user.modelAlias
+-
+
+# The default model name
+model: model
+```
+
 ## Providing Contextual User Context
 
 In case you want to provide additional context to the LLM, there is a hook that you can override in your own python code and anything that is returned will be sent with every request. This is useful for example if you would like to run a shell command and send its output along. Here is an example file that you can use as a template:

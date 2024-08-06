@@ -10,6 +10,7 @@ mod.tag("gpt_beta", desc="Tag for enabling beta GPT commands")
 mod.list("staticPrompt", desc="GPT Prompts Without Dynamic Arguments")
 mod.list("customPrompt", desc="Custom user-defined GPT prompts")
 mod.list("modelPrompt", desc="GPT Prompts")
+mod.list("modelAlias", desc="The name of the model")
 mod.list("modelDestination", desc="What to do after returning the model response")
 mod.list("modelSource", desc="Where to get the text from for the GPT")
 
