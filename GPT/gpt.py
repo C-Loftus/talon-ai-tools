@@ -146,7 +146,7 @@ class UserActions:
         text_to_process = actions.user.gpt_get_source_text(source)
 
         # Apply modifiers to prompt before handling special cases
-        if modifier == "snip":
+        if modifier == "snip" and prompt != "pass":
             prompt += "\n\nPlease return the response as a snippet with placeholders. A snippet can control cursors and text insertion using constructs like tabstops ($1, $2, etc., with $0 as the final position). Linked tabstops update together. Placeholders, such as ${1:foo}, allow easy changes and can be nested (${1:another ${2:}}). Choices, using ${1|one,two,three|}, prompt user selection."
 
         # Handle special cases in the prompt
