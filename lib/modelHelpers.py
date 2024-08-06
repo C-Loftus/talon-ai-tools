@@ -110,22 +110,18 @@ def generate_payload(
 
     language = actions.code.language()
 
-    editor_context = (
-        (
-            f"\n---\nThe user is currently in a code editor for {language}.\n---\n"
-            if language != ""
-            else ""
-        )
-        + make_prompt_from_editor_ctx(actions.user.a11y_get_context_of_editor(content))
-        + f"---\n\nThe following describes the currently focused application:\n\n{actions.user.talon_get_active_context()}\n---\n\n"
-        + (
-            "\n\n---\nPlease return the response as a snippet with placeholders. A snippet can control cursors and text insertion using constructs like tabstops ($1, $2, etc., with $0 as the final position). Linked tabstops update together. Placeholders, such as ${1:foo}, allow easy changes and can be nested (${1:another ${2:}}). Choices, using ${1|one,two,three|}, prompt user selection.\n---\n"
-            if modifier == "snip"
-            else ""
-        )
-    )
+    editor_context = f"""
+    {f"---\nThe user is currently in a code editor for {language}.\n---\n" if language else ""}
+    {make_prompt_from_editor_ctx(actions.user.a11y_get_context_of_editor(content))}
+    ---
+    The following describes the currently focused application:
 
-    additional_context = [{"type": "text", "text": editor_context}]
+    {actions.user.talon_get_active_context()}
+    ---
+    {"\n\n---\nPlease return the response as a snippet with placeholders. A snippet can control cursors and text insertion using constructs like tabstops ($1, $2, etc., with $0 as the final position). Linked tabstops update together. Placeholders, such as ${1:foo}, allow easy changes and can be nested (${1:another ${2:}}). Choices, using ${1|one,two,three|}, prompt user selection.\n---\n" if modifier == "snip" else ""}
+    """
+
+    additional_context = [format_message(editor_context)]
     reused_context = GPTState.context
     if modifier == "thread":
         reused_context += GPTState.thread
