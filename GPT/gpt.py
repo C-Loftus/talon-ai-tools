@@ -56,7 +56,7 @@ class UserActions:
         """
 
         result = gpt_query(format_message(prompt), format_message(source_text))
-        actions.user.gpt_insert_response(result, "paste")
+        actions.user.gpt_insert_response(extract_message(result), "paste")
 
     def gpt_blend_list(source_text: list[str], destination_text: str):
         """Blend all the source text as a list and send it to the destination"""
@@ -160,7 +160,7 @@ class UserActions:
             response = text_to_process
         else:
             response = gpt_query(format_message(prompt), text_to_process, modifier)
-        return response.get("text", "")
+        return extract_message(response)
 
     def gpt_help():
         """Open the GPT help file in the web browser"""
