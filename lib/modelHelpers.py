@@ -122,6 +122,11 @@ def generate_payload(
                 actions.user.a11y_get_context_of_editor(content)
             )
             + f"The following describes the currently focused application:\n\n{actions.user.talon_get_active_context()}"
+            + (
+                "\n\nPlease return the response as a snippet with placeholders. A snippet can control cursors and text insertion using constructs like tabstops ($1, $2, etc., with $0 as the final position). Linked tabstops update together. Placeholders, such as ${1:foo}, allow easy changes and can be nested (${1:another ${2:}}). Choices, using ${1|one,two,three|}, prompt user selection."
+                if modifier == "snip"
+                else ""
+            )
         ]
     ]
     reused_context = GPTState.context
