@@ -95,7 +95,7 @@ class UserActions:
         """Reset the stored context"""
         GPTState.clear_context()
 
-    def gpt_new_thread():
+    def gpt_clear_thread():
         """Create a new thread"""
         GPTState.new_thread()
 
@@ -245,6 +245,11 @@ class UserActions:
                 actions.user.cursorless_insert(cursorless_destination, result)
             case "window":
                 actions.user.add_to_confirmation_gui(result)
+
+            case "chain":
+                GPTState.last_was_pasted = True
+                paste_and_modify(result, modifier)
+                actions.user.gpt_select_last()
 
             case "paste" | _:
                 GPTState.last_was_pasted = True

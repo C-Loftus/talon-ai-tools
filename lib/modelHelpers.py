@@ -196,7 +196,3 @@ def paste_and_modify(formatted_message: str, modifier: str = ""):
             actions.user.insert_snippet(formatted_message)
         case "" | _:
             actions.user.paste(formatted_message)
-
-    # Snip is mutually exclusive with pasting, but chain can be run additionally after pasting
-    if modifier == "chain":
-        actions.user.gpt_select_last()

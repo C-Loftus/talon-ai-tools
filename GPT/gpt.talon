@@ -25,11 +25,10 @@ model [nope] that was <user.text>$:
     user.paste(result)
 
 # Clear the context stored in the model
-model context clear: user.gpt_clear_context()
+model clear context: user.gpt_clear_context()
 
 # Create a new thread which is similar to a conversation with the model
 # A thread allows the model to access data from the previous queries in the same thread
-model thread new: user.gpt_new_thread()
-
+model clear thread: user.gpt_clear_thread()
 model enable thread: user.gpt_enable_threading()
 model disable thread: user.gpt_disable_threading()
