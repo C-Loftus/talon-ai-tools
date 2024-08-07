@@ -6,6 +6,3 @@ snip: snip
 
 # Keep track of the questions and responses as a conversation
 thread: thread
-
-# Select the response after insertion so you can apply subsequent prompts on it
-chain: chain

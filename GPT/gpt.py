@@ -238,6 +238,11 @@ class UserActions:
             case "window":
                 actions.user.add_to_confirmation_gui(result)
 
+            case "chain":
+                GPTState.last_was_pasted = True
+                paste_and_modify(result, modifier)
+                actions.user.gpt_select_last()
+
             case "paste" | _:
                 GPTState.last_was_pasted = True
                 paste_and_modify(result, modifier)
