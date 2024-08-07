@@ -9,6 +9,7 @@ class GPTState:
     last_was_pasted: ClassVar[bool] = False
     context: ClassVar[list] = []
     thread: ClassVar[list] = []
+    thread_enabled: ClassVar[bool] = False
 
     @classmethod
     def clear_context(cls):
@@ -21,6 +22,18 @@ class GPTState:
         """Create a new thread"""
         cls.thread = []
         actions.app.notify("Created a new thread")
+
+    @classmethod
+    def enable_thread(cls):
+        """Enable threading"""
+        cls.thread_enabled = True
+        actions.app.notify("Enabled threading")
+
+    @classmethod
+    def disable_thread(cls):
+        """Disable threading"""
+        cls.thread_enabled = False
+        actions.app.notify("Disabled threading")
 
     @classmethod
     def push_context(cls, context: dict[str, any]):

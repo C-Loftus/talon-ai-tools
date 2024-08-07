@@ -33,7 +33,7 @@ def gpt_query(prompt: dict[str, any], content: dict[str, any], modifier: str = "
 
     response = gpt_send_request(headers, data)
     GPTState.last_response = extract_message(response)
-    if modifier == "thread":
+    if GPTState.thread_enabled:
         GPTState.push_thread(prompt)
         GPTState.push_thread(content)
         GPTState.push_thread(response)
@@ -98,6 +98,14 @@ class UserActions:
     def gpt_new_thread():
         """Create a new thread"""
         GPTState.new_thread()
+
+    def gpt_enable_threading():
+        """Enable threading of subsequent requests"""
+        GPTState.enable_thread()
+
+    def gpt_disable_threading():
+        """Enable threading of subsequent requests"""
+        GPTState.disable_thread()
 
     def gpt_push_context(context: str):
         """Add the selected text to the stored context"""
