@@ -3,6 +3,3 @@ list: user.modelModifier
 
 # Construct snippet with the response
 snip: snip
-
-# Keep track of the questions and responses as a conversation
-thread: thread
