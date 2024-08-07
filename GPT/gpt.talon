@@ -30,3 +30,5 @@ model clear context: user.gpt_clear_context()
 # Create a new thread which is similar to a conversation with the model
 # A thread allows the model to access data from the previous queries in the same thread
 model clear thread: user.gpt_clear_thread()
+model enable thread: user.gpt_enable_threading()
+model disable thread: user.gpt_disable_threading()

@@ -105,6 +105,9 @@ def generate_payload(
     notification = "GPT Task Started"
     if len(GPTState.context) > 0:
         notification += ": Reusing Stored Context"
+    if GPTState.thread_enabled:
+        notification += ", Threading Enabled"
+
     notify(notification)
     TOKEN = get_token()
 
@@ -133,8 +136,8 @@ def generate_payload(
         if item is not None
     ]
 
-    reused_context = GPTState.context
-    if modifier == "thread":
+    reused_context = list(GPTState.context)
+    if GPTState.thread_enabled:
         reused_context += GPTState.thread
 
     current_query = [prompt, content]
