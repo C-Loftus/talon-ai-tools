@@ -38,3 +38,6 @@ to speech: textToSpeech
 
 # Output the result in a talon imgui window
 to window: window
+
+# Select the response after insertion so you can apply subsequent prompts on it
+chain: chain
