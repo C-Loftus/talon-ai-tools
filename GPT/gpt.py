@@ -95,7 +95,7 @@ class UserActions:
         """Reset the stored context"""
         GPTState.clear_context()
 
-    def gpt_new_thread():
+    def gpt_clear_thread():
         """Create a new thread"""
         GPTState.new_thread()
 
