@@ -12,7 +12,6 @@ from ..lib.modelHelpers import (
     gpt_send_request,
     messages_to_string,
     notify,
-    paste_and_modify,
 )
 from ..lib.modelState import GPTState
 
@@ -23,13 +22,13 @@ mod.tag(
 )
 
 
-def gpt_query(prompt: dict[str, any], content: dict[str, any], modifier: str = ""):
+def gpt_query(prompt: dict[str, any], content: dict[str, any], destination: str = ""):
     """Send a prompt to the GPT API and return the response"""
 
     # Reset state before pasting
     GPTState.last_was_pasted = False
 
-    headers, data = generate_payload(prompt, content, None, modifier)
+    headers, data = generate_payload(prompt, content, None, destination)
 
     response = gpt_send_request(headers, data)
     GPTState.last_response = extract_message(response)
@@ -140,15 +139,13 @@ class UserActions:
         for _ in lines[0]:
             actions.edit.extend_left()
 
-    def gpt_apply_prompt(
-        prompt: str, source: str = "", destination: str = "", modifier: str = ""
-    ):
+    def gpt_apply_prompt(prompt: str, source: str = "", destination: str = ""):
         """Apply an arbitrary prompt to arbitrary text"""
-        response = actions.user.gpt_run_prompt(modifier, prompt, source)
-        actions.user.gpt_insert_response(response, destination, modifier)
+        response = actions.user.gpt_run_prompt(destination, prompt, source)
+        actions.user.gpt_insert_response(response, destination)
         return response
 
-    def gpt_run_prompt(modifier: str, prompt: str, source: str) -> str:
+    def gpt_run_prompt(destination: str, prompt: str, source: str) -> str:
         """Apply an arbitrary prompt to arbitrary text and return the response as text"""
 
         text_to_process = actions.user.gpt_get_source_text(source)
@@ -163,7 +160,7 @@ class UserActions:
         if prompt == "pass":
             response = text_to_process
         else:
-            response = gpt_query(format_message(prompt), text_to_process, modifier)
+            response = gpt_query(format_message(prompt), text_to_process, destination)
         return extract_message(response)
 
     def gpt_help():
@@ -198,7 +195,6 @@ class UserActions:
     def gpt_insert_response(
         result: str,
         method: str = "",
-        modifier: str = "",
         cursorless_destination: Any = None,
     ):
         """Insert a GPT result in a specified way"""
@@ -207,14 +203,16 @@ class UserActions:
                 actions.key("left")
                 actions.edit.line_insert_up()
                 GPTState.last_was_pasted = True
-                paste_and_modify(result, modifier)
+                actions.user.paste(result)
             case "below":
                 actions.key("right")
                 actions.edit.line_insert_down()
                 GPTState.last_was_pasted = True
-                paste_and_modify(result, modifier)
+                actions.user.paste(result)
             case "clipboard":
                 clip.set_text(result)
+            case "snip":
+                actions.user.insert_snippet(result)
             case "context":
                 GPTState.push_context(format_message(result))
             case "newContext":
@@ -248,12 +246,12 @@ class UserActions:
 
             case "chain":
                 GPTState.last_was_pasted = True
-                paste_and_modify(result, modifier)
+                actions.user.paste(result)
                 actions.user.gpt_select_last()
 
             case "paste" | _:
                 GPTState.last_was_pasted = True
-                paste_and_modify(result, modifier)
+                actions.user.paste(result)
 
     def gpt_get_source_text(spoken_text: str) -> dict[str, any]:
         """Get the source text that is will have the prompt applied to it"""
