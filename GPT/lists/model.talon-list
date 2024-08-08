@@ -1,4 +1,4 @@
-list: user.modelAlias
+list: user.model
 -
 
 # The default model name
