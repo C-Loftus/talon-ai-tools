@@ -8,9 +8,9 @@ from ..lib.modelHelpers import (
     extract_message,
     format_clipboard,
     format_message,
-    send_request,
     messages_to_string,
     notify,
+    send_request,
 )
 from ..lib.modelState import GPTState
 
