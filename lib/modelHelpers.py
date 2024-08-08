@@ -139,8 +139,8 @@ def send_request(
             ),
             application_context,
             snippet_context,
-            actions.user.contextual_user_context(),
         ]
+        + actions.user.contextual_user_context()
         if item is not None
     ]
 
@@ -150,6 +150,10 @@ def send_request(
     }
 
     current_request = format_messages("user", [prompt, content])
+    print("current context")
+    print(GPTState.context)
+    print("current thread")
+    print(GPTState.thread)
     data = {
         "messages": [
             {
@@ -157,17 +161,18 @@ def send_request(
                 "content": [
                     {"type": "text", "text": settings.get("user.model_system_prompt")},
                 ]
-                + additional_context
-                + GPTState.context,
+                + additional_context,
             },
-            GPTState.thread,
-            current_request,
-        ],
+            format_messages("system", GPTState.context),
+        ]
+        + GPTState.thread
+        + [current_request],
         "max_tokens": 2024,
         "temperature": settings.get("user.model_temperature"),
         "n": 1,
         "model": settings.get("user.openai_model"),
     }
+    print(data)
     if tools is not None:
         data["tools"] = tools
 
