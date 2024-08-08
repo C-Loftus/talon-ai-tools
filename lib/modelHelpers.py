@@ -1,7 +1,7 @@
 import base64
 import json
 import os
-from typing import Optional, Tuple
+from typing import Optional
 
 import requests
 from talon import actions, app, clip, settings
@@ -72,6 +72,13 @@ def make_prompt_from_editor_ctx(ctx: str):
     )
 
 
+def format_messages(role: str, messages: list[dict[str, any]]):
+    return {
+        "role": role,
+        "content": messages,
+    }
+
+
 def format_message(content: str):
     return {"type": "text", "text": content}
 
@@ -93,12 +100,12 @@ def format_clipboard():
         return format_message(clip.text())
 
 
-def generate_payload(
+def send_request(
     prompt: dict[str, any],
     content: dict[str, any],
     tools: Optional[list[Tool]] = None,
     destination: str = "",
-) -> Tuple[Headers, Data]:
+):
     """Generate the headers and data for the OpenAI API GPT request.
     Does not return the URL given the fact not all openai-compatible endpoints support new features like tools
     """
@@ -132,21 +139,17 @@ def generate_payload(
             ),
             application_context,
             snippet_context,
+            actions.user.contextual_user_context(),
         ]
         if item is not None
     ]
-
-    reused_context = list(GPTState.context)
-    if GPTState.thread_enabled:
-        reused_context += GPTState.thread
-
-    current_query = [prompt, content]
 
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {TOKEN}",
     }
 
+    current_request = format_messages("user", [prompt, content])
     data = {
         "messages": [
             {
@@ -155,15 +158,10 @@ def generate_payload(
                     {"type": "text", "text": settings.get("user.model_system_prompt")},
                 ]
                 + additional_context
-                + [
-                    {"type": "text", "text": item}
-                    for item in actions.user.contextual_user_context()
-                ],
+                + GPTState.context,
             },
-            {
-                "role": "user",
-                "content": reused_context + current_query,
-            },
+            GPTState.thread,
+            current_request,
         ],
         "max_tokens": 2024,
         "temperature": settings.get("user.model_temperature"),
@@ -172,7 +170,12 @@ def generate_payload(
     }
     if tools is not None:
         data["tools"] = tools
-    return headers, data
+
+    response = gpt_send_request(headers, data)
+    if GPTState.thread_enabled:
+        GPTState.push_thread(current_request)
+        GPTState.push_thread(format_messages("assistant", [response]))
+    return response
 
 
 def get_clipboard_image():

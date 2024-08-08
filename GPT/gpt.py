@@ -8,8 +8,7 @@ from ..lib.modelHelpers import (
     extract_message,
     format_clipboard,
     format_message,
-    generate_payload,
-    gpt_send_request,
+    send_request,
     messages_to_string,
     notify,
 )
@@ -28,14 +27,8 @@ def gpt_query(prompt: dict[str, any], content: dict[str, any], destination: str 
     # Reset state before pasting
     GPTState.last_was_pasted = False
 
-    headers, data = generate_payload(prompt, content, None, destination)
-
-    response = gpt_send_request(headers, data)
+    response = send_request(prompt, content, None, destination)
     GPTState.last_response = extract_message(response)
-    if GPTState.thread_enabled:
-        GPTState.push_thread(prompt)
-        GPTState.push_thread(content)
-        GPTState.push_thread(response)
     return response
 
 
