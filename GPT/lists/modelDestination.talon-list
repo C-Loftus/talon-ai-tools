@@ -41,3 +41,6 @@ to window: window
 
 # Select the response after insertion so you can apply subsequent prompts on it
 chain: chain
+
+# Insert the response as a snippet with placeholders (only works in vscode)
+snip: snip

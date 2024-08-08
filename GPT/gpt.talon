@@ -5,8 +5,8 @@ model help$: user.gpt_help()
 #   Example: `model fix grammar below` -> Fixes the grammar of the selected text and pastes below
 #   Example: `model explain this` -> Explains the selected text and pastes in place
 #   Example: `model fix grammar clip to browser` -> Fixes the grammar of the text on the clipboard and opens in browser`
-model [{user.modelModifier}] <user.modelPrompt> [{user.modelSource}] [{user.modelDestination}]:
-    user.gpt_apply_prompt(modelPrompt, modelSource or "", modelDestination or "", modelModifier or "")
+model <user.modelPrompt> [{user.modelSource}] [{user.modelDestination}]:
+    user.gpt_apply_prompt(modelPrompt, modelSource or "", modelDestination or "")
 
 # Select the last GPT response so you can edit it further
 model take response: user.gpt_select_last()

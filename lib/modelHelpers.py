@@ -97,7 +97,7 @@ def generate_payload(
     prompt: dict[str, any],
     content: dict[str, any],
     tools: Optional[list[Tool]] = None,
-    modifier: str = "",
+    destination: str = "",
 ) -> Tuple[Headers, Data]:
     """Generate the headers and data for the OpenAI API GPT request.
     Does not return the URL given the fact not all openai-compatible endpoints support new features like tools
@@ -120,7 +120,7 @@ def generate_payload(
     application_context = f"The following describes the currently focused application:\n\n{actions.user.talon_get_active_context()}"
     snippet_context = (
         "\n\nPlease return the response as a snippet with placeholders. A snippet can control cursors and text insertion using constructs like tabstops ($1, $2, etc., with $0 as the final position). Linked tabstops update together. Placeholders, such as ${1:foo}, allow easy changes and can be nested (${1:another ${2:}}). Choices, using ${1|one,two,three|}, prompt user selection."
-        if modifier == "snip"
+        if destination == "snip"
         else None
     )
     additional_context = [
@@ -187,12 +187,3 @@ def get_clipboard_image():
     except Exception as e:
         print(e)
         raise Exception("Invalid image in clipboard")
-
-
-def paste_and_modify(formatted_message: str, modifier: str = ""):
-    """Paste or insert the result of a GPT query in a special way, e.g. as a snippet or selected"""
-    match modifier:
-        case "snip":
-            actions.user.insert_snippet(formatted_message)
-        case "" | _:
-            actions.user.paste(formatted_message)
