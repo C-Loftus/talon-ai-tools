@@ -14,3 +14,42 @@ import FetchedData from "../../../components/FetchedData.astro";
 You do not need to fork the repository to add your own custom prompts. Copy the file below, place it anywhere inside your talon `user/` directory and follow the pattern of the key value mapping.
 
 <FetchedData data="https://raw.githubusercontent.com/C-Loftus/talon-ai-tools/main/GPT/lists/customPrompt.talon-list.example" />
+
+
+
+## Advanced Customization
+
+### Configuring Model Name
+
+The model name is used to invoke the large language model. By default it is named 'model' and you can use 'model' when you invoke any commands. For example you can ask the model to do something for you by saying 'model ask \<text\>'. You can override this in your own configuration without changing this repository. To do so just create another talon list with the same name and a higher specificity. Here is an example that you can copy and past into your own configuration files
+
+```yml
+list: user.modelAlias
+-
+
+# The default model name
+model: model
+```
+
+
+### Providing Custom User Context
+
+In case you want to provide additional context to the LLM, there is a hook that you can override in your own python code and anything that is returned will be sent with every request. Here is an example:
+
+```py
+from talon import Context, Module, actions
+
+mod = Module()
+
+ctx = Context()
+
+
+@ctx.action_class("user")
+class UserActions:
+    def contextual_user_context():
+        """This is an override function that can be used to add additional context to the prompt"""
+        result = actions.user.talon_get_active_context()
+        return [
+            f"The following describes the currently focused application:\n\n{result}"
+        ]
+```
