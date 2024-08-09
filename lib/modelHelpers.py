@@ -159,10 +159,6 @@ def send_request(
     }
 
     current_request = format_messages("user", [prompt, content])
-    print("current context")
-    print(GPTState.context)
-    print("current thread")
-    print(GPTState.thread)
     data = {
         "messages": [
             {
@@ -181,7 +177,6 @@ def send_request(
         "n": 1,
         "model": settings.get("user.openai_model"),
     }
-    print(data)
     if tools is not None:
         data["tools"] = tools
 
