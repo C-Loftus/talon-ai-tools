@@ -11,6 +11,7 @@ from ..lib.modelHelpers import (
     messages_to_string,
     notify,
     send_request,
+    thread_to_string,
 )
 from ..lib.modelState import GPTState
 
@@ -113,7 +114,7 @@ class UserActions:
 
     def gpt_get_thread():
         """Fetch the user thread as a string"""
-        return messages_to_string(GPTState.thread)
+        return thread_to_string(GPTState.thread)
 
     def contextual_user_context():
         """This is an override function that can be used to add additional context to the prompt"""
@@ -254,7 +255,7 @@ class UserActions:
             case "context":
                 return format_message(messages_to_string(GPTState.context))
             case "thread":
-                return format_message(messages_to_string(GPTState.thread))
+                return format_message(thread_to_string(GPTState.thread))
             case "gptResponse":
                 if GPTState.last_response == "":
                     raise Exception(

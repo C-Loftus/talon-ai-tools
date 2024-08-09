@@ -26,6 +26,15 @@ def messages_to_string(messages: list[dict[str, any]]) -> str:
     return "\n\n".join(formatted_messages)
 
 
+def thread_to_string(chats: list[dict[str, list[dict[str, any]]]]) -> str:
+    """Format thread as a string"""
+    formatted_messages = []
+    for chat in chats:
+        formatted_messages.append(chat.get("role"))
+        formatted_messages.append(messages_to_string(chat.get("content", [])))
+    return "\n\n".join(formatted_messages)
+
+
 def gpt_send_request(headers: Headers, data: Data):
     url = settings.get("user.model_endpoint")
     response = requests.post(url, headers=headers, data=json.dumps(data))
