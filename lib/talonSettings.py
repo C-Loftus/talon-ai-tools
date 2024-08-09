@@ -63,8 +63,3 @@ mod.setting(
     default="bash",
     desc="The default shell for outputting model shell commands",
 )
-
-# Image description settings
-mod.setting("openDescriptionInBrowser", type=bool, default=True)
-mod.setting("maxDescriptionTokens", type=int, default=300)
-mod.list("descriptionPrompt", desc="Prompts for describing images")

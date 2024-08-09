@@ -43,7 +43,7 @@ ctx = Context()
 
 @ctx.action_class("user")
 class UserActions:
-    def contextual_user_context():
+    def gpt_additional_user_context():
         """This is an override function that can be used to add additional context to the prompt"""
         result = actions.user.talon_get_active_context()
         return [

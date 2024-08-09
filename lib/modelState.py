@@ -2,13 +2,15 @@ from typing import ClassVar
 
 from talon import actions
 
+from lib.modelTypes import GPTMessage, GPTMessageItem
+
 
 class GPTState:
     text_to_confirm: ClassVar[str] = ""
     last_response: ClassVar[str] = ""
     last_was_pasted: ClassVar[bool] = False
-    context: ClassVar[list] = []
-    thread: ClassVar[list] = []
+    context: ClassVar[list[GPTMessageItem]] = []
+    thread: ClassVar[list[GPTMessage]] = []
     thread_enabled: ClassVar[bool] = False
 
     @classmethod
@@ -36,13 +38,13 @@ class GPTState:
         actions.app.notify("Disabled threading")
 
     @classmethod
-    def push_context(cls, context: dict[str, any]):
+    def push_context(cls, context: GPTMessageItem):
         """Add the selected text to the stored context"""
         cls.context += [context]
         actions.app.notify("Appended user context")
 
     @classmethod
-    def push_thread(cls, context: dict[str, any]):
+    def push_thread(cls, context: GPTMessage):
         """Add the selected text to the current thread"""
         cls.thread += [context]
         actions.app.notify("Appended to thread")
