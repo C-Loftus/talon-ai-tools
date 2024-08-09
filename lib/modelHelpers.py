@@ -8,7 +8,7 @@ from talon import actions, app, clip, settings
 
 from ..lib.pureHelpers import strip_markdown
 from .modelState import GPTState
-from .modelTypes import Data, Headers, Tool
+from .modelTypes import Tool
 
 """"
 All functions in this this file have impure dependencies on either the model or the talon APIs
@@ -33,21 +33,6 @@ def thread_to_string(chats: list[dict[str, list[dict[str, any]]]]) -> str:
         formatted_messages.append(chat.get("role"))
         formatted_messages.append(messages_to_string(chat.get("content", [])))
     return "\n\n".join(formatted_messages)
-
-
-def gpt_send_request(headers: Headers, data: Data):
-    url = settings.get("user.model_endpoint")
-    response = requests.post(url, headers=headers, data=json.dumps(data))
-
-    match response.status_code:
-        case 200:
-            notify("GPT Task Completed")
-            resp = response.json()["choices"][0]["message"]["content"].strip()
-            formatted_resp = strip_markdown(resp)
-            return format_message(formatted_resp)
-        case _:
-            notify("GPT Failure: Check the Talon Log")
-            raise Exception(response.json())
 
 
 def notify(message: str):
@@ -174,7 +159,20 @@ def send_request(
     if tools is not None:
         data["tools"] = tools
 
-    response = gpt_send_request(headers, data)
+    url = settings.get("user.model_endpoint")
+    raw_response = requests.post(url, headers=headers, data=json.dumps(data))
+
+    response = None
+    match raw_response.status_code:
+        case 200:
+            notify("GPT Task Completed")
+            resp = raw_response.json()["choices"][0]["message"]["content"].strip()
+            formatted_resp = strip_markdown(resp)
+            response = format_message(formatted_resp)
+        case _:
+            notify("GPT Failure: Check the Talon Log")
+            raise Exception(raw_response.json())
+
     if GPTState.thread_enabled:
         GPTState.push_thread(current_request)
         GPTState.push_thread(format_messages("assistant", [response]))
