@@ -139,9 +139,10 @@ def send_request(
         if destination == "snip"
         else None
     )
-    additional_context = [
+    system_messages = [
         {"type": "text", "text": item}
         for item in [
+            settings.get("user.model_system_prompt"),
             language_context,
             make_prompt_from_editor_ctx(
                 actions.user.a11y_get_context_of_editor(content)
@@ -151,7 +152,7 @@ def send_request(
         ]
         + actions.user.contextual_user_context()
         if item is not None
-    ]
+    ] + GPTState.context
 
     headers = {
         "Content-Type": "application/json",
@@ -161,14 +162,7 @@ def send_request(
     current_request = format_messages("user", [prompt, content])
     data = {
         "messages": [
-            {
-                "role": "system",
-                "content": [
-                    {"type": "text", "text": settings.get("user.model_system_prompt")},
-                ]
-                + additional_context,
-            },
-            format_messages("system", GPTState.context),
+            format_messages("system", system_messages),
         ]
         + GPTState.thread
         + [current_request],
