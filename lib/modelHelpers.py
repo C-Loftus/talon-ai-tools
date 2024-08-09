@@ -1,14 +1,14 @@
 import base64
 import json
 import os
-from typing import Optional, Tuple
+from typing import Optional
 
 import requests
 from talon import actions, app, clip, settings
 
 from ..lib.pureHelpers import strip_markdown
 from .modelState import GPTState
-from .modelTypes import Data, Headers, Tool
+from .modelTypes import Tool
 
 """"
 All functions in this this file have impure dependencies on either the model or the talon APIs
@@ -26,19 +26,13 @@ def messages_to_string(messages: list[dict[str, any]]) -> str:
     return "\n\n".join(formatted_messages)
 
 
-def gpt_send_request(headers: Headers, data: Data):
-    url = settings.get("user.model_endpoint")
-    response = requests.post(url, headers=headers, data=json.dumps(data))
-
-    match response.status_code:
-        case 200:
-            notify("GPT Task Completed")
-            resp = response.json()["choices"][0]["message"]["content"].strip()
-            formatted_resp = strip_markdown(resp)
-            return format_message(formatted_resp)
-        case _:
-            notify("GPT Failure: Check the Talon Log")
-            raise Exception(response.json())
+def thread_to_string(chats: list[dict[str, list[dict[str, any]]]]) -> str:
+    """Format thread as a string"""
+    formatted_messages = []
+    for chat in chats:
+        formatted_messages.append(chat.get("role"))
+        formatted_messages.append(messages_to_string(chat.get("content", [])))
+    return "\n\n".join(formatted_messages)
 
 
 def notify(message: str):
@@ -72,6 +66,13 @@ def make_prompt_from_editor_ctx(ctx: str):
     )
 
 
+def format_messages(role: str, messages: list[dict[str, any]]):
+    return {
+        "role": role,
+        "content": messages,
+    }
+
+
 def format_message(content: str):
     return {"type": "text", "text": content}
 
@@ -93,12 +94,12 @@ def format_clipboard():
         return format_message(clip.text())
 
 
-def generate_payload(
+def send_request(
     prompt: dict[str, any],
     content: dict[str, any],
     tools: Optional[list[Tool]] = None,
     destination: str = "",
-) -> Tuple[Headers, Data]:
+):
     """Generate the headers and data for the OpenAI API GPT request.
     Does not return the URL given the fact not all openai-compatible endpoints support new features like tools
     """
@@ -113,7 +114,7 @@ def generate_payload(
 
     language = actions.code.language()
     language_context = (
-        f"\nThe user is currently in a code editor for {language}."
+        f"The user is currently in a code editor for the programming language: {language}."
         if language != ""
         else None
     )
@@ -123,9 +124,10 @@ def generate_payload(
         if destination == "snip"
         else None
     )
-    additional_context = [
+    system_messages = [
         {"type": "text", "text": item}
         for item in [
+            settings.get("user.model_system_prompt"),
             language_context,
             make_prompt_from_editor_ctx(
                 actions.user.a11y_get_context_of_editor(content)
@@ -133,38 +135,22 @@ def generate_payload(
             application_context,
             snippet_context,
         ]
+        + actions.user.contextual_user_context()
         if item is not None
-    ]
-
-    reused_context = list(GPTState.context)
-    if GPTState.thread_enabled:
-        reused_context += GPTState.thread
-
-    current_query = [prompt, content]
+    ] + GPTState.context
 
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {TOKEN}",
     }
 
+    current_request = format_messages("user", [prompt, content])
     data = {
         "messages": [
-            {
-                "role": "system",
-                "content": [
-                    {"type": "text", "text": settings.get("user.model_system_prompt")},
-                ]
-                + additional_context
-                + [
-                    {"type": "text", "text": item}
-                    for item in actions.user.contextual_user_context()
-                ],
-            },
-            {
-                "role": "user",
-                "content": reused_context + current_query,
-            },
-        ],
+            format_messages("system", system_messages),
+        ]
+        + GPTState.thread
+        + [current_request],
         "max_tokens": 2024,
         "temperature": settings.get("user.model_temperature"),
         "n": 1,
@@ -172,7 +158,25 @@ def generate_payload(
     }
     if tools is not None:
         data["tools"] = tools
-    return headers, data
+
+    url = settings.get("user.model_endpoint")
+    raw_response = requests.post(url, headers=headers, data=json.dumps(data))
+
+    response = None
+    match raw_response.status_code:
+        case 200:
+            notify("GPT Task Completed")
+            resp = raw_response.json()["choices"][0]["message"]["content"].strip()
+            formatted_resp = strip_markdown(resp)
+            response = format_message(formatted_resp)
+        case _:
+            notify("GPT Failure: Check the Talon Log")
+            raise Exception(raw_response.json())
+
+    if GPTState.thread_enabled:
+        GPTState.push_thread(current_request)
+        GPTState.push_thread(format_messages("assistant", [response]))
+    return response
 
 
 def get_clipboard_image():

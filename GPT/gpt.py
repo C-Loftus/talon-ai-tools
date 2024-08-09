@@ -8,10 +8,11 @@ from ..lib.modelHelpers import (
     extract_message,
     format_clipboard,
     format_message,
-    generate_payload,
-    gpt_send_request,
+    format_messages,
     messages_to_string,
     notify,
+    send_request,
+    thread_to_string,
 )
 from ..lib.modelState import GPTState
 
@@ -28,14 +29,8 @@ def gpt_query(prompt: dict[str, any], content: dict[str, any], destination: str 
     # Reset state before pasting
     GPTState.last_was_pasted = False
 
-    headers, data = generate_payload(prompt, content, None, destination)
-
-    response = gpt_send_request(headers, data)
+    response = send_request(prompt, content, None, destination)
     GPTState.last_response = extract_message(response)
-    if GPTState.thread_enabled:
-        GPTState.push_thread(prompt)
-        GPTState.push_thread(content)
-        GPTState.push_thread(response)
     return response
 
 
@@ -112,7 +107,7 @@ class UserActions:
 
     def gpt_push_thread(content: str):
         """Add the selected text to the active thread"""
-        GPTState.push_thread(format_message(content))
+        GPTState.push_thread(format_messages("user", [format_message(content)]))
 
     def gpt_get_context():
         """Fetch the user context as a string"""
@@ -120,7 +115,7 @@ class UserActions:
 
     def gpt_get_thread():
         """Fetch the user thread as a string"""
-        return messages_to_string(GPTState.thread)
+        return thread_to_string(GPTState.thread)
 
     def contextual_user_context():
         """This is an override function that can be used to add additional context to the prompt"""
@@ -219,10 +214,10 @@ class UserActions:
                 GPTState.clear_context()
                 GPTState.push_context(format_message(result))
             case "thread":
-                GPTState.push_thread(format_message(result))
+                GPTState.push_thread(format_messages("user", [format_message(result)]))
             case "newThread":
                 GPTState.new_thread()
-                GPTState.push_thread(format_message(result))
+                GPTState.push_thread(format_messages("user", [format_message(result)]))
             case "appendClipboard":
                 clip.set_text(clip.text() + "\n" + result)
             case "browser":
@@ -261,7 +256,7 @@ class UserActions:
             case "context":
                 return format_message(messages_to_string(GPTState.context))
             case "thread":
-                return format_message(messages_to_string(GPTState.thread))
+                return format_message(thread_to_string(GPTState.thread))
             case "gptResponse":
                 if GPTState.last_response == "":
                     raise Exception(
