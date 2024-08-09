@@ -129,7 +129,7 @@ def send_request(
 
     language = actions.code.language()
     language_context = (
-        f"\nThe user is currently in a code editor for {language}."
+        f"The user is currently in a code editor for the programming language: {language}."
         if language != ""
         else None
     )
