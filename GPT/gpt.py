@@ -8,6 +8,7 @@ from ..lib.modelHelpers import (
     extract_message,
     format_clipboard,
     format_message,
+    format_messages,
     messages_to_string,
     notify,
     send_request,
@@ -106,7 +107,7 @@ class UserActions:
 
     def gpt_push_thread(content: str):
         """Add the selected text to the active thread"""
-        GPTState.push_thread(format_message(content))
+        GPTState.push_thread(format_messages("user", [format_message(content)]))
 
     def gpt_get_context():
         """Fetch the user context as a string"""
@@ -213,10 +214,10 @@ class UserActions:
                 GPTState.clear_context()
                 GPTState.push_context(format_message(result))
             case "thread":
-                GPTState.push_thread(format_message(result))
+                GPTState.push_thread(format_messages("user", [format_message(result)]))
             case "newThread":
                 GPTState.new_thread()
-                GPTState.push_thread(format_message(result))
+                GPTState.push_thread(format_messages("user", [format_message(result)]))
             case "appendClipboard":
                 clip.set_text(clip.text() + "\n" + result)
             case "browser":
