@@ -37,7 +37,6 @@
 {user.model} start thread: user.gpt_enable_threading()
 {user.model} stop thread: user.gpt_disable_threading()
 
-
-^{user.model} toggle window$: 
+^{user.model} toggle window$:
     force_open = true
     user.confirmation_gui_refresh_thread(force_open)

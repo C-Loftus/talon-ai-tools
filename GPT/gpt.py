@@ -4,6 +4,7 @@ from typing import Any, Optional
 from talon import Module, actions, clip, settings
 
 from ..lib.HTMLBuilder import Builder
+from ..lib.modelConfirmationGUI import confirmation_gui
 from ..lib.modelHelpers import (
     extract_message,
     format_clipboard,
@@ -16,7 +17,6 @@ from ..lib.modelHelpers import (
 )
 from ..lib.modelState import GPTState
 from ..lib.modelTypes import GPTMessageItem
-from ..lib.modelConfirmationGUI import confirmation_gui
 
 mod = Module()
 mod.tag(
