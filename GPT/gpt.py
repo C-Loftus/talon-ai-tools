@@ -3,8 +3,6 @@ from typing import Any
 
 from talon import Module, actions, clip, settings
 
-from ..lib.modelTypes import GPTMessageItem
-
 from ..lib.HTMLBuilder import Builder
 from ..lib.modelHelpers import (
     extract_message,
@@ -17,6 +15,7 @@ from ..lib.modelHelpers import (
     thread_to_string,
 )
 from ..lib.modelState import GPTState
+from ..lib.modelTypes import GPTMessageItem
 
 mod = Module()
 mod.tag(
