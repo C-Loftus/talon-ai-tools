@@ -141,6 +141,11 @@ class UserActions:
         actions.user.gpt_insert_response(response, destination)
         return response
 
+    def gpt_pass(source: str = "", destination: str = ""):
+        """Passes a response from source to destination"""
+        source_text = extract_message(actions.user.gpt_get_source_text(source))
+        actions.user.gpt_insert_response(source_text, destination)
+
     def gpt_run_prompt(destination: str, prompt: str, source: str) -> str:
         """Apply an arbitrary prompt to arbitrary text and return the response as text"""
 
@@ -152,11 +157,7 @@ class UserActions:
             text_to_process = format_message(prompt.removeprefix("ask"))
             prompt = "Generate text that satisfies the question or request given in the input."
 
-        # If the user is just moving the source to the destination, we don't need to apply a query
-        if prompt == "pass":
-            response = text_to_process
-        else:
-            response = gpt_query(format_message(prompt), text_to_process, destination)
+        response = gpt_query(format_message(prompt), text_to_process, destination)
         return extract_message(response)
 
     def gpt_help():
