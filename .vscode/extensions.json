@@ -4,6 +4,9 @@
         "ms-python.vscode-pylance",
         "charliermarsh.ruff",
         "astro-build.astro-vscode",
-        "unifiedjs.vscode-mdx"
+        "unifiedjs.vscode-mdx",
+        "mrob95.vscode-talonscript",
+        "AndreasArvidsson.andreas-talon",
+        "pokey.command-server"
     ]
 }

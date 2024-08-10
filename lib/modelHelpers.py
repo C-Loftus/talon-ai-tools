@@ -1,21 +1,21 @@
 import base64
 import json
 import os
-from typing import Optional
+from typing import Literal, Optional
 
 import requests
 from talon import actions, app, clip, settings
 
 from ..lib.pureHelpers import strip_markdown
 from .modelState import GPTState
-from .modelTypes import Tool
+from .modelTypes import GPTMessage, GPTMessageItem
 
 """"
 All functions in this this file have impure dependencies on either the model or the talon APIs
 """
 
 
-def messages_to_string(messages: list[dict[str, any]]) -> str:
+def messages_to_string(messages: list[GPTMessageItem]) -> str:
     """Format messages as a string"""
     formatted_messages = []
     for message in messages:
@@ -26,7 +26,7 @@ def messages_to_string(messages: list[dict[str, any]]) -> str:
     return "\n\n".join(formatted_messages)
 
 
-def thread_to_string(chats: list[dict[str, list[dict[str, any]]]]) -> str:
+def thread_to_string(chats: list[GPTMessage]) -> str:
     """Format thread as a string"""
     formatted_messages = []
     for chat in chats:
@@ -55,33 +55,24 @@ def get_token() -> str:
         raise Exception(message)
 
 
-def make_prompt_from_editor_ctx(ctx: str):
-    """Add the editor context to the prompt"""
-    if not ctx:
-        return ""
-
-    return (
-        "\n The user is inside a code editor. Use the content of the editor to improve the response and make it tailored to the specific context. The content is as follows: \n\n\n"
-        + ctx
-    )
-
-
-def format_messages(role: str, messages: list[dict[str, any]]):
+def format_messages(
+    role: Literal["user", "system", "assistant"], messages: list[GPTMessageItem]
+) -> GPTMessage:
     return {
         "role": role,
         "content": messages,
     }
 
 
-def format_message(content: str):
+def format_message(content: str) -> GPTMessageItem:
     return {"type": "text", "text": content}
 
 
-def extract_message(content: dict[str, any]) -> str:
+def extract_message(content: GPTMessageItem) -> str:
     return content.get("text", "")
 
 
-def format_clipboard():
+def format_clipboard() -> GPTMessageItem:
     clipped_image = clip.image()
     if clipped_image:
         data = clipped_image.encode().data()
@@ -91,13 +82,18 @@ def format_clipboard():
             "image_url": {"url": f"data:image/;base64,{base64_image}"},
         }
     else:
-        return format_message(clip.text())
+        if not clip.text():
+            raise RuntimeError(
+                "User requested info from the clipboard but there is nothing in it"
+            )
+
+        return format_message(clip.text())  # type: ignore Unclear why this is not narrowing the type
 
 
 def send_request(
-    prompt: dict[str, any],
-    content: dict[str, any],
-    tools: Optional[list[Tool]] = None,
+    prompt: GPTMessageItem,
+    content: GPTMessageItem,
+    tools: Optional[list[dict[str, str]]] = None,
     destination: str = "",
 ):
     """Generate the headers and data for the OpenAI API GPT request.
@@ -124,27 +120,31 @@ def send_request(
         if destination == "snip"
         else None
     )
-    system_messages = [
+
+    system_messages: list[GPTMessageItem] = [
         {"type": "text", "text": item}
         for item in [
             settings.get("user.model_system_prompt"),
             language_context,
-            make_prompt_from_editor_ctx(
-                actions.user.a11y_get_context_of_editor(content)
-            ),
             application_context,
             snippet_context,
         ]
-        + actions.user.contextual_user_context()
+        + actions.user.gpt_additional_user_context()
         if item is not None
-    ] + GPTState.context
+    ]
+
+    system_messages += GPTState.context
 
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {TOKEN}",
     }
 
-    current_request = format_messages("user", [prompt, content])
+    current_request: GPTMessage = {
+        "role": "user",
+        "content": [prompt, content],
+    }
+
     data = {
         "messages": [
             format_messages("system", system_messages),
@@ -156,13 +156,13 @@ def send_request(
         "n": 1,
         "model": settings.get("user.openai_model"),
     }
+
     if tools is not None:
         data["tools"] = tools
 
-    url = settings.get("user.model_endpoint")
+    url: str = settings.get("user.model_endpoint")  # type: ignore
     raw_response = requests.post(url, headers=headers, data=json.dumps(data))
 
-    response = None
     match raw_response.status_code:
         case 200:
             notify("GPT Task Completed")
@@ -175,7 +175,13 @@ def send_request(
 
     if GPTState.thread_enabled:
         GPTState.push_thread(current_request)
-        GPTState.push_thread(format_messages("assistant", [response]))
+        GPTState.push_thread(
+            {
+                "role": "assistant",
+                "content": [response],
+            }
+        )
+
     return response
 
 

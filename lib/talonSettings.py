@@ -31,7 +31,7 @@ def modelSimplePrompt(matched_prompt) -> str:
 
 mod.setting(
     "openai_model",
-    type=Literal["gpt-3.5-turbo", "gpt-4", "gpt-4o-mini"],
+    type=Literal["gpt-3.5-turbo", "gpt-4", "gpt-4o-mini"],  # type: ignore
     default="gpt-4o-mini",
 )
 
@@ -63,8 +63,3 @@ mod.setting(
     default="bash",
     desc="The default shell for outputting model shell commands",
 )
-
-# Image description settings
-mod.setting("openDescriptionInBrowser", type=bool, default=True)
-mod.setting("maxDescriptionTokens", type=int, default=300)
-mod.list("descriptionPrompt", desc="Prompts for describing images")

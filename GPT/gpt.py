@@ -15,6 +15,7 @@ from ..lib.modelHelpers import (
     thread_to_string,
 )
 from ..lib.modelState import GPTState
+from ..lib.modelTypes import GPTMessageItem
 
 mod = Module()
 mod.tag(
@@ -23,7 +24,7 @@ mod.tag(
 )
 
 
-def gpt_query(prompt: dict[str, any], content: dict[str, any], destination: str = ""):
+def gpt_query(prompt: GPTMessageItem, content: GPTMessageItem, destination: str = ""):
     """Send a prompt to the GPT API and return the response"""
 
     # Reset state before pasting
@@ -117,7 +118,7 @@ class UserActions:
         """Fetch the user thread as a string"""
         return thread_to_string(GPTState.thread)
 
-    def contextual_user_context():
+    def gpt_additional_user_context():
         """This is an override function that can be used to add additional context to the prompt"""
         return []
 
@@ -220,7 +221,10 @@ class UserActions:
                 GPTState.new_thread()
                 GPTState.push_thread(format_messages("user", [format_message(result)]))
             case "appendClipboard":
-                clip.set_text(clip.text() + "\n" + result)
+                if clip.text() is not None:
+                    clip.set_text(clip.text() + "\n" + result)  # type: ignore Unclear why this is throwing a type error in pylance
+                else:
+                    clip.set_text(result)
             case "browser":
                 builder = Builder()
                 builder.h1("Talon GPT Result")
@@ -249,14 +253,20 @@ class UserActions:
                 GPTState.last_was_pasted = True
                 actions.user.paste(result)
 
-    def gpt_get_source_text(spoken_text: str) -> dict[str, any]:
+    def gpt_get_source_text(spoken_text: str) -> GPTMessageItem:
         """Get the source text that is will have the prompt applied to it"""
         match spoken_text:
             case "clipboard":
                 return format_clipboard()
             case "context":
+                if GPTState.context == []:
+                    notify("GPT Failure: Context is empty")
+                    raise Exception(
+                        "GPT Failure: User applied a prompt to the phrase context, but there was no context stored"
+                    )
                 return format_message(messages_to_string(GPTState.context))
             case "thread":
+                # TODO: Do we want to throw an exception here if the thread is empty?
                 return format_message(thread_to_string(GPTState.thread))
             case "gptResponse":
                 if GPTState.last_response == "":
@@ -271,9 +281,7 @@ class UserActions:
                     actions.user.clear_last_phrase()
                     return format_message(last_output)
                 else:
-                    notify(
-                        "GPT Failure: User applied a prompt to the phrase last Talon Dictation, but there was no text to reformat"
-                    )
+                    notify("GPT Failure: No last dictation to reformat")
                     raise Exception(
                         "GPT Failure: User applied a prompt to the phrase last Talon Dictation, but there was no text to reformat"
                     )
