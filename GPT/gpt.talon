@@ -8,7 +8,8 @@
 {user.model} <user.modelPrompt> [{user.modelSource}] [{user.modelDestination}]$:
     user.gpt_apply_prompt(modelPrompt, modelSource or "", modelDestination or "")
 
-# Passes a model source to a model destination unchanged
+# Passes a model source to a model destination unchanged. 
+# If the source is omitted, default to selected text; If the destination is omitted default to paste
 {user.model} pass ({user.modelSource} | {user.modelDestination} | {user.modelSource} {user.modelDestination})$:
     user.gpt_pass(modelSource or "", modelDestination or "")
 
