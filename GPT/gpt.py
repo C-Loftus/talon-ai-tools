@@ -16,6 +16,7 @@ from ..lib.modelHelpers import (
 )
 from ..lib.modelState import GPTState
 from ..lib.modelTypes import GPTMessageItem
+from ..lib.modelConfirmationGUI import confirmation_gui
 
 mod = Module()
 mod.tag(
@@ -97,6 +98,7 @@ class UserActions:
     def gpt_clear_thread():
         """Create a new thread"""
         GPTState.new_thread()
+        actions.user.confirmation_gui_refresh_thread()
 
     def gpt_enable_threading():
         """Enable threading of subsequent requests"""
@@ -201,6 +203,16 @@ class UserActions:
         cursorless_destination: Any = None,
     ):
         """Insert a GPT result in a specified way"""
+        # If threading is enabled, and the window is open, refresh the confirmation GUI
+        # unless the user explicitly wanted to pass the result to the window without viewing the rest of the thread
+        if (
+            GPTState.thread_enabled
+            and confirmation_gui.showing
+            and not method == "window"
+        ):
+            # Skip inserting the response if the user is just viewing the thread in the window
+            actions.user.confirmation_gui_refresh_thread()
+
         match method:
             case "above":
                 actions.key("left")
@@ -258,14 +270,15 @@ class UserActions:
                 actions.user.paste(result)
                 actions.user.gpt_select_last()
 
-            case "paste" | _:
+            case "paste":
                 GPTState.last_was_pasted = True
                 actions.user.paste(result)
-
-        # No matter where the text was inserted, if threading is enabled, refresh the confirmation GUI
-        # unless the user explicitly wanted to pass the result to the window without viewing the rest of the thread
-        if GPTState.thread_enabled and not method == "window":
-            actions.user.confirmation_gui_refresh_thread()
+            # If the user doesn't specify a method assume they want to paste.
+            # However if they didn't specify a method when the confirmation gui
+            # is showing, assume they don't want anything to be inserted
+            case _ if not confirmation_gui.showing:
+                GPTState.last_was_pasted = True
+                actions.user.paste(result)
 
     def gpt_get_source_text(spoken_text: str) -> GPTMessageItem:
         """Get the source text that is will have the prompt applied to it"""

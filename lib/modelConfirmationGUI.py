@@ -90,12 +90,17 @@ class UserActions:
     def confirmation_gui_refresh_thread(force_open: bool = False):
         """Refresh the threading output in the confirmation GUI"""
 
-        output = ""
+        formatted_output = ""
         for msg in GPTState.thread:
             for item in msg["content"]:
-                output += msg["role"] + ": " + extract_message(item) + "\n"
+                output = msg["role"] + ": " + extract_message(item)
+                # every 100 characters split the output into multiple lines
+                formatted_output += (
+                    "\n".join(output[i : i + 100] for i in range(0, len(output), 100))
+                    + "\n"
+                )
 
-        GPTState.text_to_confirm = output
+        GPTState.text_to_confirm = formatted_output
         ctx.tags = ["user.model_window_open"]
         if confirmation_gui.showing or force_open:
             confirmation_gui.show()
