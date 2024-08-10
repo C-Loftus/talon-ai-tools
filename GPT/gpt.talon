@@ -13,8 +13,7 @@
     user.gpt_pass(modelSource, modelDestination or "")
 
 # Pastes the model destination at the cursor position
-{user.model} pass {user.modelDestination}$:
-    user.gpt_pass("", modelDestination)
+{user.model} pass {user.modelDestination}$: user.gpt_pass("", modelDestination)
 
 # Select the last GPT response so you can edit it further
 {user.model} take response: user.gpt_select_last()
