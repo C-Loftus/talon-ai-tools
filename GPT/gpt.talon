@@ -9,11 +9,8 @@
     user.gpt_apply_prompt(modelPrompt, modelSource or "", modelDestination or "")
 
 # Passes a model source to a model destination unchanged
-{user.model} pass {user.modelSource} [{user.modelDestination}]$:
-    user.gpt_pass(modelSource, modelDestination or "")
-
-# Pastes the model destination at the cursor position
-{user.model} pass {user.modelDestination}$: user.gpt_pass("", modelDestination)
+{user.model} pass ({user.modelSource} | {user.modelDestination} | {user.modelSource} {user.modelDestination})$:
+    user.gpt_pass(modelSource or "", modelDestination or "")
 
 # Select the last GPT response so you can edit it further
 {user.model} take response: user.gpt_select_last()
