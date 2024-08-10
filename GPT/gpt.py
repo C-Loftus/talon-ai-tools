@@ -3,7 +3,7 @@ from typing import Any
 
 from talon import Module, actions, clip, settings
 
-from lib.modelTypes import GPTMessageItem
+from ..lib.modelTypes import GPTMessageItem
 
 from ..lib.HTMLBuilder import Builder
 from ..lib.modelHelpers import (
@@ -259,8 +259,14 @@ class UserActions:
             case "clipboard":
                 return format_clipboard()
             case "context":
+                if GPTState.context == []:
+                    notify("GPT Failure: Context is empty")
+                    raise Exception(
+                        "GPT Failure: User applied a prompt to the phrase context, but there was no context stored"
+                    )
                 return format_message(messages_to_string(GPTState.context))
             case "thread":
+                # TODO: Do we want to throw an exception here if the thread is empty?
                 return format_message(thread_to_string(GPTState.thread))
             case "gptResponse":
                 if GPTState.last_response == "":
@@ -275,9 +281,7 @@ class UserActions:
                     actions.user.clear_last_phrase()
                     return format_message(last_output)
                 else:
-                    notify(
-                        "GPT Failure: User applied a prompt to the phrase last Talon Dictation, but there was no text to reformat"
-                    )
+                    notify("GPT Failure: No last dictation to reformat")
                     raise Exception(
                         "GPT Failure: User applied a prompt to the phrase last Talon Dictation, but there was no text to reformat"
                     )

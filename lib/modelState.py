@@ -2,7 +2,7 @@ from typing import ClassVar
 
 from talon import actions
 
-from lib.modelTypes import GPTMessage, GPTMessageItem
+from .modelTypes import GPTMessage, GPTMessageItem
 
 
 class GPTState:

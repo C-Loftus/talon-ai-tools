@@ -129,7 +129,7 @@ def send_request(
             application_context,
             snippet_context,
         ]
-        + actions.user.contextual_user_context()
+        + actions.user.gpt_additional_user_context()
         if item is not None
     ]
 

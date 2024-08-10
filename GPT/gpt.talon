@@ -30,5 +30,5 @@
 # Create a new thread which is similar to a conversation with the model
 # A thread allows the model to access data from the previous queries in the same thread
 {user.model} clear thread: user.gpt_clear_thread()
-{user.model} enable thread: user.gpt_enable_threading()
-{user.model} disable thread: user.gpt_disable_threading()
+{user.model} start thread: user.gpt_enable_threading()
+{user.model} stop thread: user.gpt_disable_threading()
