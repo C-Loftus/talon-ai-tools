@@ -1,5 +1,5 @@
 import os
-from typing import Any
+from typing import Any, Optional
 
 from talon import Module, actions, clip, settings
 
@@ -24,13 +24,17 @@ mod.tag(
 )
 
 
-def gpt_query(prompt: GPTMessageItem, content: GPTMessageItem, destination: str = ""):
+def gpt_query(
+    prompt: GPTMessageItem,
+    text_to_process: Optional[GPTMessageItem],
+    destination: str = "",
+):
     """Send a prompt to the GPT API and return the response"""
 
     # Reset state before pasting
     GPTState.last_was_pasted = False
 
-    response = send_request(prompt, content, None, destination)
+    response = send_request(prompt, text_to_process, None, destination)
     GPTState.last_response = extract_message(response)
     return response
 
@@ -137,19 +141,13 @@ class UserActions:
 
     def gpt_apply_prompt(prompt: str, source: str = "", destination: str = ""):
         """Apply an arbitrary prompt to arbitrary text"""
-        response = actions.user.gpt_run_prompt(destination, prompt, source)
-        actions.user.gpt_insert_response(response, destination)
-        return response
 
-    def gpt_pass(source: str = "", destination: str = ""):
-        """Passes a response from source to destination"""
-        source_text = extract_message(actions.user.gpt_get_source_text(source))
-        actions.user.gpt_insert_response(source_text, destination)
+        text_to_process: GPTMessageItem = actions.user.gpt_get_source_text(source)
 
-    def gpt_run_prompt(destination: str, prompt: str, source: str) -> str:
-        """Apply an arbitrary prompt to arbitrary text and return the response as text"""
-
-        text_to_process = actions.user.gpt_get_source_text(source)
+        # If after creating the message there wasn't anything in the text_to_process, set it to None so
+        # we don't send meaningless data to the model
+        if text_to_process.get("text", "") == "":
+            text_to_process = None  # type: ignore
 
         # Handle special cases in the prompt
         ### Ask is a special case, where the text to process is the prompted question, not selected text
@@ -158,7 +156,15 @@ class UserActions:
             prompt = "Generate text that satisfies the question or request given in the input."
 
         response = gpt_query(format_message(prompt), text_to_process, destination)
-        return extract_message(response)
+        extracted_text = extract_message(response)
+
+        actions.user.gpt_insert_response(extracted_text, destination)
+        return response
+
+    def gpt_pass(source: str = "", destination: str = ""):
+        """Passes a response from source to destination"""
+        source_text = extract_message(actions.user.gpt_get_source_text(source))
+        actions.user.gpt_insert_response(source_text, destination)
 
     def gpt_help():
         """Open the GPT help file in the web browser"""
@@ -241,9 +247,12 @@ class UserActions:
             # Greatly increases DFA compliation times and should be avoided if possible
             case "cursorless":
                 actions.user.cursorless_insert(cursorless_destination, result)
+            # Don't add to the window twice if the thread is enabled
             case "window":
-                actions.user.add_to_confirmation_gui(result)
-
+                # If there was prior text in the confirmation GUI and the user
+                # explicitly passed new text to the gui, clear the old result
+                GPTState.text_to_confirm = result
+                actions.user.confirmation_gui_append(result)
             case "chain":
                 GPTState.last_was_pasted = True
                 actions.user.paste(result)
@@ -252,6 +261,11 @@ class UserActions:
             case "paste" | _:
                 GPTState.last_was_pasted = True
                 actions.user.paste(result)
+
+        # No matter where the text was inserted, if threading is enabled, refresh the confirmation GUI
+        # unless the user explicitly wanted to pass the result to the window without viewing the rest of the thread
+        if GPTState.thread_enabled and not method == "window":
+            actions.user.confirmation_gui_refresh_thread()
 
     def gpt_get_source_text(spoken_text: str) -> GPTMessageItem:
         """Get the source text that is will have the prompt applied to it"""

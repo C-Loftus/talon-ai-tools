@@ -92,13 +92,11 @@ def format_clipboard() -> GPTMessageItem:
 
 def send_request(
     prompt: GPTMessageItem,
-    content: GPTMessageItem,
+    text_to_process: Optional[GPTMessageItem],
     tools: Optional[list[dict[str, str]]] = None,
     destination: str = "",
 ):
-    """Generate the headers and data for the OpenAI API GPT request.
-    Does not return the URL given the fact not all openai-compatible endpoints support new features like tools
-    """
+    """Generate run a GPT request and return the response"""
     notification = "GPT Task Started"
     if len(GPTState.context) > 0:
         notification += ": Reusing Stored Context"
@@ -142,8 +140,11 @@ def send_request(
 
     current_request: GPTMessage = {
         "role": "user",
-        "content": [prompt, content],
+        "content": [prompt],
     }
+
+    if text_to_process is not None:
+        current_request["content"].append(text_to_process)
 
     data = {
         "messages": [

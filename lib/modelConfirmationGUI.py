@@ -1,6 +1,6 @@
 from talon import Context, Module, actions, clip, imgui
 
-from .modelHelpers import GPTState, notify
+from .modelHelpers import GPTState, extract_message, notify
 
 mod = Module()
 ctx = Context()
@@ -16,64 +16,64 @@ def confirmation_gui(gui: imgui.GUI):
 
     gui.spacer()
     if gui.button("Paste response"):
-        actions.user.paste_model_confirmation_gui()
+        actions.user.confirmation_gui_paste()
 
     gui.spacer()
     if gui.button("Chain response"):
-        actions.user.paste_model_confirmation_gui()
+        actions.user.confirmation_gui_paste()
         actions.user.gpt_select_last()
 
     gui.spacer()
     if gui.button("Pass response to context"):
-        actions.user.pass_context_model_confirmation_gui()
+        actions.user.confirmation_gui_pass_context()
 
     gui.spacer()
     if gui.button("Pass response to thread"):
-        actions.user.pass_thread_model_confirmation_gui()
+        actions.user.confirmation_gui_pass_thread()
 
     gui.spacer()
     if gui.button("Copy response"):
-        actions.user.copy_model_confirmation_gui()
+        actions.user.confirmation_gui_copy()
 
     gui.spacer()
     if gui.button("Discard response"):
-        actions.user.close_model_confirmation_gui()
+        actions.user.confirmation_gui_close()
 
 
 @mod.action_class
 class UserActions:
-    def add_to_confirmation_gui(model_output: str):
+    def confirmation_gui_append(model_output: str):
         """Add text to the confirmation gui"""
         ctx.tags = ["user.model_window_open"]
         GPTState.text_to_confirm = model_output
         confirmation_gui.show()
 
-    def close_model_confirmation_gui():
+    def confirmation_gui_close():
         """Close the model output without pasting it"""
         GPTState.text_to_confirm = ""
         confirmation_gui.hide()
         ctx.tags = []
 
-    def pass_context_model_confirmation_gui():
+    def confirmation_gui_pass_context():
         """Add the model output to the context"""
         actions.user.gpt_push_context(GPTState.text_to_confirm)
         GPTState.text_to_confirm = ""
         actions.user.close_model_confirmation_gui()
 
-    def pass_thread_model_confirmation_gui():
+    def confirmation_gui_pass_thread():
         """Add the model output to the thread"""
         actions.user.gpt_push_thread(GPTState.text_to_confirm)
         GPTState.text_to_confirm = ""
         actions.user.close_model_confirmation_gui()
 
-    def copy_model_confirmation_gui():
+    def confirmation_gui_copy():
         """Copy the model output to the clipboard"""
         clip.set_text(GPTState.text_to_confirm)
         GPTState.text_to_confirm = ""
 
         actions.user.close_model_confirmation_gui()
 
-    def paste_model_confirmation_gui():
+    def confirmation_gui_paste():
         """Paste the model output"""
         if not GPTState.text_to_confirm:
             notify("GPT error: No text in confirmation GUI to paste")
@@ -86,3 +86,16 @@ class UserActions:
             GPTState.last_was_pasted = True
             GPTState.text_to_confirm = ""
             actions.user.close_model_confirmation_gui()
+
+    def confirmation_gui_refresh_thread(force_open: bool = False):
+        """Refresh the threading output in the confirmation GUI"""
+
+        output = ""
+        for msg in GPTState.thread:
+            for item in msg["content"]:
+                output += msg["role"] + ": " + extract_message(item) + "\n"
+
+        GPTState.text_to_confirm = output
+        ctx.tags = ["user.model_window_open"]
+        if confirmation_gui.showing or force_open:
+            confirmation_gui.show()
