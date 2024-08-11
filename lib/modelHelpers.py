@@ -152,6 +152,7 @@ def send_request(
             prompt["text"] = (
                 prompt["text"] + '\n\n"""' + content_to_process["text"] + '"""'  # type: ignore a Prompt has to be of type text
             )
+            content = [prompt]
     else:
         # If there isn't any content to process,
         # we just use the prompt and nothing else
