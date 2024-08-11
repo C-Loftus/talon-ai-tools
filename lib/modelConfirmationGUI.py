@@ -1,10 +1,22 @@
-from typing import Optional
 from talon import Context, Module, actions, clip, imgui
 
 from .modelHelpers import GPTState, extract_message, notify
 
 mod = Module()
 ctx = Context()
+
+
+class ConfirmationGUIState:
+    display_thread = False
+    last_item_text = ""
+
+    @classmethod
+    def update(cls):
+        cls.display_thread = (
+            "USER" in GPTState.text_to_confirm and "GPT" in GPTState.text_to_confirm
+        )
+        last_message_item = GPTState.thread[-1]["content"][0]
+        cls.last_item_text = last_message_item.get("text", "")
 
 
 @imgui.open()
@@ -16,12 +28,7 @@ def confirmation_gui(gui: imgui.GUI):
     # This is a heuristic. realistically, it is extremely unlikely that
     # any other text would have both of these literals in the text
     # to confirm and it not represent a thread
-    display_thread: bool = (
-        "USER" in GPTState.text_to_confirm and "GPT" in GPTState.text_to_confirm
-    )
-
-    last_message_item = GPTState.thread[-1]["content"][0]
-    last_item_text = last_message_item.get("text", None)
+    ConfirmationGUIState.update()
 
     for line in GPTState.text_to_confirm.split("\n"):
         gui.text(line)
@@ -41,17 +48,11 @@ def confirmation_gui(gui: imgui.GUI):
 
     gui.spacer()
     if gui.button("Copy response"):
-        if display_thread:
-            actions.user.confirmation_gui_copy()
-        else:
-            actions.user.confirmation_gui_copy(last_item_text)
+        actions.user.confirmation_gui_copy()
 
     gui.spacer()
     if gui.button("Paste response"):
-        if display_thread:
-            actions.user.confirmation_gui_paste()
-        else:
-            actions.user.confirmation_gui_paste(last_item_text)
+        actions.user.confirmation_gui_paste()
 
     gui.spacer()
     if gui.button("Discard response"):
@@ -76,30 +77,35 @@ class UserActions:
         """Add the model output to the context"""
         actions.user.gpt_push_context(GPTState.text_to_confirm)
         GPTState.text_to_confirm = ""
-        actions.user.close_model_confirmation_gui()
+        actions.user.confirmation_gui_close()
 
     def confirmation_gui_pass_thread():
         """Add the model output to the thread"""
 
         actions.user.gpt_push_thread(GPTState.text_to_confirm)
         GPTState.text_to_confirm = ""
-        actions.user.close_model_confirmation_gui()
+        actions.user.confirmation_gui_close()
 
-    def confirmation_gui_copy(string_override: Optional[str] = None):
+    def confirmation_gui_copy():
         """Copy the model output to the clipboard"""
         text_to_set = (
-            GPTState.text_to_confirm if not string_override else string_override
+            GPTState.text_to_confirm
+            if not ConfirmationGUIState.display_thread
+            else ConfirmationGUIState.last_item_text
         )
 
         clip.set_text(text_to_set)
         GPTState.text_to_confirm = ""
 
-        actions.user.close_model_confirmation_gui()
+        actions.user.confirmation_gui_close()
 
-    def confirmation_gui_paste(string_override: Optional[str] = None):
+    def confirmation_gui_paste():
         """Paste the model output"""
+
         text_to_set = (
-            GPTState.text_to_confirm if not string_override else string_override
+            GPTState.text_to_confirm
+            if not ConfirmationGUIState.display_thread
+            else ConfirmationGUIState.last_item_text
         )
 
         if not text_to_set:
@@ -109,7 +115,7 @@ class UserActions:
             GPTState.last_response = text_to_set
             GPTState.last_was_pasted = True
         GPTState.text_to_confirm = ""
-        actions.user.close_model_confirmation_gui()
+        actions.user.confirmation_gui_close()
 
     def confirmation_gui_refresh_thread(force_open: bool = False):
         """Refresh the threading output in the confirmation GUI"""
