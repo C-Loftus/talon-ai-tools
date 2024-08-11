@@ -19,14 +19,16 @@ You do not need to fork the repository to add your own custom prompts. Copy the 
 
 ### Configuring Model Name
 
-The model name is used to invoke the large language model. By default it is named 'model' and you can use 'model' when you invoke any commands. For example you can ask the model to do something for you by saying 'model ask \<text\>'. You can override this in your own configuration without changing this repository. To do so just create another talon list with the same name and a higher specificity. Here is an example that you can copy and past into your own configuration files
+The word `model` is the default prefix before all LLM commands to prevent collisions with other Talon commands. However, you can change or override it. To do so just create another talon list with the same name and a higher specificity. Here is an example that you can copy and past into your own configuration files
 
-```yml
+```yml title="myCustomModelName.talon-list"
 list: user.model
 -
 
-# The default model name
-model: model
+# Whatever you say that matches the value on the left will be mapped to the word `model`
+# and thus allow any model commands to work as normal, but with a new prefix keyword
+
+my custom model name: model
 ```
 
 ### Providing Custom User Context

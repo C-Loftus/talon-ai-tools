@@ -1,6 +1,8 @@
 ---
 title: Quickstart
 description: Set up talon-ai-tools in under 5 min
+sidebar:
+    order: 1
 ---
 
 :::note
@@ -9,24 +11,30 @@ This assumes you have Talon installed. If you are new to Talon check out the Qui
 
 :::
 
+import { Steps } from '@astrojs/starlight/components';
+
+<Steps>
+
 1. Download or `git clone` this repo into your Talon user directory.
 1. [Obtain an OpenAI API key](https://platform.openai.com/signup).
 
 1. Create a Python file anywhere in your Talon user directory.
 1. Set the key environment variable within the Python file
 
-:::caution
+    :::caution
 
-Make sure you do not push the key to a public repo!
+    Make sure you do not push the key to a public repo!
 
-:::
+    :::
 
-```python
-# Example of setting the environment variable
-import os
+    ```python
+    # Example of setting the environment variable
+    import os
 
-os.environ["OPENAI_API_KEY"] = "YOUR-KEY-HERE"
-```
+    os.environ["OPENAI_API_KEY"] = "YOUR-KEY-HERE"
+    ```
+
+</Steps>
 
 ### Quickstart Video
 
