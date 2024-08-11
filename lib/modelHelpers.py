@@ -64,7 +64,13 @@ def format_messages(
     }
 
 
-def format_message(content: str) -> GPTMessageItem:
+def format_message(content: str, wrapContent: bool = False) -> GPTMessageItem:
+    if wrapContent:
+        content = f"""
+        \"\"\"
+        {content}
+        \"\"\"
+        """
     return {"type": "text", "text": content}
 
 
@@ -87,7 +93,7 @@ def format_clipboard() -> GPTMessageItem:
                 "User requested info from the clipboard but there is nothing in it"
             )
 
-        return format_message(clip.text())  # type: ignore Unclear why this is not narrowing the type
+        return format_message(clip.text(), True)  # type: ignore Unclear why this is not narrowing the type
 
 
 def send_request(

@@ -267,26 +267,26 @@ class UserActions:
                     raise Exception(
                         "GPT Failure: User applied a prompt to the phrase context, but there was no context stored"
                     )
-                return format_message(messages_to_string(GPTState.context))
+                return format_message(messages_to_string(GPTState.context), True)
             case "thread":
                 # TODO: Do we want to throw an exception here if the thread is empty?
-                return format_message(thread_to_string(GPTState.thread))
+                return format_message(thread_to_string(GPTState.thread), True)
             case "gptResponse":
                 if GPTState.last_response == "":
                     raise Exception(
                         "GPT Failure: User applied a prompt to the phrase GPT response, but there was no GPT response stored"
                     )
-                return format_message(GPTState.last_response)
+                return format_message(GPTState.last_response, True)
 
             case "lastTalonDictation":
                 last_output = actions.user.get_last_phrase()
                 if last_output:
                     actions.user.clear_last_phrase()
-                    return format_message(last_output)
+                    return format_message(last_output, True)
                 else:
                     notify("GPT Failure: No last dictation to reformat")
                     raise Exception(
                         "GPT Failure: User applied a prompt to the phrase last Talon Dictation, but there was no text to reformat"
                     )
             case "this" | _:
-                return format_message(actions.edit.selected_text())
+                return format_message(actions.edit.selected_text(), True)
