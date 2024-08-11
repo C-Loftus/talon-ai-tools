@@ -1,7 +1,6 @@
 tag: user.model_window_open
 -
 
-
 # Confirm and paste the output of the model
 ^paste response$: user.confirmation_gui_paste()
 
