@@ -50,7 +50,7 @@ class UserActions:
         Please return only the final text. What follows is all of the source texts separated by '---'.
         """
 
-        result = gpt_query(format_message(prompt), format_message(source_text))
+        result = gpt_query(format_message(prompt), format_message(source_text, True))
         actions.user.gpt_insert_response(extract_message(result), "paste")
 
     def gpt_blend_list(source_text: list[str], destination_text: str):
@@ -70,7 +70,9 @@ class UserActions:
         Condense the code into a single line such that it can be ran in the terminal.
         """
 
-        result = gpt_query(format_message(prompt), format_message(text_to_process))
+        result = gpt_query(
+            format_message(prompt), format_message(text_to_process, True)
+        )
         return result.get("text", "")
 
     def gpt_generate_sql(text_to_process: str) -> str:
@@ -82,9 +84,9 @@ class UserActions:
        Do not output comments, backticks, or natural language explanations.
        Prioritize SQL queries that are database agnostic.
         """
-        return gpt_query(format_message(prompt), format_message(text_to_process)).get(
-            "text", ""
-        )
+        return gpt_query(
+            format_message(prompt), format_message(text_to_process, True)
+        ).get("text", "")
 
     def gpt_clear_context():
         """Reset the stored context"""
@@ -154,7 +156,7 @@ class UserActions:
         # Handle special cases in the prompt
         ### Ask is a special case, where the text to process is the prompted question, not selected text
         if prompt.startswith("ask"):
-            text_to_process = format_message(prompt.removeprefix("ask"))
+            text_to_process = format_message(prompt.removeprefix("ask"), True)
             prompt = "Generate text that satisfies the question or request given in the input."
 
         response = gpt_query(format_message(prompt), text_to_process, destination)
@@ -184,7 +186,7 @@ class UserActions:
         last_output = actions.user.get_last_phrase()
         if last_output:
             actions.user.clear_last_phrase()
-            return gpt_query(format_message(PROMPT), format_message(last_output))
+            return gpt_query(format_message(PROMPT), format_message(last_output, True))
         else:
             notify("No text to reformat")
             raise Exception("No text to reformat")
