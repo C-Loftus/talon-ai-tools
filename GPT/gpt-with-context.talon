@@ -5,10 +5,10 @@
 # Passes a model source to a model destination unchanged; useful for debugging,
 # passing around context, or chaining the responses of previous prompts
 # If the source is omitted, default to selected text; If the destination is omitted default to paste
-    # Example: `model pass this to context`
-    # Example: `model pass context to clip`
-    # Example: `model pass thread to browser`
-    # Example: `model pass clip to this`
+# Example: `model pass this to context`
+# Example: `model pass context to clip`
+# Example: `model pass thread to browser`
+# Example: `model pass clip to this`
 {user.model} pass ({user.modelSource} | {user.modelDestination} | {user.modelSource} {user.modelDestination})$:
     user.gpt_pass(modelSource or "", modelDestination or "")
 
