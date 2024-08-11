@@ -140,9 +140,19 @@ def send_request(
         "Authorization": f"Bearer {TOKEN}",
     }
 
+    message_content = [prompt, content]
+    if content.get("type") != "image_url":
+        message_content = [
+            format_message(f"""
+                {extract_message(prompt)}
+                \"\"\"
+                {extract_message(content)}
+                \"\"\"
+            """)
+        ]
     current_request: GPTMessage = {
         "role": "user",
-        "content": [prompt, content],
+        "content": message_content,
     }
 
     data = {
