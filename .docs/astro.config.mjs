@@ -14,11 +14,7 @@ export default defineConfig({
             sidebar: [
                 {
                     label: "Guides",
-                    items: [
-                        // Each item here is one entry in the navigation menu.
-                        { label: "Quickstart", slug: "guides/quickstart" },
-                        { label: "Customizing", slug: "guides/customizing" },
-                    ],
+                    autogenerate: { directory: "guides" },
                 },
                 {
                     label: "Reference",

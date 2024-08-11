@@ -197,6 +197,11 @@ class UserActions:
         cursorless_destination: Any = None,
     ) -> None:
         """Insert a GPT result in a specified way"""
+        # Use a custom default if nothing is provided and the user has set
+        # a different default destination
+        if method == "":
+            method = settings.get("user.model_default_destination")
+
         # If threading is enabled, and the window is open, refresh the confirmation GUI
         # unless the user explicitly wanted to pass the result to the window without viewing the rest of the thread
         if (
