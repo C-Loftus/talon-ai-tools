@@ -1,8 +1,9 @@
 list: user.staticPrompt
 -
 
-# Use static prompts for detailed instructions without needing to say them every time
-# These all operate upon the currently selected text
+# Use static prompts as aliases for detailed instructions
+# Reduce verbosity and prevent the need to say the entire prompt each time time
+
 ## FIXES
 fix grammar formally: Fix any mistakes or irregularities in grammar, spelling, or formatting. Use a professional business tone. The text was created using voice dictation. Thus, there are likely to be issues regarding homophones and other misrecognitions. Do not change the original structure of the text.
 fix grammar: Fix any mistakes or irregularities in grammar, spelling, or formatting. The text was created using voice dictation. Thus, there are likely to be issues regarding homophones and other misrecognitions. Do not change the tone. Do not change the original structure of the text.
