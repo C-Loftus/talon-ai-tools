@@ -1,9 +1,10 @@
 import os
-from typing import Any
+from typing import Any, Optional
 
 from talon import Module, actions, clip, settings
 
 from ..lib.HTMLBuilder import Builder
+from ..lib.modelConfirmationGUI import confirmation_gui
 from ..lib.modelHelpers import (
     extract_message,
     format_clipboard,
@@ -24,20 +25,24 @@ mod.tag(
 )
 
 
-def gpt_query(prompt: GPTMessageItem, content: GPTMessageItem, destination: str = ""):
+def gpt_query(
+    prompt: GPTMessageItem,
+    text_to_process: Optional[GPTMessageItem],
+    destination: str = "",
+):
     """Send a prompt to the GPT API and return the response"""
 
     # Reset state before pasting
     GPTState.last_was_pasted = False
 
-    response = send_request(prompt, content, None, destination)
+    response = send_request(prompt, text_to_process, None, destination)
     GPTState.last_response = extract_message(response)
     return response
 
 
 @mod.action_class
 class UserActions:
-    def gpt_blend(source_text: str, destination_text: str):
+    def gpt_blend(source_text: str, destination_text: str) -> None:
         """Blend all the source text and send it to the destination"""
         prompt = f"""
         Act as a text transformer. I'm going to give you some source text and destination text, and I want you to modify the destination text based on the contents of the source text in a way that combines both of them together. Use the structure of the destination text, reordering and renaming as necessary to ensure a natural and coherent flow. Please return only the final text with no decoration for insertion into a document in the specified language.
@@ -53,7 +58,7 @@ class UserActions:
         result = gpt_query(format_message(prompt), format_message(source_text))
         actions.user.gpt_insert_response(extract_message(result), "paste")
 
-    def gpt_blend_list(source_text: list[str], destination_text: str):
+    def gpt_blend_list(source_text: list[str], destination_text: str) -> None:
         """Blend all the source text as a list and send it to the destination"""
 
         return actions.user.gpt_blend("\n---\n".join(source_text), destination_text)
@@ -71,7 +76,7 @@ class UserActions:
         """
 
         result = gpt_query(format_message(prompt), format_message(text_to_process))
-        return result.get("text", "")
+        return extract_message(result)
 
     def gpt_generate_sql(text_to_process: str) -> str:
         """Generate a SQL query from a spoken instruction"""
@@ -93,6 +98,7 @@ class UserActions:
     def gpt_clear_thread():
         """Create a new thread"""
         GPTState.new_thread()
+        actions.user.confirmation_gui_refresh_thread()
 
     def gpt_enable_threading():
         """Enable threading of subsequent requests"""
@@ -110,19 +116,11 @@ class UserActions:
         """Add the selected text to the active thread"""
         GPTState.push_thread(format_messages("user", [format_message(content)]))
 
-    def gpt_get_context():
-        """Fetch the user context as a string"""
-        return messages_to_string(GPTState.context)
-
-    def gpt_get_thread():
-        """Fetch the user thread as a string"""
-        return thread_to_string(GPTState.thread)
-
-    def gpt_additional_user_context():
+    def gpt_additional_user_context() -> list[str]:
         """This is an override function that can be used to add additional context to the prompt"""
         return []
 
-    def gpt_select_last():
+    def gpt_select_last() -> None:
         """select all the text in the last GPT output"""
         if not GPTState.last_was_pasted:
             notify("Tried to select GPT output, but it was not pasted in an editor")
@@ -137,19 +135,13 @@ class UserActions:
 
     def gpt_apply_prompt(prompt: str, source: str = "", destination: str = ""):
         """Apply an arbitrary prompt to arbitrary text"""
-        response = actions.user.gpt_run_prompt(destination, prompt, source)
-        actions.user.gpt_insert_response(response, destination)
-        return response
 
-    def gpt_pass(source: str = "", destination: str = ""):
-        """Passes a response from source to destination"""
-        source_text = extract_message(actions.user.gpt_get_source_text(source))
-        actions.user.gpt_insert_response(source_text, destination)
+        text_to_process: GPTMessageItem = actions.user.gpt_get_source_text(source)
 
-    def gpt_run_prompt(destination: str, prompt: str, source: str) -> str:
-        """Apply an arbitrary prompt to arbitrary text and return the response as text"""
-
-        text_to_process = actions.user.gpt_get_source_text(source)
+        # If after creating the message there wasn't anything in the text_to_process, set it to None so
+        # we don't send meaningless data to the model
+        if text_to_process.get("text", "") == "":
+            text_to_process = None  # type: ignore
 
         # Handle special cases in the prompt
         ### Ask is a special case, where the text to process is the prompted question, not selected text
@@ -158,9 +150,17 @@ class UserActions:
             prompt = "Generate text that satisfies the question or request given in the input."
 
         response = gpt_query(format_message(prompt), text_to_process, destination)
-        return extract_message(response)
+        extracted_text = extract_message(response)
 
-    def gpt_help():
+        actions.user.gpt_insert_response(extracted_text, destination)
+        return response
+
+    def gpt_pass(source: str = "", destination: str = "") -> None:
+        """Passes a response from source to destination"""
+        source_text = extract_message(actions.user.gpt_get_source_text(source))
+        actions.user.gpt_insert_response(source_text, destination)
+
+    def gpt_help() -> None:
         """Open the GPT help file in the web browser"""
         # get the text from the file and open it in the web browser
         current_dir = os.path.dirname(__file__)
@@ -178,13 +178,15 @@ class UserActions:
 
         builder.render()
 
-    def gpt_reformat_last(how_to_reformat: str):
+    def gpt_reformat_last(how_to_reformat: str) -> str:
         """Reformat the last model output"""
         PROMPT = f"""The last phrase was written using voice dictation. It has an error with spelling, grammar, or just general misrecognition due to a lack of context. Please reformat the following text to correct the error with the context that it was {how_to_reformat}."""
         last_output = actions.user.get_last_phrase()
         if last_output:
             actions.user.clear_last_phrase()
-            return gpt_query(format_message(PROMPT), format_message(last_output))
+            return extract_message(
+                gpt_query(format_message(PROMPT), format_message(last_output))
+            )
         else:
             notify("No text to reformat")
             raise Exception("No text to reformat")
@@ -193,11 +195,23 @@ class UserActions:
         result: str,
         method: str = "",
         cursorless_destination: Any = None,
-    ):
+    ) -> None:
         """Insert a GPT result in a specified way"""
-
+        # Use a custom default if nothing is provided and the user has set
+        # a different default destination
         if method == "":
             method = settings.get("user.model_default_destination")
+
+        # If threading is enabled, and the window is open, refresh the confirmation GUI
+        # unless the user explicitly wanted to pass the result to the window without viewing the rest of the thread
+        if (
+            GPTState.thread_enabled
+            and confirmation_gui.showing
+            and not method == "window"
+        ):
+            # Skip inserting the response if the user is just viewing the thread in the window
+            actions.user.confirmation_gui_refresh_thread()
+
         match method:
             case "above":
                 actions.key("left")
@@ -244,17 +258,29 @@ class UserActions:
             # Greatly increases DFA compliation times and should be avoided if possible
             case "cursorless":
                 actions.user.cursorless_insert(cursorless_destination, result)
+            # Don't add to the window twice if the thread is enabled
             case "window":
-                actions.user.add_to_confirmation_gui(result)
-
+                # If there was prior text in the confirmation GUI and the user
+                # explicitly passed new text to the gui, clear the old result
+                GPTState.text_to_confirm = result
+                actions.user.confirmation_gui_append(result)
             case "chain":
                 GPTState.last_was_pasted = True
                 actions.user.paste(result)
                 actions.user.gpt_select_last()
 
-            case "paste" | _:
+            case "paste":
                 GPTState.last_was_pasted = True
                 actions.user.paste(result)
+            # If the user doesn't specify a method assume they want to paste.
+            # However if they didn't specify a method when the confirmation gui
+            # is showing, assume they don't want anything to be inserted
+            case _ if not confirmation_gui.showing:
+                GPTState.last_was_pasted = True
+                actions.user.paste(result)
+            # Don't do anything if none of the previous conditions were valid
+            case _:
+                pass
 
     def gpt_get_source_text(spoken_text: str) -> GPTMessageItem:
         """Get the source text that is will have the prompt applied to it"""

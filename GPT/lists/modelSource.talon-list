@@ -1,6 +1,8 @@
 list: user.modelSource
 -
 
+# A list of sources from which the model can take in data to process
+
 # Apply the prompt to the text on the clipboard
 clip: clipboard
 
