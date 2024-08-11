@@ -195,6 +195,9 @@ class UserActions:
         cursorless_destination: Any = None,
     ):
         """Insert a GPT result in a specified way"""
+
+        if method == "":
+            method = settings.get("user.model_default_destination")
         match method:
             case "above":
                 actions.key("left")
