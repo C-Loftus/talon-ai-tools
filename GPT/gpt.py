@@ -42,7 +42,7 @@ def gpt_query(
 
 @mod.action_class
 class UserActions:
-    def gpt_blend(source_text: str, destination_text: str):
+    def gpt_blend(source_text: str, destination_text: str) -> None:
         """Blend all the source text and send it to the destination"""
         prompt = f"""
         Act as a text transformer. I'm going to give you some source text and destination text, and I want you to modify the destination text based on the contents of the source text in a way that combines both of them together. Use the structure of the destination text, reordering and renaming as necessary to ensure a natural and coherent flow. Please return only the final text with no decoration for insertion into a document in the specified language.
@@ -58,7 +58,7 @@ class UserActions:
         result = gpt_query(format_message(prompt), format_message(source_text))
         actions.user.gpt_insert_response(extract_message(result), "paste")
 
-    def gpt_blend_list(source_text: list[str], destination_text: str):
+    def gpt_blend_list(source_text: list[str], destination_text: str) -> None:
         """Blend all the source text as a list and send it to the destination"""
 
         return actions.user.gpt_blend("\n---\n".join(source_text), destination_text)
@@ -76,7 +76,7 @@ class UserActions:
         """
 
         result = gpt_query(format_message(prompt), format_message(text_to_process))
-        return result.get("text", "")
+        return extract_message(result)
 
     def gpt_generate_sql(text_to_process: str) -> str:
         """Generate a SQL query from a spoken instruction"""
@@ -116,19 +116,11 @@ class UserActions:
         """Add the selected text to the active thread"""
         GPTState.push_thread(format_messages("user", [format_message(content)]))
 
-    def gpt_get_context():
-        """Fetch the user context as a string"""
-        return messages_to_string(GPTState.context)
-
-    def gpt_get_thread():
-        """Fetch the user thread as a string"""
-        return thread_to_string(GPTState.thread)
-
-    def gpt_additional_user_context():
+    def gpt_additional_user_context() -> list[str]:
         """This is an override function that can be used to add additional context to the prompt"""
         return []
 
-    def gpt_select_last():
+    def gpt_select_last() -> None:
         """select all the text in the last GPT output"""
         if not GPTState.last_was_pasted:
             notify("Tried to select GPT output, but it was not pasted in an editor")
@@ -163,12 +155,12 @@ class UserActions:
         actions.user.gpt_insert_response(extracted_text, destination)
         return response
 
-    def gpt_pass(source: str = "", destination: str = ""):
+    def gpt_pass(source: str = "", destination: str = "") -> None:
         """Passes a response from source to destination"""
         source_text = extract_message(actions.user.gpt_get_source_text(source))
         actions.user.gpt_insert_response(source_text, destination)
 
-    def gpt_help():
+    def gpt_help() -> None:
         """Open the GPT help file in the web browser"""
         # get the text from the file and open it in the web browser
         current_dir = os.path.dirname(__file__)
@@ -186,13 +178,15 @@ class UserActions:
 
         builder.render()
 
-    def gpt_reformat_last(how_to_reformat: str):
+    def gpt_reformat_last(how_to_reformat: str) -> str:
         """Reformat the last model output"""
         PROMPT = f"""The last phrase was written using voice dictation. It has an error with spelling, grammar, or just general misrecognition due to a lack of context. Please reformat the following text to correct the error with the context that it was {how_to_reformat}."""
         last_output = actions.user.get_last_phrase()
         if last_output:
             actions.user.clear_last_phrase()
-            return gpt_query(format_message(PROMPT), format_message(last_output))
+            return extract_message(
+                gpt_query(format_message(PROMPT), format_message(last_output))
+            )
         else:
             notify("No text to reformat")
             raise Exception("No text to reformat")
@@ -201,7 +195,7 @@ class UserActions:
         result: str,
         method: str = "",
         cursorless_destination: Any = None,
-    ):
+    ) -> None:
         """Insert a GPT result in a specified way"""
         # If threading is enabled, and the window is open, refresh the confirmation GUI
         # unless the user explicitly wanted to pass the result to the window without viewing the rest of the thread
@@ -279,6 +273,9 @@ class UserActions:
             case _ if not confirmation_gui.showing:
                 GPTState.last_was_pasted = True
                 actions.user.paste(result)
+            # Don't do anything if none of the previous conditions were valid
+            case _:
+                pass
 
     def gpt_get_source_text(spoken_text: str) -> GPTMessageItem:
         """Get the source text that is will have the prompt applied to it"""

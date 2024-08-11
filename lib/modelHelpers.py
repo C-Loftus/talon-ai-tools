@@ -92,7 +92,7 @@ def format_clipboard() -> GPTMessageItem:
 
 def send_request(
     prompt: GPTMessageItem,
-    text_to_process: Optional[GPTMessageItem],
+    content_to_process: Optional[GPTMessageItem],
     tools: Optional[list[dict[str, str]]] = None,
     destination: str = "",
 ):
@@ -138,13 +138,29 @@ def send_request(
         "Authorization": f"Bearer {TOKEN}",
     }
 
+    content: list[GPTMessageItem] = []
+    if content_to_process is not None:
+        if content_to_process["type"] == "image_url":
+            image = content_to_process
+            # If we are processing an image, we have
+            # to add it as a second message
+            content = [prompt, image]
+        elif content_to_process["type"] == "text":
+            # If we are processing text content, just
+            # add the text on to the same message instead
+            # of splitting it into multiple messages
+            prompt["text"] = (
+                prompt["text"] + '\n\n"""' + content_to_process["text"] + '"""'  # type: ignore a Prompt has to be of type text
+            )
+    else:
+        # If there isn't any content to process,
+        # we just use the prompt and nothing else
+        content = [prompt]
+
     current_request: GPTMessage = {
         "role": "user",
-        "content": [prompt],
+        "content": content,
     }
-
-    if text_to_process is not None:
-        current_request["content"].append(text_to_process)
 
     data = {
         "messages": [

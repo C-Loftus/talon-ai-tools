@@ -8,7 +8,7 @@ Query language models with voice commands. Helpful to automatically generate tex
 
 - See the [examples file](../.docs/usage-examples/examples.md) for gifs that show how to use the commands.
 
-- View the [docs](http://localhost:4321/talon-ai-tools/)
+- View the [docs](http://localhost:4321/talon-ai-tools/) for more detailed usage and help
 
 ## OpenAI API Pricing
 

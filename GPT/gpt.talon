@@ -8,10 +8,6 @@
 {user.model} <user.modelPrompt> [{user.modelSource}] [{user.modelDestination}]$:
     user.gpt_apply_prompt(modelPrompt, modelSource or "", modelDestination or "")
 
-# Passes a model source to a model destination unchanged; useful for debugging and passing context
-{user.model} pass [{user.modelSource}] [{user.modelDestination}]$:
-    user.gpt_pass(modelSource or "", modelDestination or "")
-
 # Select the last GPT response so you can edit it further
 {user.model} take response: user.gpt_select_last()
 
@@ -27,16 +23,3 @@
 {user.model} [nope] that was <user.text>$:
     result = user.gpt_reformat_last(text)
     user.paste(result)
-
-# Clear the context stored in the model
-{user.model} clear context: user.gpt_clear_context()
-
-# Create a new thread which is similar to a conversation with the model
-# A thread allows the model to access data from the previous queries in the same thread
-{user.model} clear thread: user.gpt_clear_thread()
-{user.model} start thread: user.gpt_enable_threading()
-{user.model} stop thread: user.gpt_disable_threading()
-
-^{user.model} toggle window$:
-    force_open = true
-    user.confirmation_gui_refresh_thread(force_open)
