@@ -1,7 +1,7 @@
 list: user.staticPrompt
 -
 
-# Use static prompts as aliases for detailed instructions 
+# Use static prompts as aliases for detailed instructions
 # Reduce verbosity and prevent the need to say the entire prompt each time time
 
 ## FIXES
