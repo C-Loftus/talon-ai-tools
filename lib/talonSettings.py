@@ -43,6 +43,13 @@ mod.setting(
 )
 
 mod.setting(
+    "model_default_destination",
+    type=str,
+    default="paste",
+    desc="The default insertion destination. This can be overridden contextually to provide application level defaults.",
+)
+
+mod.setting(
     "model_endpoint",
     type=str,
     default="https://api.openai.com/v1/chat/completions",
