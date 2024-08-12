@@ -179,6 +179,7 @@ def send_request(
         data["tools"] = tools
 
     url: str = settings.get("user.model_endpoint")  # type: ignore
+    print(data)
     raw_response = requests.post(url, headers=headers, data=json.dumps(data))
 
     match raw_response.status_code:
