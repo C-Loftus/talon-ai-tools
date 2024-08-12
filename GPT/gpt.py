@@ -207,6 +207,21 @@ class UserActions:
             # Skip inserting the response if the user is just viewing the thread in the window
             actions.user.confirmation_gui_refresh_thread()
 
+        match method:
+            case "thread":
+                GPTState.push_thread(format_messages("user", [gpt_message]))
+                return
+            case "newThread":
+                GPTState.new_thread()
+                GPTState.push_thread(format_messages("user", [gpt_message]))
+                return
+
+        if gpt_message.get("type") != "text":
+            actions.app.notify(
+                f"Tried to insert an image to {method}, but that is not currently supported. To insert an image to this destination use a prompt to convert it to text."
+            )
+            return
+
         message_text_no_images = extract_message(gpt_message)
         match method:
             case "above":
@@ -228,11 +243,6 @@ class UserActions:
             case "newContext":
                 GPTState.clear_context()
                 GPTState.push_context(gpt_message)
-            case "thread":
-                GPTState.push_thread(format_messages("user", [gpt_message]))
-            case "newThread":
-                GPTState.new_thread()
-                GPTState.push_thread(format_messages("user", [gpt_message]))
             case "appendClipboard":
                 if clip.text() is not None:
                     clip.set_text(clip.text() + "\n" + message_text_no_images)  # type: ignore Unclear why this is throwing a type error in pylance
