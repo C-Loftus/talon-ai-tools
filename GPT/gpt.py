@@ -143,6 +143,11 @@ class UserActions:
         if prompt.startswith("ask"):
             text_to_process = format_message(prompt.removeprefix("ask"))
             prompt = "Generate text that satisfies the question or request given in the input."
+        elif (
+            text_to_process.get("text", "") == ""
+            and text_to_process.get("image_url", "") == ""
+        ):
+            text_to_process = None  # type: ignore
 
         response = gpt_query(format_message(prompt), text_to_process, destination)
 
