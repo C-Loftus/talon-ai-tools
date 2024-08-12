@@ -15,6 +15,10 @@ class ConfirmationGUIState:
         cls.display_thread = (
             "USER" in GPTState.text_to_confirm and "GPT" in GPTState.text_to_confirm
         )
+        if len(GPTState.thread) == 0:
+            cls.last_item_text = ""
+            return
+
         last_message_item = GPTState.thread[-1]["content"][0]
         cls.last_item_text = last_message_item.get("text", "")
 
