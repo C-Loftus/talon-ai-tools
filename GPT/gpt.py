@@ -208,17 +208,21 @@ class UserActions:
             GPTState.thread_enabled
             and confirmation_gui.showing
             and not method == "window"
+            # If they ask for thread or newThread specifically,
+            # it should be pushed to the thread and not just refreshed
+            and not method == "thread"
+            and not method == "newThread"
         ):
             # Skip inserting the response if the user is just viewing the thread in the window
             actions.user.confirmation_gui_refresh_thread()
+            return
 
         match method:
-            case "thread":
+            case "thread" | "newThread" as t:
+                if t == "newThread":
+                    GPTState.new_thread()
                 GPTState.push_thread(format_messages("user", [gpt_message]))
-                return
-            case "newThread":
-                GPTState.new_thread()
-                GPTState.push_thread(format_messages("user", [gpt_message]))
+                actions.user.confirmation_gui_refresh_thread()
                 return
 
         if gpt_message.get("type") != "text":
