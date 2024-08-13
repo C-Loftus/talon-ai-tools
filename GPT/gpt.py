@@ -56,7 +56,7 @@ class UserActions:
         """
 
         result = gpt_query(format_message(prompt), format_message(source_text))
-        actions.user.gpt_insert_response(extract_message(result), "paste")
+        actions.user.gpt_insert_response(result, "paste")
 
     def gpt_blend_list(source_text: list[str], destination_text: str) -> None:
         """Blend all the source text as a list and send it to the destination"""
@@ -137,10 +137,10 @@ class UserActions:
         """Apply an arbitrary prompt to arbitrary text"""
 
         text_to_process: GPTMessageItem = actions.user.gpt_get_source_text(source)
-
-        # If after creating the message there wasn't anything in the text_to_process, set it to None so
-        # we don't send meaningless data to the model
-        if text_to_process.get("text", "") == "":
+        if (
+            text_to_process.get("text", "") == ""
+            and text_to_process.get("image_url", "") == ""
+        ):
             text_to_process = None  # type: ignore
 
         # Handle special cases in the prompt
@@ -150,15 +150,15 @@ class UserActions:
             prompt = "Generate text that satisfies the question or request given in the input."
 
         response = gpt_query(format_message(prompt), text_to_process, destination)
-        extracted_text = extract_message(response)
 
-        actions.user.gpt_insert_response(extracted_text, destination)
+        actions.user.gpt_insert_response(response, destination)
         return response
 
     def gpt_pass(source: str = "", destination: str = "") -> None:
         """Passes a response from source to destination"""
-        source_text = extract_message(actions.user.gpt_get_source_text(source))
-        actions.user.gpt_insert_response(source_text, destination)
+        actions.user.gpt_insert_response(
+            actions.user.gpt_get_source_text(source), destination
+        )
 
     def gpt_help() -> None:
         """Open the GPT help file in the web browser"""
@@ -192,7 +192,7 @@ class UserActions:
             raise Exception("No text to reformat")
 
     def gpt_insert_response(
-        result: str,
+        gpt_message: GPTMessageItem,
         method: str = "",
         cursorless_destination: Any = None,
     ) -> None:
@@ -208,76 +208,93 @@ class UserActions:
             GPTState.thread_enabled
             and confirmation_gui.showing
             and not method == "window"
+            # If they ask for thread or newThread specifically,
+            # it should be pushed to the thread and not just refreshed
+            and not method == "thread"
+            and not method == "newThread"
         ):
             # Skip inserting the response if the user is just viewing the thread in the window
             actions.user.confirmation_gui_refresh_thread()
+            return
 
+        match method:
+            case "thread" | "newThread" as t:
+                if t == "newThread":
+                    GPTState.new_thread()
+                GPTState.push_thread(format_messages("user", [gpt_message]))
+                actions.user.confirmation_gui_refresh_thread()
+                return
+
+        if gpt_message.get("type") != "text":
+            actions.app.notify(
+                f"Tried to insert an image to {method}, but that is not currently supported. To insert an image to this destination use a prompt to convert it to text."
+            )
+            return
+
+        message_text_no_images = extract_message(gpt_message)
         match method:
             case "above":
                 actions.key("left")
                 actions.edit.line_insert_up()
                 GPTState.last_was_pasted = True
-                actions.user.paste(result)
+                actions.user.paste(message_text_no_images)
             case "below":
                 actions.key("right")
                 actions.edit.line_insert_down()
                 GPTState.last_was_pasted = True
-                actions.user.paste(result)
+                actions.user.paste(message_text_no_images)
             case "clipboard":
-                clip.set_text(result)
+                clip.set_text(message_text_no_images)
             case "snip":
-                actions.user.insert_snippet(result)
+                actions.user.insert_snippet(message_text_no_images)
             case "context":
-                GPTState.push_context(format_message(result))
+                GPTState.push_context(gpt_message)
             case "newContext":
                 GPTState.clear_context()
-                GPTState.push_context(format_message(result))
-            case "thread":
-                GPTState.push_thread(format_messages("user", [format_message(result)]))
-            case "newThread":
-                GPTState.new_thread()
-                GPTState.push_thread(format_messages("user", [format_message(result)]))
+                GPTState.push_context(gpt_message)
             case "appendClipboard":
                 if clip.text() is not None:
-                    clip.set_text(clip.text() + "\n" + result)  # type: ignore Unclear why this is throwing a type error in pylance
+                    clip.set_text(clip.text() + "\n" + message_text_no_images)  # type: ignore Unclear why this is throwing a type error in pylance
                 else:
-                    clip.set_text(result)
+                    clip.set_text(message_text_no_images)
             case "browser":
                 builder = Builder()
                 builder.h1("Talon GPT Result")
-                for line in result.split("\n"):
+                for line in message_text_no_images.split("\n"):
                     builder.p(line)
                 builder.render()
             case "textToSpeech":
                 try:
-                    actions.user.tts(result)
+                    actions.user.tts(message_text_no_images)
                 except KeyError:
                     notify("GPT Failure: text to speech is not installed")
 
             # Although we can insert to a cursorless destination, the cursorless_target capture
             # Greatly increases DFA compliation times and should be avoided if possible
             case "cursorless":
-                actions.user.cursorless_insert(cursorless_destination, result)
+                actions.user.cursorless_insert(
+                    cursorless_destination, message_text_no_images
+                )
             # Don't add to the window twice if the thread is enabled
             case "window":
                 # If there was prior text in the confirmation GUI and the user
                 # explicitly passed new text to the gui, clear the old result
-                GPTState.text_to_confirm = result
-                actions.user.confirmation_gui_append(result)
+                GPTState.text_to_confirm = message_text_no_images
+                actions.user.confirmation_gui_append(message_text_no_images)
             case "chain":
                 GPTState.last_was_pasted = True
-                actions.user.paste(result)
+                actions.user.paste(message_text_no_images)
                 actions.user.gpt_select_last()
 
             case "paste":
                 GPTState.last_was_pasted = True
-                actions.user.paste(result)
+                actions.user.paste(message_text_no_images)
             # If the user doesn't specify a method assume they want to paste.
             # However if they didn't specify a method when the confirmation gui
             # is showing, assume they don't want anything to be inserted
             case _ if not confirmation_gui.showing:
                 GPTState.last_was_pasted = True
-                actions.user.paste(result)
+                actions.user.paste(message_text_no_images)
             # Don't do anything if none of the previous conditions were valid
             case _:
                 pass

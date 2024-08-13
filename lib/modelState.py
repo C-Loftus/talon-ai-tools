@@ -40,6 +40,11 @@ class GPTState:
     @classmethod
     def push_context(cls, context: GPTMessageItem):
         """Add the selected text to the stored context"""
+        if context.get("type") != "text":
+            actions.app.notify(
+                "Only text can be added to context. To add images, try using a prompt to summarize or otherwise describe the image to the context."
+            )
+            return
         cls.context += [context]
         actions.app.notify("Appended user context")
 
