@@ -23,3 +23,9 @@
 {user.model} [nope] that was <user.text>$:
     result = user.gpt_reformat_last(text)
     user.paste(result)
+
+# Enable debug logging so you can more details about messages being sent
+{user.model} enable debug: user.gpt_enable_debug()
+
+# Disable debug logging
+{user.model} disable debug: user.gpt_disable_debug()
