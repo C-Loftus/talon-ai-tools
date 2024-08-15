@@ -54,3 +54,6 @@ improve semantics: The following is an HTML document. Keep the same structure an
 add questions: Help me explore this question from multiple perspectives. For each perspective, ask follow-up questions and indicate what perspective is being taken.
 format outline: Create an outline that encapsulates the text below. Keep the number of sections between three and five to optimize for human working memory. Return just the outline.
 format prose: As an editor, format the following outline or summarization as prose. You can have headings and paragraphs. Avoid using bullet points. Reorder and add transitions as necessary to make the document flow. Return just the text.
+
+## AI TOOLS
+explain prompt: Analyze the provided prompt and response. Explain how the prompt was understood to generate the given response. Provide only the explanation.

@@ -13,7 +13,7 @@ from ..lib.modelHelpers import (
     messages_to_string,
     notify,
     send_request,
-    thread_to_string,
+    chats_to_string,
 )
 from ..lib.modelState import GPTState
 from ..lib.modelTypes import GPTMessageItem
@@ -36,7 +36,6 @@ def gpt_query(
     GPTState.last_was_pasted = False
 
     response = send_request(prompt, text_to_process, None, destination)
-    GPTState.last_response = extract_message(response)
     return response
 
 
@@ -313,13 +312,19 @@ class UserActions:
                 return format_message(messages_to_string(GPTState.context))
             case "thread":
                 # TODO: Do we want to throw an exception here if the thread is empty?
-                return format_message(thread_to_string(GPTState.thread))
+                return format_message(chats_to_string(GPTState.thread))
             case "gptResponse":
                 if GPTState.last_response == "":
                     raise Exception(
                         "GPT Failure: User applied a prompt to the phrase GPT response, but there was no GPT response stored"
                     )
                 return format_message(GPTState.last_response)
+            case "gptRequest":
+                return format_message(GPTState.last_request)
+            case "gptExchange":
+                return format_message(
+                    GPTState.last_request + "\n\nassistant\n\n" + GPTState.last_response
+                )
 
             case "lastTalonDictation":
                 last_output = actions.user.get_last_phrase()

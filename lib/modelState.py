@@ -8,6 +8,7 @@ from .modelTypes import GPTMessage, GPTMessageItem
 class GPTState:
     text_to_confirm: ClassVar[str] = ""
     last_response: ClassVar[str] = ""
+    last_request: ClassVar[str] = ""
     last_was_pasted: ClassVar[bool] = False
     context: ClassVar[list[GPTMessageItem]] = []
     thread: ClassVar[list[GPTMessage]] = []

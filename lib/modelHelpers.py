@@ -26,7 +26,7 @@ def messages_to_string(messages: list[GPTMessageItem]) -> str:
     return "\n\n".join(formatted_messages)
 
 
-def thread_to_string(chats: list[GPTMessage]) -> str:
+def chats_to_string(chats: list[GPTMessage]) -> str:
     """Format thread as a string"""
     formatted_messages = []
     for chat in chats:
@@ -163,12 +163,15 @@ def send_request(
         "content": content,
     }
 
-    data = {
-        "messages": [
+    messages = (
+        [
             format_messages("system", system_messages),
         ]
         + GPTState.thread
-        + [current_request],
+        + [current_request]
+    )
+    data = {
+        "messages": messages,
         "max_tokens": 2024,
         "temperature": settings.get("user.model_temperature"),
         "n": 1,
@@ -186,6 +189,8 @@ def send_request(
             notify("GPT Task Completed")
             resp = raw_response.json()["choices"][0]["message"]["content"].strip()
             formatted_resp = strip_markdown(resp)
+            GPTState.last_request = chats_to_string(messages)
+            GPTState.last_response = formatted_resp
             response = format_message(formatted_resp)
         case _:
             notify("GPT Failure: Check the Talon Log")
