@@ -91,6 +91,14 @@ class UserActions:
             "text", ""
         )
 
+    def gpt_start_debug():
+        """Enable debug logging"""
+        GPTState.start_debug()
+
+    def gpt_stop_debug():
+        """Disable debug logging"""
+        GPTState.stop_debug()
+
     def gpt_clear_context():
         """Reset the stored context"""
         GPTState.clear_context()
