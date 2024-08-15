@@ -6,6 +6,7 @@ from talon import Module, actions, clip, settings
 from ..lib.HTMLBuilder import Builder
 from ..lib.modelConfirmationGUI import confirmation_gui
 from ..lib.modelHelpers import (
+    chats_to_string,
     extract_message,
     format_clipboard,
     format_message,
@@ -13,7 +14,6 @@ from ..lib.modelHelpers import (
     messages_to_string,
     notify,
     send_request,
-    chats_to_string,
 )
 from ..lib.modelState import GPTState
 from ..lib.modelTypes import GPTMessageItem
