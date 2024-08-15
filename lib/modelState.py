@@ -15,15 +15,15 @@ class GPTState:
     debug_enabled: ClassVar[bool] = False
 
     @classmethod
-    def enable_debug(cls):
+    def start_debug(cls):
         """Enable debug printing"""
-        cls.context = []
+        GPTState.debug_enabled = True
         actions.app.notify("Enabled debug logging")
 
     @classmethod
-    def disable_debug(cls):
+    def stop_debug(cls):
         """Disable debug printing"""
-        cls.context = []
+        GPTState.debug_enabled = False
         actions.app.notify("Disabled debug logging")
 
     @classmethod

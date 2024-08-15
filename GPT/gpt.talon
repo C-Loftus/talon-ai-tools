@@ -25,7 +25,7 @@
     user.paste(result)
 
 # Enable debug logging so you can more details about messages being sent
-{user.model} enable debug: user.gpt_enable_debug()
+{user.model} start debug: user.gpt_start_debug()
 
 # Disable debug logging
-{user.model} disable debug: user.gpt_disable_debug()
+{user.model} stop debug: user.gpt_stop_debug()
