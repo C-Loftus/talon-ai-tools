@@ -13,6 +13,19 @@ class GPTState:
     context: ClassVar[list[GPTMessageItem]] = []
     thread: ClassVar[list[GPTMessage]] = []
     thread_enabled: ClassVar[bool] = False
+    debug_enabled: ClassVar[bool] = False
+
+    @classmethod
+    def start_debug(cls):
+        """Enable debug printing"""
+        GPTState.debug_enabled = True
+        actions.app.notify("Enabled debug logging")
+
+    @classmethod
+    def stop_debug(cls):
+        """Disable debug printing"""
+        GPTState.debug_enabled = False
+        actions.app.notify("Disabled debug logging")
 
     @classmethod
     def clear_context(cls):
