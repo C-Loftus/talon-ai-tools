@@ -175,9 +175,7 @@ def send_request(
         data["tools"] = tools
 
     url: str = settings.get("user.model_endpoint")  # type: ignore
-    headers = {
-    "Content-Type": "application/json"
-    }
+    headers = {"Content-Type": "application/json"}
     # If the model endpoint is Azure, we need to use a different header
     if "azure.com" in url:
         headers["api-key"] = TOKEN
