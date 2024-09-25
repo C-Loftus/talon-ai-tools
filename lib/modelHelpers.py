@@ -134,9 +134,15 @@ def send_request(
     system_messages += GPTState.context
 
     headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {TOKEN}",
+    "Content-Type": "application/json"
     }
+
+    # If the model endpoint is Azure, we need to use a different header
+    if "azure.com" in settings.get("user.model_endpoint"):
+        headers["api-key"] = TOKEN
+    else:
+        headers["Authorization"] = f"Bearer {TOKEN}"
+
 
     content: list[GPTMessageItem] = []
     if content_to_process is not None:
