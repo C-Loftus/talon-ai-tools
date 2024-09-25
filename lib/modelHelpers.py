@@ -133,17 +133,6 @@ def send_request(
 
     system_messages += GPTState.context
 
-    headers = {
-    "Content-Type": "application/json"
-    }
-
-    # If the model endpoint is Azure, we need to use a different header
-    if "azure.com" in settings.get("user.model_endpoint"):
-        headers["api-key"] = TOKEN
-    else:
-        headers["Authorization"] = f"Bearer {TOKEN}"
-
-
     content: list[GPTMessageItem] = []
     if content_to_process is not None:
         if content_to_process["type"] == "image_url":
@@ -186,6 +175,15 @@ def send_request(
         data["tools"] = tools
 
     url: str = settings.get("user.model_endpoint")  # type: ignore
+    headers = {
+    "Content-Type": "application/json"
+    }
+    # If the model endpoint is Azure, we need to use a different header
+    if "azure.com" in url:
+        headers["api-key"] = TOKEN
+    else:
+        headers["Authorization"] = f"Bearer {TOKEN}"
+
     raw_response = requests.post(url, headers=headers, data=json.dumps(data))
 
     match raw_response.status_code:
