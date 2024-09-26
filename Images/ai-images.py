@@ -19,6 +19,7 @@ class Actions:
         # If the model endpoint is Azure, we need to use a different header
         if "azure.com" in url:
             headers["api-key"] = TOKEN
+       # otherwise default to the standard header format for openai
         else:
             headers["Authorization"] = f"Bearer {TOKEN}"
         data = {
