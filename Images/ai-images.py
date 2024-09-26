@@ -15,10 +15,13 @@ class Actions:
 
         url = "https://api.openai.com/v1/images/generations"
         TOKEN = get_token()
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {TOKEN}",
-        }
+        headers = {"Content-Type": "application/json"}
+        # If the model endpoint is Azure, we need to use a different header
+        if "azure.com" in url:
+            headers["api-key"] = TOKEN
+        # otherwise default to the standard header format for openai
+        else:
+            headers["Authorization"] = f"Bearer {TOKEN}"
         data = {
             "model": "dall-e-3",
             "prompt": prompt,
