@@ -16,7 +16,8 @@ pilot new file <user.cursorless_ordinal_or_last>:
 pilot copy <user.cursorless_ordinal_or_last>:
     user.copilot_focus_code_block(cursorless_ordinal_or_last)
     edit.copy()
-pilot bring <user.cursorless_ordinal_or_last>: user.copilot_bring_code_block(cursorless_ordinal_or_last)
+pilot bring <user.cursorless_ordinal_or_last>:
+    user.copilot_bring_code_block(cursorless_ordinal_or_last)
 pilot bring <user.cursorless_ordinal_or_last> {user.makeshift_destination} <user.cursorless_target>:
     user.cursorless_command(makeshift_destination, cursorless_target)
     user.copilot_bring_code_block(cursorless_ordinal_or_last)
