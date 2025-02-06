@@ -32,12 +32,7 @@ mod.tag("codeium", desc="Enable codeium for copilot integration")
 class Actions:
     def copilot_inline_chat(copilot_slash_command: str = "", prose: str = ""):
         """Initiate copilot inline chat session"""
-        actions.user.run_rpc_command(
-            "editor.action.codeAction",
-            {
-                "kind": "refactor.rewrite",
-            },
-        )
+        actions.user.vscode("inlineChat.start")
         has_content = copilot_slash_command or prose
         if has_content:
             actions.sleep("50ms")
