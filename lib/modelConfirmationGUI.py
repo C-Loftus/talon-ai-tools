@@ -1,4 +1,6 @@
-from talon import Context, Module, actions, clip, imgui
+import textwrap
+
+from talon import Context, Module, actions, clip, imgui, settings
 
 from .modelHelpers import GPTState, extract_message, notify
 
@@ -34,8 +36,11 @@ def confirmation_gui(gui: imgui.GUI):
     # to confirm and it not represent a thread
     ConfirmationGUIState.update()
 
-    for line in GPTState.text_to_confirm.split("\n"):
-        gui.text(line)
+    for paragraph in GPTState.text_to_confirm.split("\n"):
+        for line in textwrap.wrap(
+            paragraph, settings.get("user.model_window_char_width")
+        ):
+            gui.text(line)
 
     # gui.spacer()
     # if gui.button("Chain response"):

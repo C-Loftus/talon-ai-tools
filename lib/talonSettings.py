@@ -70,3 +70,10 @@ mod.setting(
     default="bash",
     desc="The default shell for outputting model shell commands",
 )
+
+mod.setting(
+    "model_window_char_width",
+    type=int,
+    default=80,
+    desc="The default window width (in characters) for showing model output",
+)
