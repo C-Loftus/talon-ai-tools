@@ -35,7 +35,7 @@ def gpt_query(
     # Reset state before pasting
     GPTState.last_was_pasted = False
 
-    response = send_request(prompt, text_to_process, None, destination)
+    response = send_request(prompt, text_to_process, destination)
     GPTState.last_response = extract_message(response)
     return response
 
