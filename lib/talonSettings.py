@@ -53,14 +53,14 @@ mod.setting(
     "model_endpoint",
     type=str,
     default="https://api.openai.com/v1/chat/completions",
-    desc='The endpoint to send the model requests to. If "llm" is used, the llm CLI is used (see https://github.com/simonw/llm).',
+    desc='The endpoint to send the model requests to. If "llm" is specified instead of a url, the llm CLI tool is used when routing all language model requests (see https://github.com/simonw/llm).',
 )
 
 mod.setting(
     "model_llm_path",
     type=str,
     default="llm",
-    desc='The path to the llm executable. Only used if model_endpoint is set to "llm".',
+    desc='The path to the executable for the "llm" CLI tool. Only used if model_endpoint is set to "llm", signifying that you want to use "llm" as the manager for all your language model requests',
 )
 
 mod.setting(

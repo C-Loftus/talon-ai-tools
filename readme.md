@@ -14,14 +14,30 @@ This functionality is especially helpful for users who:
 - Github Copilot
 - OpenAI API (with any GPT model) or [simonw/llm CLI](https://github.com/simonw/llm) for text generation and processing
   - Any OpenAI compatible model endpoint can be used (Azure, local llamafiles, etc)
-- OpenAI API for image generation and vision
+- OpenAI API for image recognition
 
 ## Setup:
 
 1. Download or `git clone` this repo into your Talon user directory.
 2. Choose one of the following three options to configure LLM access (unless you want to exclusively use this with Copilot):
 
-### Option 1 (recommended): simonw/llm CLI
+### Option 1: Direct OpenAI API Access
+
+1. [Obtain an OpenAI API key](https://platform.openai.com/signup).
+2. Create a Python file anywhere in your Talon user directory.
+3. Set the key environment variable within the Python file:
+
+> [!CAUTION]
+> Make sure you do not push the key to a public repo!
+
+```python
+# Example of setting the environment variable
+import os
+
+os.environ["OPENAI_API_KEY"] = "YOUR-KEY-HERE"
+```
+
+### Option 2 (recommended): simonw/llm CLI
 
 1. Install [simonw/llm](https://github.com/simonw/llm#installation) and set up one or more models to use.
 2. Add the following lines to your settings:
@@ -39,22 +55,6 @@ user.openai_model = "claude-3.7-sonnet"  # or whichever model you installed
 ```
 
 4. By default, all model interactions will be logged and viewable via `llm logs`. If you prefer, you can disable this with `llm logs off`.
-
-### Option 2: Direct OpenAI API Access
-
-1. [Obtain an OpenAI API key](https://platform.openai.com/signup).
-2. Create a Python file anywhere in your Talon user directory.
-3. Set the key environment variable within the Python file:
-
-> [!CAUTION]
-> Make sure you do not push the key to a public repo!
-
-```python
-# Example of setting the environment variable
-import os
-
-os.environ["OPENAI_API_KEY"] = "YOUR-KEY-HERE"
-```
 
 ### Option 3: Custom Endpoint URL
 
