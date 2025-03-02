@@ -42,7 +42,7 @@ os.environ["OPENAI_API_KEY"] = "YOUR-KEY-HERE"
 1. Install [simonw/llm](https://github.com/simonw/llm#installation) and set up one or more models to use.
 
 > [!NOTE]
-> Run `llm keys set` with the name of the provider you wish to use to set the API key for your requests. i.e. `llm keys set openai`. 
+> Run `llm keys set` with the name of the provider you wish to use to set the API key for your requests. i.e. `llm keys set openai`.
 
 2. Add the following lines to your settings:
 
