@@ -54,7 +54,7 @@ user.model_endpoint = "llm"
 user.openai_model = "claude-3.7-sonnet"  # or whichever model you installed
 ```
 
-4. By default, all model interactions will be logged and viewable via `llm logs`. If you prefer, you can disable this with `llm logs off`.
+4. By default, all model interactions will be logged locally and viewable on your machine via `llm logs`. If you prefer, you can disable this with `llm logs off`.
 
 ### Option 3: Custom Endpoint URL
 
