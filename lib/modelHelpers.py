@@ -1,6 +1,8 @@
 import base64
 import json
 import os
+import platform
+import subprocess
 from typing import Literal, Optional
 
 import requests
@@ -93,9 +95,8 @@ def format_clipboard() -> GPTMessageItem:
 def send_request(
     prompt: GPTMessageItem,
     content_to_process: Optional[GPTMessageItem],
-    tools: Optional[list[dict[str, str]]] = None,
     destination: str = "",
-):
+) -> GPTMessageItem:
     """Generate run a GPT request and return the response"""
     notification = "GPT Task Started"
     if len(GPTState.context) > 0:
@@ -104,7 +105,6 @@ def send_request(
         notification += ", Threading Enabled"
 
     notify(notification)
-    TOKEN = get_token()
 
     language = actions.code.language()
     language_context = (
@@ -119,21 +119,22 @@ def send_request(
         else None
     )
 
-    system_messages: list[GPTMessageItem] = [
-        {"type": "text", "text": item}
-        for item in [
-            settings.get("user.model_system_prompt"),
-            language_context,
-            application_context,
-            snippet_context,
+    system_message = "\n\n".join(
+        [
+            item
+            for item in [
+                settings.get("user.model_system_prompt"),
+                language_context,
+                application_context,
+                snippet_context,
+            ]
+            + actions.user.gpt_additional_user_context()
+            + [context.get("text") for context in GPTState.context]
+            if item
         ]
-        + actions.user.gpt_additional_user_context()
-        if item is not None
-    ]
+    )
 
-    system_messages += GPTState.context
-
-    content: list[GPTMessageItem] = []
+    content: list[GPTMessageItem] = [prompt]
     if content_to_process is not None:
         if content_to_process["type"] == "image_url":
             image = content_to_process
@@ -148,54 +149,21 @@ def send_request(
                 prompt["text"] + '\n\n"""' + content_to_process["text"] + '"""'  # type: ignore a Prompt has to be of type text
             )
             content = [prompt]
+
+    request = GPTMessage(
+        role="user",
+        content=content,
+    )
+
+    model_endpoint: str = settings.get("user.model_endpoint")  # type: ignore
+    if model_endpoint == "llm":
+        response = send_request_to_llm_cli(prompt, content_to_process, system_message)
     else:
-        # If there isn't any content to process,
-        # we just use the prompt and nothing else
-        content = [prompt]
+        response = send_request_to_api(request, system_message)
 
-    current_request: GPTMessage = {
-        "role": "user",
-        "content": content,
-    }
-
-    data = {
-        "messages": [
-            format_messages("system", system_messages),
-        ]
-        + GPTState.thread
-        + [current_request],
-        "max_tokens": 2024,
-        "temperature": settings.get("user.model_temperature"),
-        "n": 1,
-        "model": settings.get("user.openai_model"),
-    }
-    if GPTState.debug_enabled:
-        print(data)
-    if tools is not None:
-        data["tools"] = tools
-
-    url: str = settings.get("user.model_endpoint")  # type: ignore
-    headers = {"Content-Type": "application/json"}
-    # If the model endpoint is Azure, we need to use a different header
-    if "azure.com" in url:
-        headers["api-key"] = TOKEN
-    else:
-        headers["Authorization"] = f"Bearer {TOKEN}"
-
-    raw_response = requests.post(url, headers=headers, data=json.dumps(data))
-
-    match raw_response.status_code:
-        case 200:
-            notify("GPT Task Completed")
-            resp = raw_response.json()["choices"][0]["message"]["content"].strip()
-            formatted_resp = strip_markdown(resp)
-            response = format_message(formatted_resp)
-        case _:
-            notify("GPT Failure: Check the Talon Log")
-            raise Exception(raw_response.json())
-
+    # Handle threading
     if GPTState.thread_enabled:
-        GPTState.push_thread(current_request)
+        GPTState.push_thread(request)
         GPTState.push_thread(
             {
                 "role": "assistant",
@@ -204,6 +172,105 @@ def send_request(
         )
 
     return response
+
+
+def send_request_to_api(request: GPTMessage, system_message: str) -> GPTMessageItem:
+    """Send a request to the model API endpoint and return the response"""
+    data = {
+        "messages": (
+            [
+                format_messages(
+                    "system",
+                    [GPTMessageItem(type="text", text=system_message)],
+                ),
+            ]
+            if system_message
+            else []
+        )
+        + GPTState.thread
+        + [request],
+        "max_tokens": 2024,
+        "temperature": settings.get("user.model_temperature"),
+        "n": 1,
+        "model": settings.get("user.openai_model"),
+    }
+    if GPTState.debug_enabled:
+        print(data)
+
+    url: str = settings.get("user.model_endpoint")  # type: ignore
+    headers = {"Content-Type": "application/json"}
+    token = get_token()
+    # If the model endpoint is Azure, we need to use a different header
+    if "azure.com" in url:
+        headers["api-key"] = token
+    else:
+        headers["Authorization"] = f"Bearer {token}"
+
+    raw_response = requests.post(url, headers=headers, data=json.dumps(data))
+
+    match raw_response.status_code:
+        case 200:
+            notify("GPT Task Completed")
+            resp = raw_response.json()["choices"][0]["message"]["content"].strip()
+            formatted_resp = strip_markdown(resp)
+            return format_message(formatted_resp)
+        case _:
+            notify("GPT Failure: Check the Talon Log")
+            raise Exception(raw_response.json())
+
+
+def send_request_to_llm_cli(
+    prompt: GPTMessageItem,
+    content_to_process: Optional[GPTMessageItem],
+    system_message: str,
+) -> GPTMessageItem:
+    """Send a request to the LLM CLI tool and return the response"""
+    # Build command.
+    command: list[str] = [settings.get("user.model_llm_path")]  # type: ignore
+    command.append(prompt["text"])  # type: ignore
+    cmd_input: bytes | None = None
+    if content_to_process and content_to_process["type"] == "image_url":
+        img_url: str = content_to_process["image_url"]["url"]  # type: ignore
+        if img_url.startswith("data:"):
+            command.extend(["-a", "-"])
+            base64_data: str = img_url.split(",", 1)[1]
+            cmd_input = base64.b64decode(base64_data)
+        else:
+            command.extend(["-a", img_url])
+    model: str = settings.get("user.openai_model")  # type: ignore
+    command.extend(["-m", model])
+    command.extend(["-o", "temperature", str(settings.get("user.model_temperature"))])
+    if system_message:
+        command.extend(["-s", system_message])
+
+    if GPTState.debug_enabled:
+        print(command)
+
+    # Execute command and capture output.
+    # Talon changes locale.getpreferredencoding(False) to "utf-8" on
+    # Windows, but the llm command responds with cp1252 encoding.
+    output_encoding = "cp1252" if platform.system() == "Windows" else "utf-8"
+    try:
+        result = subprocess.run(
+            command,
+            input=cmd_input,
+            capture_output=True,
+            check=True,
+            creationflags=(
+                subprocess.CREATE_NO_WINDOW if platform.system() == "Windows" else 0
+            ),
+        )
+        notify("GPT Task Completed")
+        resp = result.stdout.decode(output_encoding).strip()
+        formatted_resp = strip_markdown(resp)
+        return format_message(formatted_resp)
+    except subprocess.CalledProcessError as e:
+        error_msg = e.stderr.decode(output_encoding).strip() if e.stderr else str(e)
+        notify(f"GPT Failure: {error_msg}")
+        raise e
+    except Exception as e:
+        notify("GPT Failure: Check the Talon Log")
+        raise e
 
 
 def get_clipboard_image():
