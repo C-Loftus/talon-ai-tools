@@ -6,6 +6,8 @@ Query language models with voice commands. Helpful to automatically generate tex
 
 - See [the list of prompts](lists/staticPrompt.talon-list) for all the prompts that can be used with the `model` command.
 
+- See [the list of available models](lists/model.talon-list) that can be used to specify which model to use directly in the voice command (e.g., "four o mini explain this").
+
 - See the [examples file](../.docs/usage-examples/examples.md) for gifs that show how to use the commands.
 
 - View the [docs](http://localhost:4321/talon-ai-tools/) for more detailed usage and help
@@ -22,7 +24,7 @@ If you wish to change any configuration settings, copy the [example configuratio
 
 | Setting                  | Default                                                                                                                                                                                                                                                            | Notes                                                                                       |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
-| user.openai_model        | `"gpt-4o-mini"`                                                                                                                                                                                                                                                    | The model to use for the queries. NOTE: To access certain models you may need prior API use |
+| user.model_default_model | `"gpt-4o-mini"`                                                                                                                                                                                                                                                    | The default model to use when no specific model is specified in the command. You can also specify a model directly in the voice command, e.g., "four o mini explain this" |
 | user.model_temperature   | `0.6`                                                                                                                                                                                                                                                              | Higher temperatures will make the model more creative and less accurate                     |
 | user.model_endpoint      | `"https://api.openai.com/v1/chat/completions"`                                                                                                                                                                                                                     | Any OpenAI compatible endpoint address can be used (Azure, local llamafiles, etc)           |
 | user.model_shell_default | `"bash"`                                                                                                                                                                                                                                                           | The default shell for `model shell` commands                                                |
