@@ -95,6 +95,7 @@ def format_clipboard() -> GPTMessageItem:
 def send_request(
     prompt: GPTMessageItem,
     content_to_process: Optional[GPTMessageItem],
+    model: str,
     destination: str = "",
 ) -> GPTMessageItem:
     """Generate run a GPT request and return the response"""
@@ -103,6 +104,10 @@ def send_request(
         notification += ": Reusing Stored Context"
     if GPTState.thread_enabled:
         notification += ", Threading Enabled"
+
+    # Use specified model if provided
+    if model:
+        notification += f", Using model: {model}"
 
     notify(notification)
 
@@ -157,9 +162,11 @@ def send_request(
 
     model_endpoint: str = settings.get("user.model_endpoint")  # type: ignore
     if model_endpoint == "llm":
-        response = send_request_to_llm_cli(prompt, content_to_process, system_message)
+        response = send_request_to_llm_cli(
+            prompt, content_to_process, system_message, model
+        )
     else:
-        response = send_request_to_api(request, system_message)
+        response = send_request_to_api(request, system_message, model)
 
     # Handle threading
     if GPTState.thread_enabled:
@@ -174,7 +181,9 @@ def send_request(
     return response
 
 
-def send_request_to_api(request: GPTMessage, system_message: str) -> GPTMessageItem:
+def send_request_to_api(
+    request: GPTMessage, system_message: str, model: str
+) -> GPTMessageItem:
     """Send a request to the model API endpoint and return the response"""
     data = {
         "messages": (
@@ -192,7 +201,7 @@ def send_request_to_api(request: GPTMessage, system_message: str) -> GPTMessageI
         "max_tokens": 2024,
         "temperature": settings.get("user.model_temperature"),
         "n": 1,
-        "model": settings.get("user.openai_model"),
+        "model": model,
     }
     if GPTState.debug_enabled:
         print(data)
@@ -223,6 +232,7 @@ def send_request_to_llm_cli(
     prompt: GPTMessageItem,
     content_to_process: Optional[GPTMessageItem],
     system_message: str,
+    model: str,
 ) -> GPTMessageItem:
     """Send a request to the LLM CLI tool and return the response"""
     # Build command.
@@ -237,7 +247,6 @@ def send_request_to_llm_cli(
             cmd_input = base64.b64decode(base64_data)
         else:
             command.extend(["-a", img_url])
-    model: str = settings.get("user.openai_model")  # type: ignore
     command.extend(["-m", model])
     command.extend(["-o", "temperature", str(settings.get("user.model_temperature"))])
     if system_message:

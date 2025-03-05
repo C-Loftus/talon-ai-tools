@@ -6,7 +6,7 @@ tag: user.cursorless
 # Paste it to the cursor if no target is specified
 {user.model} <user.modelSimplePrompt> <user.cursorless_target> [<user.cursorless_destination>]$:
     text = user.cursorless_get_text_list(cursorless_target)
-    result = user.gpt_apply_prompt(user.modelSimplePrompt, text)
+    result = user.gpt_apply_prompt(user.modelSimplePrompt, model, text)
     default_destination = user.cursorless_create_destination(cursorless_target)
     user.cursorless_insert(cursorless_destination or default_destination, result)
 
@@ -37,6 +37,6 @@ tag: user.cursorless
 {user.model} apply [from] clip <user.cursorless_target>$:
     prompt = clip.text()
     text = user.cursorless_get_text_list(cursorless_target)
-    result = user.gpt_apply_prompt(prompt, text)
+    result = user.gpt_apply_prompt(prompt, model, text)
     default_destination = user.cursorless_create_destination(cursorless_target)
     user.cursorless_insert(default_destination, result)

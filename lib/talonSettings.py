@@ -1,5 +1,3 @@
-from typing import Literal
-
 from talon import Context, Module
 
 mod = Module()
@@ -30,9 +28,17 @@ def modelSimplePrompt(matched_prompt) -> str:
 
 
 mod.setting(
-    "openai_model",
-    type=Literal["gpt-3.5-turbo", "gpt-4", "gpt-4o-mini"],  # type: ignore
+    "model_default_model",
+    type=str,
     default="gpt-4o-mini",
+    desc="The default model to use when no specific model is specified in the command",
+)
+
+mod.setting(
+    "openai_model",
+    type=str,
+    default="do_not_use",
+    desc="DEPRECATED: Use model_default_model instead. This setting is maintained for backward compatibility only.",
 )
 
 mod.setting(
