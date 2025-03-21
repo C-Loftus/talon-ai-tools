@@ -16,7 +16,7 @@ settings():
     # user.model_system_prompt = "You are an assistant helping an office worker to be more productive."
 
     # Change to the model of your choice
-    # user.model_default_model = 'gpt-4o'
+    # user.model_default = 'gpt-4o'
 
     # Increase the window width.
     # user.model_window_char_width = 120

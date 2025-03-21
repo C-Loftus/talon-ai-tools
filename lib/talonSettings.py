@@ -28,7 +28,7 @@ def modelSimplePrompt(matched_prompt) -> str:
 
 
 mod.setting(
-    "model_default_model",
+    "model_default",
     type=str,
     default="gpt-4o-mini",
     desc="The default model to use when no specific model is specified in the command",
@@ -38,7 +38,7 @@ mod.setting(
     "openai_model",
     type=str,
     default="do_not_use",
-    desc="DEPRECATED: Use model_default_model instead. This setting is maintained for backward compatibility only.",
+    desc="DEPRECATED: Use model_default instead. This setting is maintained for backward compatibility only.",
 )
 
 mod.setting(

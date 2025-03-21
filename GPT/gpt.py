@@ -176,11 +176,11 @@ class UserActions:
             openai_model: str = settings.get("user.openai_model")  # type: ignore
             if openai_model != "do_not_use":
                 logging.warning(
-                    "The setting 'user.openai_model' is deprecated. Please use 'user.model_default_model' instead."
+                    "The setting 'user.openai_model' is deprecated. Please use 'user.model_default' instead."
                 )
                 model = openai_model
             else:
-                model = settings.get("user.model_default_model")  # type: ignore
+                model = settings.get("user.model_default")  # type: ignore
 
         response = gpt_query(
             format_message(prompt), text_to_process, model, destination
