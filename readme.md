@@ -55,7 +55,7 @@ user.model_endpoint = "llm"
 3. Choose a model in settings:
 
 ```
-user.openai_model = "claude-3.7-sonnet"  # or whichever model you installed
+user.model_default = "claude-3.7-sonnet"  # or whichever model you installed
 ```
 
 4. By default, all model interactions will be logged locally and viewable on your machine via `llm logs`. If you prefer, you can disable this with `llm logs off`.

@@ -3,6 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 from talon import Module, registry
 
 from ...lib.HTMLBuilder import Builder
+from ...lib.modelHelpers import format_message
 from ...lib.pureHelpers import remove_wrapper
 from ..gpt import gpt_query
 
@@ -11,7 +12,7 @@ mod = Module()
 
 @mod.action_class
 class UserActions:
-    def gpt_find_talon_commands(command_description: str):
+    def gpt_find_talon_commands(command_description: str, model: str):
         """Search for relevant talon commands"""
         command_list = ""
         for ctx in registry.active_contexts():
@@ -33,10 +34,13 @@ class UserActions:
 
         command_chunks = split_into_chunks(command_list, 1400 - len(prompt))
 
-        with ThreadPoolExecutor() as executor:
-            results = list(
-                executor.map(gpt_query, [prompt] * len(command_chunks), command_chunks)
+        def process_chunk(chunk):
+            return gpt_query(format_message(prompt), format_message(chunk), model).get(
+                "text", "None"
             )
+
+        with ThreadPoolExecutor() as executor:
+            results = list(executor.map(process_chunk, command_chunks))
 
         builder = Builder()
         builder.h1("Talon GPT Command Response")

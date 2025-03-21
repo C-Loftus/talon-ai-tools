@@ -15,8 +15,8 @@ settings():
 
     # user.model_system_prompt = "You are an assistant helping an office worker to be more productive."
 
-    # Change to 'gpt-4' or the model of your choice
-    # user.openai_model = 'gpt-3.5-turbo'
+    # Change to the model of your choice
+    # user.model_default = 'gpt-4o'
 
     # Increase the window width.
     # user.model_window_char_width = 120

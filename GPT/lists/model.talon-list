@@ -3,3 +3,8 @@ list: user.model
 
 # The default model name
 model: model
+# OpenAI models
+four o mini: gpt-4o-mini
+four o: gpt-4o
+
+# If using user.model_endpoint = "llm", run `llm models` and add any models you want to use here.
