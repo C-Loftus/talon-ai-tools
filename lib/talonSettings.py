@@ -70,6 +70,13 @@ mod.setting(
 )
 
 mod.setting(
+    "model_verbose_notifications",
+    type=bool,
+    default=True,
+    desc="If true, show notifications when model starts and completes successfully.",
+)
+
+mod.setting(
     "model_system_prompt",
     type=str,
     default="You are an assistant helping an office worker to be more productive. Output just the response to the request and no additional content. Do not generate any markdown formatting such as backticks for programming languages unless it is explicitly requested. If the user requests code generation, output just code and not additional natural language explanation.",
