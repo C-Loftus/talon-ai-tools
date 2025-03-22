@@ -21,6 +21,10 @@ settings():
     # Increase the window width.
     # user.model_window_char_width = 120
 
+    # Disable notifications for nominal behavior. Useful on Windows where notifications are
+    # throttled.
+    # user.model_verbose_notifications = false
+
 # Only uncomment the line below if you want experimental behavior to parse Talon files
 # tag(): user.gpt_beta
 
