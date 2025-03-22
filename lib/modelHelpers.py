@@ -109,7 +109,8 @@ def send_request(
     if model:
         notification += f", Using model: {model}"
 
-    notify(notification)
+    if settings.get("user.model_verbose_notifications"):
+        notify(notification)
 
     language = actions.code.language()
     language_context = (
@@ -219,7 +220,8 @@ def send_request_to_api(
 
     match raw_response.status_code:
         case 200:
-            notify("GPT Task Completed")
+            if settings.get("user.model_verbose_notifications"):
+                notify("GPT Task Completed")
             resp = raw_response.json()["choices"][0]["message"]["content"].strip()
             formatted_resp = strip_markdown(resp)
             return format_message(formatted_resp)
@@ -269,7 +271,8 @@ def send_request_to_llm_cli(
                 subprocess.CREATE_NO_WINDOW if platform.system() == "Windows" else 0
             ),
         )
-        notify("GPT Task Completed")
+        if settings.get("user.model_verbose_notifications"):
+            notify("GPT Task Completed")
         resp = result.stdout.decode(output_encoding).strip()
         formatted_resp = strip_markdown(resp)
         return format_message(formatted_resp)
