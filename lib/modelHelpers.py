@@ -1,5 +1,6 @@
 import base64
 import json
+import logging
 import os
 import platform
 import subprocess
@@ -15,6 +16,23 @@ from .modelTypes import GPTMessage, GPTMessageItem
 """"
 All functions in this this file have impure dependencies on either the model or the talon APIs
 """
+
+
+def resolve_model_name(model: str) -> str:
+    """
+    Get the actual model name from the model list value.
+    """
+    if model == "model":
+        # Check for deprecated setting first for backward compatibility
+        openai_model: str = settings.get("user.openai_model")  # type: ignore
+        if openai_model != "do_not_use":
+            logging.warning(
+                "The setting 'user.openai_model' is deprecated. Please use 'user.model_default' instead."
+            )
+            model = openai_model
+        else:
+            model = settings.get("user.model_default")  # type: ignore
+    return model
 
 
 def messages_to_string(messages: list[GPTMessageItem]) -> str:
@@ -99,6 +117,7 @@ def send_request(
     destination: str = "",
 ) -> GPTMessageItem:
     """Generate run a GPT request and return the response"""
+    model = resolve_model_name(model)
     notification = "GPT Task Started"
     if len(GPTState.context) > 0:
         notification += ": Reusing Stored Context"

@@ -1,4 +1,3 @@
-import logging
 import os
 from typing import Any, Optional
 
@@ -169,18 +168,6 @@ class UserActions:
         if prompt.startswith("ask"):
             text_to_process = format_message(prompt.removeprefix("ask"))
             prompt = "Generate text that satisfies the question or request given in the input."
-
-        # Convert model name from the model list to actual model name or use default
-        if model == "model":
-            # Check for deprecated setting first for backward compatibility
-            openai_model: str = settings.get("user.openai_model")  # type: ignore
-            if openai_model != "do_not_use":
-                logging.warning(
-                    "The setting 'user.openai_model' is deprecated. Please use 'user.model_default' instead."
-                )
-                model = openai_model
-            else:
-                model = settings.get("user.model_default")  # type: ignore
 
         response = gpt_query(
             format_message(prompt), text_to_process, model, destination
