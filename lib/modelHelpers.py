@@ -5,6 +5,7 @@ import os
 import platform
 import subprocess
 from typing import Literal, Optional
+
 import requests
 from talon import actions, app, clip, settings
 
@@ -256,7 +257,7 @@ def send_request_to_llm_cli(
 ) -> GPTMessageItem:
     """Send a request to the LLM CLI tool and return the response"""
     # Build command.
-    llm_binary: str = settings.get("user.model_llm_path") # type: ignore
+    llm_binary: str = settings.get("user.model_llm_path")  # type: ignore
     command: list[str] = [llm_binary]
     assert "text" in prompt
     command.append(prompt["text"])
@@ -270,7 +271,6 @@ def send_request_to_llm_cli(
         else:
             command.extend(["-a", img_url])
     command.extend(["-m", model])
-
 
     if system_message:
         command.extend(["-s", system_message])
