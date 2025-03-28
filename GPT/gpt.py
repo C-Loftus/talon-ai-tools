@@ -123,12 +123,16 @@ class UserActions:
         """Enable threading of subsequent requests"""
         GPTState.disable_thread()
 
-    def gpt_push_context(context: str):
+    def gpt_push_context(context: str | list[str]):
         """Add the selected text to the stored context"""
+        if isinstance(context, list):
+            context = "\n".join(context)
         GPTState.push_context(format_message(context))
 
-    def gpt_push_thread(content: str):
+    def gpt_push_thread(content: str | list[str]):
         """Add the selected text to the active thread"""
+        if isinstance(content, list):
+            content = "\n".join(content)
         GPTState.push_thread(format_messages("user", [format_message(content)]))
 
     def gpt_additional_user_context() -> list[str]:
@@ -175,6 +179,25 @@ class UserActions:
 
         actions.user.gpt_insert_response(response, destination)
         return response
+
+    def gpt_apply_prompt_for_cursorless(
+        prompt: str,
+        model: str,
+        source: list[str],
+    ) -> str:
+        """Apply a prompt to text from Cursorless and return a string result.
+        This function is specifically designed for Cursorless integration
+        and does not trigger insertion actions."""
+
+        # Join the list into a single string
+        source_text = "\n".join(source)
+        text_to_process = format_message(source_text)
+
+        # Send the request but don't insert the response (Cursorless will handle insertion)
+        response = gpt_query(format_message(prompt), text_to_process, model, "")
+
+        # Return just the text string
+        return extract_message(response)
 
     def gpt_pass(source: str = "", destination: str = "") -> None:
         """Passes a response from source to destination"""
