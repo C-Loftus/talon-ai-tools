@@ -12,5 +12,3 @@
 
 # Clear the context stored in the model
 {user.model} clear context: user.gpt_clear_context()
-
-#
