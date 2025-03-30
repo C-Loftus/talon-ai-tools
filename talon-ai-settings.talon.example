@@ -25,8 +25,5 @@ settings():
     # throttled.
     # user.model_verbose_notifications = false
 
-# Only uncomment the line below if you want experimental behavior to parse Talon files
-# tag(): user.gpt_beta
-
 # Use codeium instead of Github Copilot
 # tag(): user.codeium
