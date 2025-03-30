@@ -11,7 +11,6 @@ tag: user.model_window_open
 
 ^copy response$: user.confirmation_gui_copy()
 ^pass response to context$: user.confirmation_gui_pass_context()
-^pass response to thread$: user.confirmation_gui_pass_thread()
 
 # Deny the output of the model and discard it
 ^discard response$: user.confirmation_gui_close()

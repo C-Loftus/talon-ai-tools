@@ -9,9 +9,6 @@ clip: clipboard
 # Apply the prompt to the text in the context
 context: context
 
-# Apply the prompt to the text in the thread
-thread: thread
-
 # Apply the prompt to the currently selected text
 this: selection
 

@@ -2,7 +2,6 @@ from talon import Context, Module
 
 mod = Module()
 ctx = Context()
-mod.tag("gpt_beta", desc="Tag for enabling beta GPT commands")
 # Stores all our prompts that don't require arguments
 # (ie those that just take in the clipboard text)
 mod.list("staticPrompt", desc="GPT Prompts Without Dynamic Arguments")

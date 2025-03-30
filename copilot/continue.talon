@@ -1,5 +1,4 @@
 app: vscode
-tag: user.gpt_beta
 -
 
 ## Commands to interact with https://continue.dev/ extension

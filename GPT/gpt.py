@@ -9,11 +9,9 @@ from ..lib.modelHelpers import (
     extract_message,
     format_clipboard,
     format_message,
-    format_messages,
     messages_to_string,
     notify,
     send_request,
-    thread_to_string,
 )
 from ..lib.modelState import GPTState
 from ..lib.modelTypes import GPTMessageItem
@@ -43,31 +41,6 @@ def gpt_query(
 
 @mod.action_class
 class UserActions:
-    def gpt_blend(source_text: str, destination_text: str, model: str) -> None:
-        """Blend all the source text and send it to the destination"""
-        prompt = f"""
-        Act as a text transformer. I'm going to give you some source text and destination text, and I want you to modify the destination text based on the contents of the source text in a way that combines both of them together. Use the structure of the destination text, reordering and renaming as necessary to ensure a natural and coherent flow. Please return only the final text with no decoration for insertion into a document in the specified language.
-
-        Here is the destination text:
-        ```
-        {destination_text}
-        ```
-
-        Please return only the final text. What follows is all of the source texts separated by '---'.
-        """
-
-        result = gpt_query(format_message(prompt), format_message(source_text), model)
-        actions.user.gpt_insert_response(result, "paste")
-
-    def gpt_blend_list(
-        source_text: list[str], destination_text: str, model: str
-    ) -> None:
-        """Blend all the source text as a list and send it to the destination"""
-
-        return actions.user.gpt_blend(
-            "\n---\n".join(source_text), destination_text, model
-        )
-
     def gpt_generate_shell(text_to_process: str, model: str) -> str:
         """Generate a shell command from a spoken instruction"""
         shell_name = settings.get("user.model_shell_default")
@@ -110,30 +83,11 @@ class UserActions:
         """Reset the stored context"""
         GPTState.clear_context()
 
-    def gpt_clear_thread():
-        """Create a new thread"""
-        GPTState.new_thread()
-        actions.user.confirmation_gui_refresh_thread()
-
-    def gpt_enable_threading():
-        """Enable threading of subsequent requests"""
-        GPTState.enable_thread()
-
-    def gpt_disable_threading():
-        """Enable threading of subsequent requests"""
-        GPTState.disable_thread()
-
     def gpt_push_context(context: str | list[str]):
         """Add the selected text to the stored context"""
         if isinstance(context, list):
             context = "\n".join(context)
         GPTState.push_context(format_message(context))
-
-    def gpt_push_thread(content: str | list[str]):
-        """Add the selected text to the active thread"""
-        if isinstance(content, list):
-            content = "\n".join(content)
-        GPTState.push_thread(format_messages("user", [format_message(content)]))
 
     def gpt_additional_user_context() -> list[str]:
         """This is an override function that can be used to add additional context to the prompt"""
@@ -247,29 +201,6 @@ class UserActions:
         if method == "":
             method = settings.get("user.model_default_destination")
 
-        # If threading is enabled, and the window is open, refresh the confirmation GUI
-        # unless the user explicitly wanted to pass the result to the window without viewing the rest of the thread
-        if (
-            GPTState.thread_enabled
-            and confirmation_gui.showing
-            and not method == "window"
-            # If they ask for thread or newThread specifically,
-            # it should be pushed to the thread and not just refreshed
-            and not method == "thread"
-            and not method == "newThread"
-        ):
-            # Skip inserting the response if the user is just viewing the thread in the window
-            actions.user.confirmation_gui_refresh_thread()
-            return
-
-        match method:
-            case "thread" | "newThread" as t:
-                if t == "newThread":
-                    GPTState.new_thread()
-                GPTState.push_thread(format_messages("user", [gpt_message]))
-                actions.user.confirmation_gui_refresh_thread()
-                return
-
         if gpt_message.get("type") != "text":
             actions.app.notify(
                 f"Tried to insert an image to {method}, but that is not currently supported. To insert an image to this destination use a prompt to convert it to text."
@@ -356,9 +287,6 @@ class UserActions:
                         "GPT Failure: User applied a prompt to the phrase context, but there was no context stored"
                     )
                 return format_message(messages_to_string(GPTState.context))
-            case "thread":
-                # TODO: Do we want to throw an exception here if the thread is empty?
-                return format_message(thread_to_string(GPTState.thread))
             case "gptResponse":
                 if GPTState.last_response == "":
                     raise Exception(

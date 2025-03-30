@@ -21,12 +21,6 @@ to context: context
 # Instead of pasting, add the result to a new context
 to new context: newContext
 
-# Instead of pasting, add the result to the thread
-to thread: thread
-
-# Instead of pasting, add the result to a new thread
-to new thread: newThread
-
 # Instead of pasting, append the result to the clipboard
 to after clip: appendClipboard
 

@@ -46,15 +46,6 @@ def messages_to_string(messages: list[GPTMessageItem]) -> str:
     return "\n\n".join(formatted_messages)
 
 
-def thread_to_string(chats: list[GPTMessage]) -> str:
-    """Format thread as a string"""
-    formatted_messages = []
-    for chat in chats:
-        formatted_messages.append(chat.get("role"))
-        formatted_messages.append(messages_to_string(chat.get("content", [])))
-    return "\n\n".join(formatted_messages)
-
-
 def notify(message: str):
     """Send a notification to the user. Defaults the Andreas' notification system if you have it installed"""
     try:
@@ -121,8 +112,6 @@ def send_request(
     notification = "GPT Task Started"
     if len(GPTState.context) > 0:
         notification += ": Reusing Stored Context"
-    if GPTState.thread_enabled:
-        notification += ", Threading Enabled"
 
     # Use specified model if provided
     if model:
@@ -188,16 +177,6 @@ def send_request(
     else:
         response = send_request_to_api(request, system_message, model)
 
-    # Handle threading
-    if GPTState.thread_enabled:
-        GPTState.push_thread(request)
-        GPTState.push_thread(
-            {
-                "role": "assistant",
-                "content": [response],
-            }
-        )
-
     return response
 
 
@@ -216,7 +195,6 @@ def send_request_to_api(
             if system_message
             else []
         )
-        + GPTState.thread
         + [request],
         "max_tokens": 2024,
         "temperature": settings.get("user.model_temperature"),
