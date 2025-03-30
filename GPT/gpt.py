@@ -27,6 +27,7 @@ def gpt_query(
     prompt: GPTMessageItem,
     text_to_process: Optional[GPTMessageItem],
     model: str,
+    thread: str,
     destination: str = "",
 ):
     """Send a prompt to the GPT API and return the response"""
@@ -34,14 +35,14 @@ def gpt_query(
     # Reset state before pasting
     GPTState.last_was_pasted = False
 
-    response = send_request(prompt, text_to_process, model, destination)
+    response = send_request(prompt, text_to_process, model, thread, destination)
     GPTState.last_response = extract_message(response)
     return response
 
 
 @mod.action_class
 class UserActions:
-    def gpt_generate_shell(text_to_process: str, model: str) -> str:
+    def gpt_generate_shell(text_to_process: str, model: str, thread: str) -> str:
         """Generate a shell command from a spoken instruction"""
         shell_name = settings.get("user.model_shell_default")
         if shell_name is None:
@@ -54,11 +55,11 @@ class UserActions:
         """
 
         result = gpt_query(
-            format_message(prompt), format_message(text_to_process), model
+            format_message(prompt), format_message(text_to_process), model, thread
         )
         return extract_message(result)
 
-    def gpt_generate_sql(text_to_process: str, model: str) -> str:
+    def gpt_generate_sql(text_to_process: str, model: str, thread: str) -> str:
         """Generate a SQL query from a spoken instruction"""
 
         prompt = """
@@ -68,7 +69,7 @@ class UserActions:
        Prioritize SQL queries that are database agnostic.
         """
         return gpt_query(
-            format_message(prompt), format_message(text_to_process), model
+            format_message(prompt), format_message(text_to_process), model, thread
         ).get("text", "")
 
     def gpt_start_debug():
@@ -109,6 +110,7 @@ class UserActions:
     def gpt_apply_prompt(
         prompt: str,
         model: str,
+        thread: str,
         source: str = "",
         destination: str = "",
     ):
@@ -128,7 +130,7 @@ class UserActions:
             prompt = "Generate text that satisfies the question or request given in the input."
 
         response = gpt_query(
-            format_message(prompt), text_to_process, model, destination
+            format_message(prompt), text_to_process, model, thread, destination
         )
 
         actions.user.gpt_insert_response(response, destination)
@@ -137,6 +139,7 @@ class UserActions:
     def gpt_apply_prompt_for_cursorless(
         prompt: str,
         model: str,
+        thread: str,
         source: list[str],
     ) -> str:
         """Apply a prompt to text from Cursorless and return a string result.
@@ -148,7 +151,7 @@ class UserActions:
         text_to_process = format_message(source_text)
 
         # Send the request but don't insert the response (Cursorless will handle insertion)
-        response = gpt_query(format_message(prompt), text_to_process, model, "")
+        response = gpt_query(format_message(prompt), text_to_process, model, thread, "")
 
         # Return just the text string
         return extract_message(response)
@@ -177,14 +180,16 @@ class UserActions:
 
         builder.render()
 
-    def gpt_reformat_last(how_to_reformat: str, model: str) -> str:
+    def gpt_reformat_last(how_to_reformat: str, model: str, thread: str) -> str:
         """Reformat the last model output"""
         PROMPT = f"""The last phrase was written using voice dictation. It has an error with spelling, grammar, or just general misrecognition due to a lack of context. Please reformat the following text to correct the error with the context that it was {how_to_reformat}."""
         last_output = actions.user.get_last_phrase()
         if last_output:
             actions.user.clear_last_phrase()
             return extract_message(
-                gpt_query(format_message(PROMPT), format_message(last_output), model)
+                gpt_query(
+                    format_message(PROMPT), format_message(last_output), model, thread
+                )
             )
         else:
             notify("No text to reformat")
