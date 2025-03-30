@@ -247,7 +247,7 @@ def send_request_to_llm_cli(
         else:
             command.extend(["-a", img_url])
     command.extend(["-m", model])
-    # command.extend(["-o", "temperature", str(settings.get("user.model_temperature"))])
+    command.extend(["-o", "temperature", str(settings.get("user.model_temperature"))])
     if system_message:
         command.extend(["-s", system_message])
 
