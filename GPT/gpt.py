@@ -41,31 +41,6 @@ def gpt_query(
 
 @mod.action_class
 class UserActions:
-    def gpt_blend(source_text: str, destination_text: str, model: str) -> None:
-        """Blend all the source text and send it to the destination"""
-        prompt = f"""
-        Act as a text transformer. I'm going to give you some source text and destination text, and I want you to modify the destination text based on the contents of the source text in a way that combines both of them together. Use the structure of the destination text, reordering and renaming as necessary to ensure a natural and coherent flow. Please return only the final text with no decoration for insertion into a document in the specified language.
-
-        Here is the destination text:
-        ```
-        {destination_text}
-        ```
-
-        Please return only the final text. What follows is all of the source texts separated by '---'.
-        """
-
-        result = gpt_query(format_message(prompt), format_message(source_text), model)
-        actions.user.gpt_insert_response(result, "paste")
-
-    def gpt_blend_list(
-        source_text: list[str], destination_text: str, model: str
-    ) -> None:
-        """Blend all the source text as a list and send it to the destination"""
-
-        return actions.user.gpt_blend(
-            "\n---\n".join(source_text), destination_text, model
-        )
-
     def gpt_generate_shell(text_to_process: str, model: str) -> str:
         """Generate a shell command from a spoken instruction"""
         shell_name = settings.get("user.model_shell_default")
