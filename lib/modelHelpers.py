@@ -105,10 +105,14 @@ def send_request(
     prompt: GPTMessageItem,
     content_to_process: Optional[GPTMessageItem],
     model: str,
+    thread: str,
     destination: str = "",
 ) -> GPTMessageItem:
     """Generate run a GPT request and return the response"""
     model = resolve_model_name(model)
+
+    continue_thread = thread == "continueLast"
+
     notification = "GPT Task Started"
     if len(GPTState.context) > 0:
         notification += ": Reusing Stored Context"
@@ -172,9 +176,13 @@ def send_request(
     model_endpoint: str = settings.get("user.model_endpoint")  # type: ignore
     if model_endpoint == "llm":
         response = send_request_to_llm_cli(
-            prompt, content_to_process, system_message, model
+            prompt, content_to_process, system_message, model, continue_thread
         )
     else:
+        if continue_thread:
+            notify(
+                "Warning: Thread continuation is only supported when using setting user.model_endpoint = 'llm'"
+            )
         response = send_request_to_api(request, system_message, model)
 
     return response
@@ -232,10 +240,13 @@ def send_request_to_llm_cli(
     content_to_process: Optional[GPTMessageItem],
     system_message: str,
     model: str,
+    continue_thread: bool,
 ) -> GPTMessageItem:
     """Send a request to the LLM CLI tool and return the response"""
     # Build command.
     command: list[str] = [settings.get("user.model_llm_path")]  # type: ignore
+    if continue_thread:
+        command.append("-c")
     command.append(prompt["text"])  # type: ignore
     cmd_input: bytes | None = None
     if content_to_process and content_to_process["type"] == "image_url":
