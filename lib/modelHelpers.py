@@ -4,10 +4,11 @@ import logging
 import os
 import platform
 import subprocess
-from typing import Literal, Optional
+from pathlib import Path
+from typing import IO, Any, Literal, NotRequired, Optional, TypedDict
 
 import requests
-from talon import actions, app, clip, settings
+from talon import actions, app, clip, resource, settings
 
 from ..lib.pureHelpers import strip_markdown
 from .modelState import GPTState
@@ -16,6 +17,43 @@ from .modelTypes import GPTMessage, GPTMessageItem
 """"
 All functions in this this file have impure dependencies on either the model or the talon APIs
 """
+
+
+# TypedDict definition for model configuration
+class ModelConfig(TypedDict):
+    name: str
+    model_id: NotRequired[str]
+    system_prompt: NotRequired[str]
+    llm_options: NotRequired[dict[str, Any]]
+    api_options: NotRequired[dict[str, Any]]
+
+
+# Path to the models.json file
+MODELS_PATH = Path(__file__).parent.parent / "models.json"
+
+# Store loaded model configurations
+model_configs: dict[str, ModelConfig] = {}
+
+
+def load_model_config(f: IO) -> None:
+    """
+    Load model configurations from models.json
+    """
+    global model_configs
+    try:
+        content = f.read()
+        configs = json.loads(content)
+        # Convert list to dictionary with name as key
+        model_configs = {config["name"]: config for config in configs}
+    except Exception as e:
+        notify(f"Failed to load models.json: {e!r}")
+        model_configs = {}
+
+
+# Set up file watcher to reload configuration when models.json changes
+@resource.watch(str(MODELS_PATH))
+def on_update(f: IO):
+    load_model_config(f)
 
 
 def resolve_model_name(model: str) -> str:
@@ -33,6 +71,13 @@ def resolve_model_name(model: str) -> str:
         else:
             model = settings.get("user.model_default")  # type: ignore
     return model
+
+
+def get_model_config(model_name: str) -> Optional[ModelConfig]:
+    """
+    Get the configuration for a specific model from the loaded configs
+    """
+    return model_configs.get(model_name)
 
 
 def messages_to_string(messages: list[GPTMessageItem]) -> str:
@@ -124,6 +169,9 @@ def send_request(
     if settings.get("user.model_verbose_notifications"):
         notify(notification)
 
+    # Get model configuration if available
+    config = get_model_config(model)
+
     language = actions.code.language()
     language_context = (
         f"The user is currently in a code editor for the programming language: {language}."
@@ -141,7 +189,11 @@ def send_request(
         [
             item
             for item in [
-                settings.get("user.model_system_prompt"),
+                (
+                    config["system_prompt"]
+                    if config and "system_prompt" in config
+                    else settings.get("user.model_system_prompt")
+                ),
                 language_context,
                 application_context,
                 snippet_context,
@@ -192,6 +244,12 @@ def send_request_to_api(
     request: GPTMessage, system_message: str, model: str
 ) -> GPTMessageItem:
     """Send a request to the model API endpoint and return the response"""
+    # Get model configuration if available
+    config = get_model_config(model)
+
+    # Use model_id from configuration if available
+    model_id = config["model_id"] if config and "model_id" in config else model
+
     data = {
         "messages": (
             [
@@ -205,10 +263,22 @@ def send_request_to_api(
         )
         + [request],
         "max_tokens": 2024,
-        "temperature": settings.get("user.model_temperature"),
         "n": 1,
-        "model": model,
+        "model": model_id,
     }
+
+    # Check for deprecated temperature setting
+    temperature: float = settings.get("user.model_temperature")  # type: ignore
+    if temperature != -1.0:
+        logging.warning(
+            "The setting 'user.model_temperature' is deprecated. Please configure temperature in models.json instead."
+        )
+        data["temperature"] = temperature
+
+    # Apply API options from configuration if available
+    if config and "api_options" in config:
+        data.update(config["api_options"])
+
     if GPTState.debug_enabled:
         print(data)
 
@@ -243,7 +313,13 @@ def send_request_to_llm_cli(
     continue_thread: bool,
 ) -> GPTMessageItem:
     """Send a request to the LLM CLI tool and return the response"""
-    # Build command.
+    # Get model configuration if available
+    config = get_model_config(model)
+
+    # Use model_id from configuration if available
+    model_id = config["model_id"] if config and "model_id" in config else model
+
+    # Build command
     command: list[str] = [settings.get("user.model_llm_path")]  # type: ignore
     if continue_thread:
         command.append("-c")
@@ -257,8 +333,30 @@ def send_request_to_llm_cli(
             cmd_input = base64.b64decode(base64_data)
         else:
             command.extend(["-a", img_url])
-    command.extend(["-m", model])
-    command.extend(["-o", "temperature", str(settings.get("user.model_temperature"))])
+
+    # Add model option
+    command.extend(["-m", model_id])
+
+    # Check for deprecated temperature setting
+    temperature: float = settings.get("user.model_temperature")  # type: ignore
+    if temperature != -1.0:
+        logging.warning(
+            "The setting 'user.model_temperature' is deprecated. Please configure temperature in models.json instead."
+        )
+        command.extend(["-o", "temperature", str(temperature)])
+
+    # Apply llm_options from configuration if available
+    if config and "llm_options" in config:
+        for key, value in config["llm_options"].items():
+            if isinstance(value, bool):
+                if value:
+                    command.extend(["-o", key, "true"])
+                else:
+                    command.extend(["-o", key, "false"])
+            else:
+                command.extend(["-o", key, str(value)])
+
+    # Add system message if available
     if system_message:
         command.extend(["-s", system_message])
 

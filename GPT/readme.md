@@ -22,10 +22,24 @@ To add additional prompts, copy the [Talon list for custom prompts](lists/custom
 
 If you wish to change any configuration settings, copy the [example configuration file](../talon-ai-settings.talon.example) into your user directory and modify settings that you want to change.
 
+### Model-Specific Configuration
+
+For advanced configuration of specific models, you can create a `models.json` file in the root directory of this repository. Copy `models.json.example` to `models.json` as a starting point, and then customize it to your needs.
+
+The `models.json` file allows you to define per-model settings including:
+
+- Model aliases (via `model_id`)
+- Model-specific system prompts
+- API options (like temperature, top_p, etc.)
+- LLM CLI options (used when `user.model_endpoint` is set to "llm")
+
+The configuration is automatically reloaded when the file changes, so you don't need to restart Talon after making changes.
+
+### Global Settings
+
 | Setting                  | Default                                                                                                                                                                                                                                                            | Notes                                                                                                                                                                     |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | user.model_default       | `"gpt-4o-mini"`                                                                                                                                                                                                                                                    | The default model to use when no specific model is specified in the command. You can also specify a model directly in the voice command, e.g., "four o mini explain this" |
-| user.model_temperature   | `0.6`                                                                                                                                                                                                                                                              | Higher temperatures will make the model more creative and less accurate                                                                                                   |
 | user.model_endpoint      | `"https://api.openai.com/v1/chat/completions"`                                                                                                                                                                                                                     | Any OpenAI compatible endpoint address can be used (Azure, local llamafiles, etc)                                                                                         |
 | user.model_shell_default | `"bash"`                                                                                                                                                                                                                                                           | The default shell for `model shell` commands                                                                                                                              |
-| user.model_system_prompt | `"You are an assistant helping an office worker to be more productive. Output just the response to the request and no additional content. Do not generate any markdown formatting such as backticks for programming languages unless it is explicitly requested."` | The meta-prompt for how to respond to all prompts                                                                                                                         |
+| user.model_system_prompt | `"You are an assistant helping an office worker to be more productive. Output just the response to the request and no additional content. Do not generate any markdown formatting such as backticks for programming languages unless it is explicitly requested."` | The meta-prompt for how to respond to all prompts (can be overridden per-model in models.json)                                                                            |
