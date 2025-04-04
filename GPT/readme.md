@@ -27,6 +27,7 @@ If you wish to change any configuration settings, copy the [example configuratio
 For advanced configuration of specific models, you can create a `models.json` file in the root directory of this repository. Copy `models.json.example` to `models.json` as a starting point, and then customize it to your needs.
 
 The `models.json` file allows you to define per-model settings including:
+
 - Model aliases (via `model_id`)
 - Model-specific system prompts
 - API options (like temperature, top_p, etc.)
