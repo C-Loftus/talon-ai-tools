@@ -276,7 +276,7 @@ def send_request_to_llm_cli(
             capture_output=True,
             check=True,
             creationflags=(
-                subprocess.CREATE_NO_WINDOW if platform.system() == "Windows" else 0
+                subprocess.CREATE_NO_WINDOW if platform.system() == "Windows" else 0  # type: ignore
             ),
         )
         if settings.get("user.model_verbose_notifications"):

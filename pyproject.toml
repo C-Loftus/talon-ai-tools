@@ -24,6 +24,7 @@ profile = 'black'
 pythonpath = [".", "test/stubs"]
 
 [tool.pyright]
+pythonVersion = "3.11"
 # Talon classes don't use self so ignore the associated errors
 reportSelfClsParameterName = false
 reportGeneralTypeIssues = false
