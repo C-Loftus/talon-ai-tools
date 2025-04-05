@@ -55,7 +55,9 @@ def ensure_models_file_exists():
         with open(MODELS_PATH, "w") as f:
             f.write("[]")
 
+
 ensure_models_file_exists()
+
 
 # Set up file watcher to reload configuration when models.json changes
 @resource.watch(str(MODELS_PATH))
