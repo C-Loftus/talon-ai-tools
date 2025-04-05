@@ -44,8 +44,8 @@ mod.setting(
 mod.setting(
     "model_temperature",
     type=float,
-    default=0.6,
-    desc="The temperature of the model. Higher values make the model more creative.",
+    default=-1.0,
+    desc="DEPRECATED: Use llm_options or api_options in models.json instead.",
 )
 
 mod.setting(

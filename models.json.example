@@ -1,0 +1,25 @@
+// This is an example model configuration file.
+// To use: copy settings into models.json in the same directory. Remove any comments.
+[
+    {
+        // The name used in user.model_default or the right-hand-side of model.talon-list.
+        "name": "gpt-4o-mini",
+        // Additional JSON merged into the OpenAI Chat Completions API request if user.model_endpoint is not "llm".
+        "api_options": {
+            // The temperature of the model. Higher values make the model more creative.
+            "temperature": 0.7
+        }
+    },
+    {
+        "name": "gemini-2.0-flash-search",
+        // The model ID used in the LLM CLI tool or the API. If unspecified, defaults to the name.
+        "model_id": "gemini-2.0-flash",
+        // Model-specific system prompt (overrides user.model_system_prompt).
+        "system_prompt": "You are a sassy but helpful assistant.",
+        // Options passed to the LLM CLI tool if user.model_endpoint = "llm". Run `llm models --options` to see all options.
+        "llm_options": {
+            // Enables the Gemini search feature, which allows the model to search the web for information.
+            "google_search": true
+        }
+    }
+]

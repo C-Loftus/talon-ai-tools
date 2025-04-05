@@ -2,8 +2,6 @@
 # To make changes, copy this into your user directory and remove the .example extension
 
 settings():
-    # user.model_temperature = 0.6
-
     # Set the endpoint that the model requests should go to.
     # Works with any API with the same schema as OpenAI's (i.e. Azure, llamafiles, etc.)
     # Set to "llm" to use the local llm cli tool as a helper for routing all your model requests
