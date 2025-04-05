@@ -50,6 +50,13 @@ def load_model_config(f: IO) -> None:
         model_configs = {}
 
 
+def ensure_models_file_exists():
+    if not MODELS_PATH.exists():
+        with open(MODELS_PATH, "w") as f:
+            f.write("[]")
+
+ensure_models_file_exists()
+
 # Set up file watcher to reload configuration when models.json changes
 @resource.watch(str(MODELS_PATH))
 def on_update(f: IO):
