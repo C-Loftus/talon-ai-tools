@@ -7,3 +7,4 @@ gpt-settings.talon
 __pycache__/
 
 node_modules/
+models.json

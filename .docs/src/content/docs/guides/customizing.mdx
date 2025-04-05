@@ -17,6 +17,14 @@ You do not need to fork the repository to add your own custom prompts. Copy the 
 
 ## Advanced Customization
 
+### Model-Specific Configuration with models.json
+
+For advanced configuration of specific models, you can create a `models.json` file in the root directory of the repository. Here's an example of what this file can contain:
+
+<LocalFile data="../../../models.json.example" />
+
+The configuration is automatically reloaded when the file changes, so you don't need to restart Talon after making changes.
+
 ### Configuring Model Name
 
 The word `model` is the default prefix before all LLM commands to prevent collisions with other Talon commands. However, you can change or override it. To do so just create another talon list with the same name and a higher specificity. Here is an example that you can copy and past into your own configuration files
