@@ -16,9 +16,9 @@
         "model_id": "gemini-2.0-flash",
         // Model-specific system prompt (overrides user.model_system_prompt).
         "system_prompt": "You are a sassy but helpful assistant.",
-        // Options passed to the LLM CLI tool if user.model_endpoint = "llm". Run `llm models --options` to see all options.
+        // Options passed to the LLM CLI tool if user.model_endpoint = "llm". Run `llm models --options` to see all options for each model.
         "llm_options": {
-            // Enables the Gemini search feature, which allows the model to search the web for information.
+            // Enables a model-specific setting, namely, the Gemini search feature, which allows the model to search the web for information.
             "google_search": true
         }
     }
