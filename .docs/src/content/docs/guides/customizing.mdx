@@ -5,15 +5,15 @@ description: Customizing the model behavior
 
 talon-ai-tools can be configured by changing settings in any `.talon` file. You can copy any of the following settings, uncomment them, and change the values to customize which model you use or its runtime behavior.
 
-import FetchedData from "../../../components/FetchedData.astro";
+import LocalFile from "../../../components/LocalFile.astro";
 
-<FetchedData data="https://raw.githubusercontent.com/C-Loftus/talon-ai-tools/main/talon-ai-settings.talon.example" />
+<LocalFile data="../../../talon-ai-settings.talon.example" />
 
 ## Adding custom prompts
 
 You do not need to fork the repository to add your own custom prompts. Copy the file below, place it anywhere inside your talon `user/` directory and follow the pattern of the key value mapping.
 
-<FetchedData data="https://raw.githubusercontent.com/C-Loftus/talon-ai-tools/main/GPT/lists/customPrompt.talon-list.example" />
+<LocalFile data="../../../GPT/lists/customPrompt.talon-list.example" />
 
 ## Advanced Customization
 

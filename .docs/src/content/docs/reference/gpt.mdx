@@ -5,7 +5,7 @@ sidebar:
     order: 1
 ---
 
-import FetchedData from "../../../components/FetchedData.astro";
+import LocalFile from "../../../components/LocalFile.astro";
 
 GPT commands make requests to an LLM endpoint. In our grammar, each GPT command is prefixed with the word `model`. A model command has 4 parts
 
@@ -40,12 +40,12 @@ _The left is the spoken word, and the right is how talon interprets it_
 
 ### Mappings of prompts to their spoken name
 
-<FetchedData data="https://raw.githubusercontent.com/C-Loftus/talon-ai-tools/main/GPT/lists/staticPrompt.talon-list" />
+<LocalFile data="../../../GPT/lists/staticPrompt.talon-list" />
 
 ### Sources that the model can operate on
 
-<FetchedData data="https://raw.githubusercontent.com/C-Loftus/talon-ai-tools/main/GPT/lists/modelSource.talon-list" />
+<LocalFile data="../../../GPT/lists/modelSource.talon-list" />
 
 ### Destinations for model insertions
 
-<FetchedData data="https://raw.githubusercontent.com/C-Loftus/talon-ai-tools/main/GPT/lists/modelDestination.talon-list" />
+<LocalFile data="../../../GPT/lists/modelDestination.talon-list" />
