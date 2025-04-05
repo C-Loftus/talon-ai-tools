@@ -1,0 +1,13 @@
+---
+import { readFile } from "fs/promises";
+import { Code } from "@astrojs/starlight/components";
+const { data } = Astro.props; // Path to a file in this repo relative to this file, e.g. "../../../GPT/lists/customPrompt.talon-list.example"
+const fileContent = await readFile(new URL(data, import.meta.url), "utf-8");
+// Function to extract the basename from a path
+const getBasename = (path: string) => {
+    return path.split("/").filter(Boolean).pop() || "Index";
+};
+const basename = getBasename(data);
+---
+
+<Code code={fileContent} lang="yml" title={basename} />
