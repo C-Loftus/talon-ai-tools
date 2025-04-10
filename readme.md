@@ -46,7 +46,7 @@ os.environ["OPENAI_API_KEY"] = "YOUR-KEY-HERE"
 
 2. Add the following lines to your settings:
 
-```
+```talon
 user.model_endpoint = "llm"
 # If the llm binary is not found on Talon's PATH, uncomment and set:
 # user.model_llm_path = "/path/to/llm"
@@ -54,7 +54,7 @@ user.model_endpoint = "llm"
 
 3. Choose a model in settings:
 
-```
+```talon
 user.model_default = "claude-3.7-sonnet"  # or whichever model you installed
 ```
 
