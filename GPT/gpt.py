@@ -117,10 +117,7 @@ class UserActions:
         """Apply an arbitrary prompt to arbitrary text"""
 
         text_to_process: GPTMessageItem = actions.user.gpt_get_source_text(source)
-        if (
-            text_to_process.get("text", "") == ""
-            and text_to_process.get("image_url", "") == ""
-        ):
+        if not text_to_process.get("text") and not text_to_process.get("image_url"):
             text_to_process = None  # type: ignore
 
         # Handle special cases in the prompt
