@@ -403,17 +403,3 @@ def send_request_to_llm_cli(
     except Exception as e:
         notify("GPT Failure: Check the Talon Log")
         raise e
-
-
-def get_clipboard_image():
-    try:
-        clipped_image = clip.image()
-        if not clipped_image:
-            raise Exception("No image found in clipboard")
-
-        data = clipped_image.encode().data()
-        base64_image = base64.b64encode(data).decode("utf-8")
-        return base64_image
-    except Exception as e:
-        print(e)
-        raise Exception("Invalid image in clipboard")
