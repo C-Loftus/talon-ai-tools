@@ -372,10 +372,14 @@ def send_request_to_llm_cli(
     if GPTState.debug_enabled:
         print(command)
 
+    # Configure output encoding
+    process_env = os.environ.copy()
+    if platform.system() == "Windows":
+        process_env["PYTHONUTF8"] = "1"  # For Python 3.7+ to enable UTF-8 mode
+    # On other platforms, UTF-8 is also the common/expected encoding.
+    output_encoding = "utf-8"
+
     # Execute command and capture output.
-    # Talon changes locale.getpreferredencoding(False) to "utf-8" on
-    # Windows, but the llm command responds with cp1252 encoding.
-    output_encoding = "cp1252" if platform.system() == "Windows" else "utf-8"
     try:
         result = subprocess.run(
             command,
@@ -385,6 +389,7 @@ def send_request_to_llm_cli(
             creationflags=(
                 subprocess.CREATE_NO_WINDOW if platform.system() == "Windows" else 0  # type: ignore
             ),
+            env=process_env if platform.system() == "Windows" else None,
         )
         if settings.get("user.model_verbose_notifications"):
             notify("GPT Task Completed")
