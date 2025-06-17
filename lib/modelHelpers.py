@@ -398,5 +398,3 @@ def send_request_to_llm_cli(
     except Exception as e:
         notify("GPT Failure: Check the Talon Log")
         raise e
-
-
