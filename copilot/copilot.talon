@@ -28,7 +28,7 @@ pilot {user.copilot_slash_command} <user.cursorless_target> [to <user.prose>]$:
 pilot make [<user.prose>]: user.copilot_inline_chat("", prose or "")
 pilot edit new: user.vscode("workbench.action.chat.newEditSession")
 pilot open: user.vscode("workbench.action.chat.open")
-pilot edit attach: user.vscode("github.copilot.chat.attachFile")
+pilot attach: user.vscode("github.copilot.chat.attachFile")
 [pilot] edit next: user.vscode("chatEditor.action.navigateNext")
 [pilot] edit last: user.vscode("chatEditor.action.navigatePrevious")
 pilot hunk (keep | accept): user.vscode("chatEditor.action.acceptHunk")
