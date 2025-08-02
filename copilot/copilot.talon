@@ -2,8 +2,8 @@ app: vscode
 not tag: user.codeium
 -
 pilot jest: user.vscode("editor.action.inlineSuggest.trigger")
-pilot next: user.vscode("editor.action.inlineSuggest.showNext")
-pilot (previous | last): user.vscode("editor.action.inlineSuggest.showPrevious")
+pilot jest next: user.vscode("editor.action.inlineSuggest.showNext")
+pilot jest (previous | last): user.vscode("editor.action.inlineSuggest.showPrevious")
 pilot yes: user.vscode("editor.action.inlineSuggest.commit")
 pilot yes word: user.vscode("editor.action.inlineSuggest.acceptNextWord")
 pilot nope: user.vscode("editor.action.inlineSuggest.undo")
