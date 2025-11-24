@@ -52,7 +52,7 @@ repos:
         args: ["--in-place"]
 
   - repo: https://github.com/tcort/markdown-link-check
-    rev: v3.14.1
+    rev: v3.14.2
     hooks:
       - id: markdown-link-check
         # We have to treat 403 as success, because some sites have ddos protection. So we just need to manually check those
