@@ -12,6 +12,39 @@ Query language models with voice commands. Helpful to automatically generate tex
 
 - View the [docs](http://localhost:4321/talon-ai-tools/) for more detailed usage and help
 
+## Semantic Commands
+
+This repo includes a standalone semantic planner under `GPT/semantic/`. It is self-contained and does not depend
+on `user/semantic_commands`.
+
+Voice commands:
+
+- `model semantic <request>`
+- `model semantic run plan`
+- `model semantic cancel plan`
+- `model semantic copy plan`
+- `model semantic repeat last`
+
+Behavior:
+
+- Generates a JSON action plan with strict schema validation.
+- Applies guardrails before preview.
+- Requires explicit confirmation before execution.
+- Stops on first execution failure and keeps the failed plan for inspection.
+
+Configuration settings:
+
+- `user.gpt_semantic_max_steps` (default `12`)
+- `user.gpt_semantic_max_total_sleep_ms` (default `2000`)
+- `user.gpt_semantic_max_insert_chars` (default `500`)
+- `user.gpt_semantic_debug` (default `false`)
+- `user.gpt_semantic_system_prompt` (default built-in strict planner prompt)
+
+Transport:
+
+- Semantic translation reuses the existing AI-tools routing stack in `lib/modelHelpers.py`.
+- It respects `user.model_endpoint` and supports both OpenAI-compatible HTTP and `llm` CLI modes.
+
 ## OpenAI API Pricing
 
 The OpenAI API that is used in this repo, through which you make queries to GPT 3.5 (the model used for ChatGPT), is not free. However it is extremely cheap and unless you are frequently processing large amounts of text, it will likely cost less than $1 per month. Most months I have spent less than $0.50
